@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "895068357618",
+    "project_id": "nhom9-chatapp",
+    "storage_bucket": "nhom9-chatapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895068357618:android:05cb2c4d18efe0a82e616b",
+        "android_client_info": {
+          "package_name": "com.nhom9.message"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDx6UFcBKHa6-KNo5Ydukqta7HVHSeO-CM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
