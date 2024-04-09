@@ -36,10 +36,7 @@ import com.nhom9.message.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUpScreen(
-    navController: NavController,
-    viewModel: MViewModel
-) {
+fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
     CheckSignedIn(viewModel, navController)
     Box(modifier = Modifier) {
         Column(

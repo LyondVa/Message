@@ -27,7 +27,7 @@ sealed class DestinationScreen(var route : String){
     object Profile : DestinationScreen(route = "profile")
     object ChatList : DestinationScreen(route = "chatList")
     object SingleChat: DestinationScreen(route = "singleChat/{chatId}"){
-        fun createRoute(id : String) = "singleChat/$id"
+        fun createRoute(id : String?) = "singleChat/$id" //custom??
     }
 
     object StatusList : DestinationScreen(route = "statusList")
@@ -66,21 +66,13 @@ fun ChatAppNavigation(){
             LoginScreen(navController, viewModel)
         }
         composable(DestinationScreen.ChatList.route){
-            ChatListScreen()
+            ChatListScreen(navController, viewModel)
         }
         composable(DestinationScreen.StatusList.route){
-            StatusScreen()
+            StatusScreen(navController, viewModel)
         }
         composable(DestinationScreen.Profile.route){
-            ProfileScreen()
+            ProfileScreen(navController, viewModel)
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MessageTheme {
-
     }
 }
