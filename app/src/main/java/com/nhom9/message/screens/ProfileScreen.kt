@@ -44,6 +44,7 @@ import com.nhom9.message.CommonImage
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.TitleText
 import com.nhom9.message.navigateTo
 
 @Composable
@@ -87,7 +88,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
             imageUrl = it.toString()
         }
 
-        Column (modifier = Modifier.fillMaxSize()){
+        Column(modifier = Modifier.fillMaxSize()) {
             ProfileContent(
                 allowEdit = allowEdit.value,
                 viewModel = viewModel,
@@ -118,6 +119,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
 
 @Composable
 fun ProfileContent(
+    modifier: Modifier,
     allowEdit: Boolean,
     viewModel: MViewModel,
     name: String,
@@ -128,12 +130,11 @@ fun ProfileContent(
     onEdit: () -> Unit,
     onCancel: () -> Unit,
     onSave: () -> Unit,
-    onChangeImage: (Uri) -> Unit,
-    modifier: Modifier
+    onChangeImage: (Uri) -> Unit
 ) {
     val imageUrl = viewModel.userData.value?.imageUrl
     Column(
-        modifier = Modifier
+        modifier = modifier
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -160,11 +161,23 @@ fun ProfileContent(
                         .clickable {
                             onEdit.invoke()
                         }
+
+                )
+                Text(
+                    text = "Logout",
+                    modifier = Modifier.clickable {
+                        onLogOut.invoke()
+                    }
                 )
             }
         }
         CommonDivider()
-        ProfileImage(allowEdit = allowEdit, imageUrl = imageUrl, viewModel = viewModel, onChangeImage)
+        ProfileImage(
+            allowEdit = allowEdit,
+            imageUrl = imageUrl,
+            viewModel = viewModel,
+            onChangeImage
+        )
         CommonDivider()
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -211,19 +224,6 @@ fun ProfileContent(
             )
         }
         CommonDivider()
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Logout",
-                modifier = Modifier.clickable {
-                    onLogOut.invoke()
-                }
-            )
-        }
     }
 }
 
@@ -262,7 +262,7 @@ fun ProfileImage(
             ) {
                 if (allowEdit) {
                     ProfileImagePreview(localImageUrl = localImageUrl, data = imageUrl)
-                    if(localImageUrl!=null){
+                    if (localImageUrl != null) {
                         onChangeImage.invoke(localImageUrl!!)
                     }
                 } else {
@@ -287,16 +287,11 @@ fun ProfileImagePreview(
     if (localImageUrl != null) {
         AsyncImage(
             model = localImageUrl,
+            contentScale = contentScale,
             contentDescription = "Profile Image Preview",
-            modifier = modifier
+            modifier = Modifier
         )
     } else {
-        val painter = rememberAsyncImagePainter(model = data)
-        Image(
-            painter = painter,
-            contentDescription = null,
-            modifier = modifier,
-            contentScale = contentScale
-        )
+        CommonImage(data = data)
     }
 }

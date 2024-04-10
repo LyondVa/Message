@@ -94,4 +94,8 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation("com.vanniktech:android-image-cropper:4.5.0")
+
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
 }

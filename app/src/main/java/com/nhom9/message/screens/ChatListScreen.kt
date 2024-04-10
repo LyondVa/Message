@@ -33,6 +33,7 @@ import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.CommonRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.TitleText
 import com.nhom9.message.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,13 +59,7 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
             showDialogue.value = false
         }
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = "Chats")
-                    }
-                )
-            },
+
             floatingActionButton = {
                 FAB(
                     showDialogue = showDialogue.value,
@@ -79,6 +74,7 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                         .fillMaxSize()
                         .padding(it)
                 ) {
+                    TitleText(text = "Messages")
                     if (chats.isEmpty()) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
