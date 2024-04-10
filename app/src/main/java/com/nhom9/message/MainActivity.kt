@@ -1,6 +1,7 @@
 package com.nhom9.message
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,8 @@ import com.nhom9.message.screens.ChatListScreen
 import com.nhom9.message.screens.LoginScreen
 import com.nhom9.message.screens.ProfileScreen
 import com.nhom9.message.screens.SignUpScreen
+import com.nhom9.message.screens.SingleChatScreen
+import com.nhom9.message.screens.SingleStatusScreen
 import com.nhom9.message.screens.StatusScreen
 import com.nhom9.message.ui.theme.MessageTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,12 +30,12 @@ sealed class DestinationScreen(var route : String){
     object Profile : DestinationScreen(route = "profile")
     object ChatList : DestinationScreen(route = "chatList")
     object SingleChat: DestinationScreen(route = "singleChat/{chatId}"){
-        fun createRoute(id : String) = "singleChat/$id"
+        fun createRoute(id : String?) = "singleChat/$id" //custom??x
     }
 
     object StatusList : DestinationScreen(route = "statusList")
-    object SingleStatus: DestinationScreen(route = "singleStatus/{statusId}"){
-        fun createRoute(id : String) = "singleStatus/$id"
+    object SingleStatus: DestinationScreen(route = "singleStatus/{userId}"){
+        fun createRoute(userId : String) = "singleStatus/$userId"
     }
 }
 
@@ -66,21 +69,25 @@ fun ChatAppNavigation(){
             LoginScreen(navController, viewModel)
         }
         composable(DestinationScreen.ChatList.route){
-            ChatListScreen()
+            ChatListScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.SingleChat.route){
+            val chatId = it.arguments?.getString("chatId")
+            chatId?.let{
+                SingleChatScreen(navController, viewModel, chatId)
+            }
         }
         composable(DestinationScreen.StatusList.route){
-            StatusScreen()
+            StatusScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.SingleStatus.route){
+            val userId = it.arguments?.getString("userId")
+            userId?.let {
+                SingleStatusScreen(navController, viewModel, userId)
+            }
         }
         composable(DestinationScreen.Profile.route){
-            ProfileScreen()
+            ProfileScreen(navController, viewModel)
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MessageTheme {
-
     }
 }
