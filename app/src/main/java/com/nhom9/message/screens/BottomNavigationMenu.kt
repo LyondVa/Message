@@ -38,7 +38,7 @@ fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavC
             Image(
                 painter = painterResource(id = item.icon),
                 contentDescription = null,
-                colorFilter = if (item == selectedItem) {
+                colorFilter = if (selectedItem == item) {
                     ColorFilter.tint(color = Color.Black)
                 } else {
                     ColorFilter.tint(color = Color.Gray)

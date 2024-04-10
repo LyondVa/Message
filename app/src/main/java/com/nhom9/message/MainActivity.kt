@@ -17,6 +17,8 @@ import com.nhom9.message.screens.ChatListScreen
 import com.nhom9.message.screens.LoginScreen
 import com.nhom9.message.screens.ProfileScreen
 import com.nhom9.message.screens.SignUpScreen
+import com.nhom9.message.screens.SingleChatScreen
+import com.nhom9.message.screens.SingleStatusScreen
 import com.nhom9.message.screens.StatusScreen
 import com.nhom9.message.ui.theme.MessageTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +29,7 @@ sealed class DestinationScreen(var route : String){
     object Profile : DestinationScreen(route = "profile")
     object ChatList : DestinationScreen(route = "chatList")
     object SingleChat: DestinationScreen(route = "singleChat/{chatId}"){
-        fun createRoute(id : String?) = "singleChat/$id" //custom??
+        fun createRoute(id : String?) = "singleChat/$id" //custom??x
     }
 
     object StatusList : DestinationScreen(route = "statusList")
@@ -68,8 +70,20 @@ fun ChatAppNavigation(){
         composable(DestinationScreen.ChatList.route){
             ChatListScreen(navController, viewModel)
         }
+        composable(DestinationScreen.SingleChat.route){
+            val chatId = it.arguments?.getString("chatId")
+            chatId?.let{
+                SingleChatScreen(navController, viewModel, chatId)
+            }
+        }
         composable(DestinationScreen.StatusList.route){
             StatusScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.SingleStatus.route){
+            val userId = it.arguments?.getString("userId")
+            userId?.let {
+                SingleStatusScreen(navController, viewModel, it)
+            }
         }
         composable(DestinationScreen.Profile.route){
             ProfileScreen(navController, viewModel)
