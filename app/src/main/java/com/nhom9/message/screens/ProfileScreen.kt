@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,7 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -43,8 +44,6 @@ import com.nhom9.message.CommonImage
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
-import com.nhom9.message.R
-import com.nhom9.message.data.UserData
 import com.nhom9.message.navigateTo
 
 @Composable
@@ -64,7 +63,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         var imageUrl by rememberSaveable {
             mutableStateOf(userData?.imageUrl ?: "")
         }
-        var allowEdit = remember {
+        val allowEdit = remember {
             mutableStateOf(false)
         }
 
@@ -81,14 +80,14 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
             viewModel.saveProfile(
                 name = name,
                 number = number,
-                imageUrl = imageUrl
+                uri = Uri.parse(imageUrl)
             )
         }
         val onChangeImage: (Uri) -> Unit = {
             imageUrl = it.toString()
         }
 
-        Column {
+        Column (modifier = Modifier.fillMaxSize()){
             ProfileContent(
                 allowEdit = allowEdit.value,
                 viewModel = viewModel,
@@ -100,13 +99,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                     viewModel.logOut()
                     navigateTo(navController, DestinationScreen.Login.route)
                 },
-                onSave = {
-                    viewModel.createOrUpdateProfile(
-                        name = name,
-                        number = number,
-                        imageUrl = imageUrl
-                    )
-                },
+                onSave = onSave,
                 onEdit = onEdit,
                 onCancel = onCancel,
                 onChangeImage = onChangeImage,
@@ -269,7 +262,9 @@ fun ProfileImage(
             ) {
                 if (allowEdit) {
                     ProfileImagePreview(localImageUrl = localImageUrl, data = imageUrl)
-                    onChangeImage.invoke(localImageUrl!!)
+                    if(localImageUrl!=null){
+                        onChangeImage.invoke(localImageUrl!!)
+                    }
                 } else {
                     CommonImage(data = imageUrl)
                 }

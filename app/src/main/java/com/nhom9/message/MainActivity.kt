@@ -1,6 +1,7 @@
 package com.nhom9.message
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,8 +34,8 @@ sealed class DestinationScreen(var route : String){
     }
 
     object StatusList : DestinationScreen(route = "statusList")
-    object SingleStatus: DestinationScreen(route = "singleStatus/{statusId}"){
-        fun createRoute(id : String) = "singleStatus/$id"
+    object SingleStatus: DestinationScreen(route = "singleStatus/{userId}"){
+        fun createRoute(userId : String) = "singleStatus/$userId"
     }
 }
 
@@ -82,7 +83,7 @@ fun ChatAppNavigation(){
         composable(DestinationScreen.SingleStatus.route){
             val userId = it.arguments?.getString("userId")
             userId?.let {
-                SingleStatusScreen(navController, viewModel, it)
+                SingleStatusScreen(navController, viewModel, userId)
             }
         }
         composable(DestinationScreen.Profile.route){

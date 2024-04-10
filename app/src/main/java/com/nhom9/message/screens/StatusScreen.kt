@@ -83,7 +83,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                                 navigateTo(
                                     navController = navController,
                                     DestinationScreen.SingleStatus.createRoute(myStatuses[0].user.userId!!)
-                                )
+                                   )
                             }
                             CommonDivider()
                             val uniqueUsers = otherStatuses.map { it.user }.toSet().toList()

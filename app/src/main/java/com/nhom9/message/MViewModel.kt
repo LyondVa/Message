@@ -118,7 +118,8 @@ class MViewModel @Inject constructor(
             db.collection(USER_NODE).document(uid).get()
                 .addOnSuccessListener {
                     if (it.exists()) {
-                        db.collection(USER_NODE).document(uid).update("name", name, "number", number, "imageUrl", imageUrl)
+                        db.collection(USER_NODE).document(uid)
+                            .update("name", name, "number", number, "imageUrl", imageUrl)
                         getUserData(uid)
                         inProcess.value = false //custom
                     } else {
@@ -133,7 +134,7 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun saveProfile(name:String, number: String, uri: Uri) {
+    fun saveProfile(name: String, number: String, uri: Uri) {
         uploadImage(uri) {
             createOrUpdateProfile(name = name, number = number, imageUrl = it.toString())
         }
@@ -323,6 +324,7 @@ class MViewModel @Inject constructor(
         ).addSnapshotListener { value, error ->
             if (error != null) {
                 handleException(error)
+                inProgressStatus.value = false
             }
             if (value != null) {
                 val currentConnections = arrayListOf(userData.value?.userId)
@@ -333,16 +335,20 @@ class MViewModel @Inject constructor(
                     } else {
                         currentConnections.add(chat.user1.userId)
                     }
-                    db.collection(STATUS).whereGreaterThan("timestamp", cutOff).whereIn("user.userId", currentConnections)
+                    db.collection(STATUS).whereGreaterThan("timeStamp", cutOff)
+                        .whereIn("user.userId", currentConnections)
                         .addSnapshotListener { value, error ->
                             if (error != null) {
                                 handleException(error)
+
+                                inProgressStatus.value = false
                             }
-                            if (value != null) {
+                            if (value!=null) {
                                 status.value = value.toObjects()
                                 inProgressStatus.value = false
                             }
                         }
+
                 }
             }
         }

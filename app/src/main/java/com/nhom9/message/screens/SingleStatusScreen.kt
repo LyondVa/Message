@@ -1,5 +1,6 @@
 package com.nhom9.message.screens
 
+import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -10,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,10 +32,11 @@ enum class State {
 
 @Composable
 fun SingleStatusScreen(navController: NavController, viewModel: MViewModel, userId: String) {
+    Log.d("SINGLE STATUS", userId)
     val statuses = viewModel.status.value.filter { it.user.userId == userId }
     if (statuses.isNotEmpty()) {
         val currentStatus = remember {
-            mutableStateOf(0)
+            mutableIntStateOf(0)
         }
         Box(
             modifier = Modifier
@@ -40,13 +44,12 @@ fun SingleStatusScreen(navController: NavController, viewModel: MViewModel, user
                 .background(Color.Black)
         ) {
             CommonImage(
-                data = statuses[currentStatus.value].imageUrl,
+                data = statuses[currentStatus.intValue].imageUrl,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit
             )
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 statuses.forEachIndexed { index, status ->
                     CustomProgressIndicator(
@@ -54,13 +57,16 @@ fun SingleStatusScreen(navController: NavController, viewModel: MViewModel, user
                             .weight(1f)
                             .height(7.dp)
                             .padding(1.dp),
-                        state = if (currentStatus.value < index) State.INITIAL else if (currentStatus.value == index) State.ACTIVE else State.COMPLETED
+                        state = if (currentStatus.intValue < index) State.INITIAL else if (currentStatus.intValue == index) State.ACTIVE else State.COMPLETED
                     ) {
-                        if (currentStatus.value < statuses.size - 1) currentStatus.value++ else navController.popBackStack()
+                        if (currentStatus.intValue < statuses.size - 1) currentStatus.intValue++ else navController.popBackStack()
                     }
                 }
             }
         }
+    }
+    else{
+        Text(text = "Issue")
     }
 }
 
@@ -79,7 +85,10 @@ fun CustomProgressIndicator(modifier: Modifier, state: State, onComplete: () -> 
         val p: Float by animateFloatAsState(
             if (toggleState.value) 1f else 0f,
             animationSpec = tween(5000),
-            finishedListener = { onComplete.invoke() })
+            finishedListener = {
+                onComplete.invoke()
+            }
+        )
         progress = p
     }
     LinearProgressIndicator(modifier = Modifier, color = Color.Red, progress = progress)

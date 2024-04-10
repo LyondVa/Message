@@ -57,8 +57,10 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         viewModel.populateMessages(chatId)
     }
 
-    BackHandler {
+    BackHandler() {
+        // Code to execute when the back button is pressed
         viewModel.depopulateMessages()
+        navController.popBackStack()
     }
 
     Column {
