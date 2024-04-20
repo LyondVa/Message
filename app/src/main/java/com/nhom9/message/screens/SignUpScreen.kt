@@ -2,10 +2,14 @@ package com.nhom9.message.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +38,7 @@ import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.navigateTo
+import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,19 +67,20 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             val focus = LocalFocusManager.current
 
             Image(
-                painter = painterResource(id = R.drawable.heart_anterior_exterior_view),
+                painter = painterResource(id = R.drawable.undraw_welcome_cats_thqn),
                 contentDescription = null,
                 modifier = Modifier
-                    .width(200.dp)
+                    .height(200.dp)
                     .padding(top = 16.dp)
                     .padding(8.dp)
             )
             Text(
                 text = "Sign Up",
-                fontSize = 30.sp,
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                color = md_theme_light_onPrimaryContainer,
                 fontFamily = FontFamily.SansSerif,
                 modifier = Modifier
-                    .padding(8.dp)
             )
             OutlinedTextField(
                 value = nameState.value,
@@ -126,15 +133,23 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
 
                 Text(text = "SIGN UP")
             }
-            Text(text = "Already a User? Click here to login",
-                color = Color.Blue,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .clickable {
-                        navigateTo(navController, DestinationScreen.Login.route)
-                    }
-            )
         }
+    }
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.left_corner),
+            contentDescription = null,
+            modifier = Modifier.size(68.dp)
+        )
+        Image(
+            painter = painterResource(id = R.drawable.right_corner),
+            contentDescription = null,
+            modifier = Modifier.size(68.dp)
+        )
     }
     if (viewModel.inProcess.value) {
         CommonProgressbar()

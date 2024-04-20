@@ -58,7 +58,6 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
 
     BackHandler() {
-        // Code to execute when the back button is pressed
         viewModel.depopulateMessages()
         navController.popBackStack()
     }
@@ -79,12 +78,12 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
 
 @Composable
 fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: String?) {
-    LazyColumn(modifier = Modifier) {
+    LazyColumn(modifier = modifier) {
         items(chatMessages) { message ->
             val alignment = if (message.sendBy == currentUserId) Alignment.End else Alignment.Start
             val color = if (message.sendBy == currentUserId) Color.Green else Color.Cyan
             Column(
-                horizontalAlignment =alignment,
+                horizontalAlignment = alignment,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)

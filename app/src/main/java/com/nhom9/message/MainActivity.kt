@@ -1,7 +1,6 @@
 package com.nhom9.message
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,22 +8,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nhom9.message.screens.ChatListScreen
+import com.nhom9.message.screens.EntryScreen
 import com.nhom9.message.screens.LoginScreen
 import com.nhom9.message.screens.ProfileScreen
 import com.nhom9.message.screens.SignUpScreen
 import com.nhom9.message.screens.SingleChatScreen
 import com.nhom9.message.screens.SingleStatusScreen
 import com.nhom9.message.screens.StatusScreen
-import com.nhom9.message.ui.theme.MessageTheme
+import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 sealed class DestinationScreen(var route : String){
+    object Entry : DestinationScreen(route = "entry")
     object SignUp : DestinationScreen(route = "signup")
     object Login : DestinationScreen(route = "login")
     object Profile : DestinationScreen(route = "profile")
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MessageTheme {
+            AppTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -61,7 +61,10 @@ class MainActivity : ComponentActivity() {
 fun ChatAppNavigation(){
     val viewModel = hiltViewModel<MViewModel>()
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = DestinationScreen.SignUp.route){
+    NavHost(navController = navController, startDestination = DestinationScreen.Entry.route){
+        composable(DestinationScreen.Entry.route){
+            EntryScreen(navController, viewModel)
+        }
         composable(DestinationScreen.SignUp.route){
             SignUpScreen(navController, viewModel)
         }
