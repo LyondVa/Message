@@ -1,5 +1,6 @@
 package com.nhom9.message.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +66,10 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 mutableStateOf(TextFieldValue())
             }
             val focus = LocalFocusManager.current
+
+            BackHandler {
+                navigateTo(navController, DestinationScreen.Entry.route)
+            }
 
             Image(
                 painter = painterResource(id = R.drawable.undraw_welcome_cats_thqn),

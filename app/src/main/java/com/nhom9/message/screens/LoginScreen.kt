@@ -1,6 +1,7 @@
 package com.nhom9.message.screens
 
 import android.graphics.drawable.Icon
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -58,8 +60,145 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
         mutableStateOf(TextFieldValue())
     }
 
+    BackHandler {
+        navigateTo(navController, DestinationScreen.Entry.route)
+    }
+
     CheckSignedIn(viewModel, navController)
-    Box(modifier = Modifier) {
+
+    Scaffold(
+        content = { padding ->
+            Box() {
+                Box(modifier = Modifier.padding(padding)) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        //verticalArrangement = Arran,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentHeight()
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.undraw_welcome_re_h3d9),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .height(200.dp)
+                                .padding(top = 16.dp)
+                                .padding(8.dp)
+                        )
+                        Text(
+                            text = "Login",
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = md_theme_light_onPrimaryContainer,
+                            fontFamily = FontFamily.SansSerif,
+                            modifier = Modifier
+                        )
+                        Text(
+                            text = "Sign in to continue",
+                            color = md_theme_light_onPrimaryContainer
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .wrapContentSize()
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.mail_encircled),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(60.dp)
+                                    .padding(start = 8.dp)
+                                    .padding(top = 8.dp)
+                                    .padding(end = 8.dp)
+                            )
+                            OutlinedTextField(
+                                value = emailState.value,
+                                onValueChange = {
+                                    emailState.value = it
+                                },
+
+                                label = { Text(text = "Email") },
+                                shape = RoundedCornerShape(40.dp),
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .wrapContentSize()
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.key_encircled),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(60.dp)
+                                    .padding(start = 8.dp)
+                                    .padding(top = 8.dp)
+                                    .padding(end = 8.dp)
+                            )
+                            OutlinedTextField(
+                                value = passwordState.value,
+                                onValueChange = {
+                                    passwordState.value = it
+                                },
+                                label = { Text(text = "Password") },
+                                shape = RoundedCornerShape(40.dp),
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                        Button(
+                            onClick = {
+                                viewModel.logIn(emailState.value.text, passwordState.value.text)
+                            },
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        ) {
+
+                            Text(text = "Log in")
+                        }
+                        Text(text = "Forgotten password?",
+                            color = Color.Blue,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    navigateTo(navController, DestinationScreen.SignUp.route)
+                                }
+                        )
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.left_corner),
+                        contentDescription = null,
+                        modifier = Modifier.size(68.dp)
+                    )
+                    Image(
+                        painter = painterResource(id = R.drawable.right_corner),
+                        contentDescription = null,
+                        modifier = Modifier.size(68.dp)
+                    )
+                }
+            }
+
+        }
+    )
+
+    /*Box(modifier = Modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             //verticalArrangement = Arran,
@@ -113,7 +252,6 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                     label = { Text(text = "Email") },
                     shape = RoundedCornerShape(40.dp),
                     modifier = Modifier
-                        .height(52.dp)
                         .padding(end = 8.dp)
                         .fillMaxWidth()
                 )
@@ -141,7 +279,6 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                     label = { Text(text = "Password") },
                     shape = RoundedCornerShape(40.dp),
                     modifier = Modifier
-                        .height(52.dp)
                         .padding(end = 8.dp)
                         .fillMaxWidth()
                 )
@@ -182,7 +319,9 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
             contentDescription = null,
             modifier = Modifier.size(68.dp)
         )
-    }
+    }*/
+
+
 
     if (viewModel.inProcess.value) {
         CommonProgressbar()

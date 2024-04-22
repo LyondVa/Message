@@ -1,6 +1,9 @@
 package com.nhom9.message.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -20,20 +24,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProgressbar
-import com.nhom9.message.CommonRow
+import com.nhom9.message.CommonImageRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
-import com.nhom9.message.TitleText
+import com.nhom9.message.TitleBar
 import com.nhom9.message.navigateTo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +64,6 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
             showDialogue.value = false
         }
         Scaffold(
-
             floatingActionButton = {
                 FAB(
                     showDialogue = showDialogue.value,
@@ -73,8 +77,20 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(it)
+                        .background(Color.White)
                 ) {
-                    TitleText(text = "Messages")
+                    Box {
+                        TitleBar(text = "Messages")
+                        Icon(imageVector = Icons.Outlined.Search,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .align(
+                                    Alignment.CenterEnd
+                                )
+                                .clickable { }
+                                .padding(8.dp)
+                        )
+                    }
                     if (chats.isEmpty()) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -96,7 +112,7 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                                 } else {
                                     chat.user1
                                 }
-                                CommonRow(imageUrl = chatUser.imageUrl, name = chatUser.name) {
+                                CommonImageRow(imageUrl = chatUser.imageUrl, name = chatUser.name) {
                                     chat.chatId?.let {
                                         navigateTo(
                                             navController,
@@ -105,11 +121,12 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                                     }
 
                                 }
+                                CommonDivider(0)
                             }
                         }
                     }
                     BottomNavigationMenu(
-                        selectedItem = BottomNavigationItem.PROFILE,
+                        selectedItem = BottomNavigationItem.CHATLIST,
                         navController = navController
                     )
                 }

@@ -3,7 +3,7 @@ package com.nhom9.message.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,15 +15,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material.icons.rounded.ExitToApp
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,17 +40,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
 import com.nhom9.message.CommonProgressbar
+import com.nhom9.message.CommonSettingRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
-import com.nhom9.message.TitleText
 import com.nhom9.message.navigateTo
 
 @Composable
@@ -88,34 +93,32 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
             imageUrl = it.toString()
         }
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            ProfileContent(
-                allowEdit = allowEdit.value,
-                viewModel = viewModel,
-                name = name,
-                number = number,
-                onNameChange = { name = it },
-                onNumberChange = { number = it },
-                onLogOut = {
-                    viewModel.logOut()
-                    navigateTo(navController, DestinationScreen.Login.route)
-                },
-                onSave = onSave,
-                onEdit = onEdit,
-                onCancel = onCancel,
-                onChangeImage = onChangeImage,
+        Column() {
+            Column(
                 modifier = Modifier
+                    .fillMaxSize()
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(8.dp)
-            )
+            ) {
+                ProfileImageBar(
+                    allowEdit = allowEdit.value,
+                    imageUrl = imageUrl,
+                    name = name,
+                    viewModel = viewModel,
+                    onChangeImage
+                )
+                InfoCard(number = number, "@25")
+                SettingCard(navController)
+                LogOutCard(navController, viewModel)
+            }
+
             BottomNavigationMenu(
                 selectedItem = BottomNavigationItem.PROFILE,
-                navController = navController
+                navController = navController,
             )
         }
     }
 }
+
 
 @Composable
 fun ProfileContent(
@@ -126,7 +129,6 @@ fun ProfileContent(
     number: String,
     onNameChange: (String) -> Unit,
     onNumberChange: (String) -> Unit,
-    onLogOut: () -> Unit,
     onEdit: () -> Unit,
     onCancel: () -> Unit,
     onSave: () -> Unit,
@@ -135,14 +137,14 @@ fun ProfileContent(
     val imageUrl = viewModel.userData.value?.imageUrl
     Column(
         modifier = modifier
+            .padding(8.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp)
         ) {
-            if (allowEdit) {
+            /*if (allowEdit) {
                 Text(text = "Cancel",
                     modifier = Modifier
                         .clickable {
@@ -163,23 +165,9 @@ fun ProfileContent(
                         }
 
                 )
-                Text(
-                    text = "Logout",
-                    modifier = Modifier.clickable {
-                        onLogOut.invoke()
-                    }
-                )
-            }
+            }*/
         }
-        CommonDivider()
-        ProfileImage(
-            allowEdit = allowEdit,
-            imageUrl = imageUrl,
-            viewModel = viewModel,
-            onChangeImage
-        )
-        CommonDivider()
-        Row(
+        /*Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -224,13 +212,15 @@ fun ProfileContent(
             )
         }
         CommonDivider()
+    }*/
     }
 }
 
 @Composable
-fun ProfileImage(
+fun ProfileImageBar(
     allowEdit: Boolean,
     imageUrl: String?,
+    name: String,
     viewModel: MViewModel,
     onChangeImage: (Uri) -> Unit
 ) {
@@ -241,21 +231,22 @@ fun ProfileImage(
                 localImageUrl = it
             }
         }
-    Box(
+    Surface(
+        shadowElevation = 2.dp,
         modifier = Modifier
             .height(intrinsicSize = IntrinsicSize.Min)
+            .padding(bottom = 8.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(8.dp)
                 .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Card(
                 shape = CircleShape,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(100.dp)
+                    .size(80.dp)
                     .clickable(allowEdit) {
                         launcher.launch("image/*")
                     }
@@ -269,7 +260,14 @@ fun ProfileImage(
                     CommonImage(data = imageUrl)
                 }
             }
-            Text(text = "Change Profile Picture")
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = name,
+                    fontSize = 24.sp,
+                    modifier = Modifier
+                )
+                Text(text = "Message id: $name", color = Color.Gray)
+            }
         }
         if (viewModel.inProcess.value) {
             CommonProgressbar()
@@ -278,20 +276,103 @@ fun ProfileImage(
 }
 
 @Composable
+fun InfoCard(
+    number: String,
+    handle: String? = null
+) {
+    Surface(
+        shadowElevation = 2.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp))
+        {
+            Text(
+                text = "Info",
+                fontSize = 20.sp,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(text = "number", color = Color.Gray)
+            Text(text = number)
+            CommonDivider()
+            Text(text = "handle", color = Color.Gray)
+            Text(text = handle ?: "N/A")
+        }
+    }
+}
+
+@Composable
 fun ProfileImagePreview(
-    modifier: Modifier = Modifier.wrapContentSize(),
     localImageUrl: Uri?,
     data: String?,
-    contentScale: ContentScale = ContentScale.Crop
+    contentScale: ContentScale = ContentScale.Crop,
 ) {
     if (localImageUrl != null) {
         AsyncImage(
             model = localImageUrl,
             contentScale = contentScale,
             contentDescription = "Profile Image Preview",
-            modifier = Modifier
+            modifier = Modifier.wrapContentSize()
         )
     } else {
         CommonImage(data = data)
+    }
+}
+
+@Composable
+fun SettingCard(navController: NavController) {
+    Column(
+        Modifier
+            .background(Color.White)
+            .padding(top = 20.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "Settings",
+            fontSize = 20.sp,
+            modifier = Modifier.padding(start = 20.dp)
+        )
+        CommonSettingRow(name = "Account", Icons.Outlined.Person) {
+            navigateTo(navController, DestinationScreen.AccountSetting.route)
+        }
+        CommonDivider(0)
+        CommonSettingRow(name = "Display",Icons.Outlined.Settings) {
+            navigateTo(navController, DestinationScreen.DisplaySetting.route)
+        }
+        CommonDivider(0)
+        CommonSettingRow(name = "Notification and Sound", Icons.Outlined.Notifications) {
+            navigateTo(navController, DestinationScreen.NotificationAndSoundSetting.route)
+        }
+        CommonDivider(0)
+        CommonSettingRow(name = "Privacy and Security", Icons.Outlined.Warning) {
+            navigateTo(navController, DestinationScreen.PrivacyAndSecuritySetting.route)
+        }
+    }
+}
+
+@Composable
+fun LogOutCard(navController: NavController, viewModel: MViewModel){
+    Box(modifier = Modifier.padding(top = 8.dp)){
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .background(Color.White)
+                .clickable {
+                    viewModel.logOut()
+                    navigateTo(navController, DestinationScreen.Entry.route)
+                }
+        ) {
+                Icon(Icons.Outlined.ExitToApp, null)
+                Text(
+                    text = "Log Out",
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                )
+
+        }
     }
 }

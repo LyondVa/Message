@@ -1,9 +1,9 @@
 package com.nhom9.message
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -23,14 +27,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImage
+import com.nhom9.message.ui.theme.bar_gray
 
 fun navigateTo(navController: NavController, route: String) {
     navController.navigate(route) {
@@ -55,13 +59,13 @@ fun CommonProgressbar() {
 }
 
 @Composable
-fun CommonDivider() {
+fun CommonDivider(padding: Int = 8) {
     Divider(
         color = Color.LightGray,
         thickness = 1.dp,
         modifier = Modifier
             .alpha(0.3f)
-            .padding(top = 8.dp, bottom = 8.dp)
+            .padding(top = padding.dp, bottom = padding.dp)
     )
 }
 
@@ -71,12 +75,11 @@ fun CommonImage(
     modifier: Modifier = Modifier.wrapContentSize(),
     contentScale: ContentScale = ContentScale.Crop
 ) {
-    val painter = rememberAsyncImagePainter(model = data)
-    Image(
-        painter = painter,
-        contentDescription = null,
-        modifier = modifier,
-        contentScale = contentScale
+    AsyncImage(
+        model = data,
+        contentScale = contentScale,
+        contentDescription = "Profile Image Preview",
+        modifier = modifier
     )
 }
 
@@ -93,18 +96,50 @@ fun CheckSignedIn(viewModel: MViewModel, navController: NavController) {
 }
 
 @Composable
-fun TitleText(text: String) {
-    Text(
-        text = text,
-        fontWeight = FontWeight.Bold,
-        fontSize = 36.sp,
+fun TitleBar(text: String) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
-            .padding(8.dp)
-    )
+            .fillMaxWidth()
+            .background(color = bar_gray)
+    ) {
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(8.dp)
+        )
+    }
+
 }
 
 @Composable
-fun CommonRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
+fun TitleBarWithBack(text: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = bar_gray)
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.ArrowBack,
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.CenterStart)
+        )
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.Center)
+        )
+    }
+
+}
+
+@Composable
+fun CommonImageRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -130,3 +165,53 @@ fun CommonRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
     }
 }
 
+@Composable
+fun CommonSettingRow(
+    name: String,
+    icon: ImageVector? = null,
+    onItemClick: () -> Unit
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .background(Color.White)
+            .clickable {
+                onItemClick.invoke()
+            }
+    ) {
+        if (icon != null) {
+            Icon(icon, null, modifier = Modifier.padding(start = 20.dp))
+            Text(
+                text = name,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+            )
+        } else {
+            Text(
+                text = name,
+                modifier = Modifier.padding(start = 20.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun CommonSubSettingRow(title: String, text: String = "") {
+    Box(modifier = Modifier.background(Color.White)) {
+        CommonSettingRow(name = title) {
+
+        }
+        Row(modifier = Modifier.align(Alignment.CenterEnd)) {
+
+            if (text != "") {
+                Text(text = text)
+            } else {
+                Text(text = "Error!")
+            }
+            Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = null)
+        }
+    }
+
+}

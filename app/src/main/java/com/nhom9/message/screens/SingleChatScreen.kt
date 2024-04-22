@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -15,9 +16,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -37,6 +41,8 @@ import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
 import com.nhom9.message.MViewModel
 import com.nhom9.message.data.Message
+import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
+import com.nhom9.message.ui.theme.md_theme_light_primaryContainer
 
 @Composable
 fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId: String) {
@@ -81,7 +87,7 @@ fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: S
     LazyColumn(modifier = modifier) {
         items(chatMessages) { message ->
             val alignment = if (message.sendBy == currentUserId) Alignment.End else Alignment.Start
-            val color = if (message.sendBy == currentUserId) Color.Green else Color.Cyan
+            val color =md_theme_light_primaryContainer
             Column(
                 horizontalAlignment = alignment,
                 modifier = Modifier
@@ -90,7 +96,7 @@ fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: S
             ) {
                 Text(
                     text = message.message ?: "",
-                    color = Color.White,
+                    color = md_theme_light_onPrimaryContainer,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
@@ -123,12 +129,8 @@ fun ChatHeader(name: String, imageUrl: String, onBack: () -> Unit) {
                 .size(52.dp)
                 .clip(CircleShape)
         )
+        Text(text = name, fontWeight = FontWeight.Bold)
     }
-    Text(
-        text = name,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(start = 4.dp)
-    )
 }
 
 @Composable
@@ -140,14 +142,14 @@ fun ReplyBox(reply: String, onReplyChange: (String) -> Unit, onSendReply: () -> 
         CommonDivider()
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            TextField(value = reply, onValueChange = onReplyChange, maxLines = 3)
-            Button(onClick = onSendReply) {
-                Text(text = "Send")
-            }
+            Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = null, modifier = Modifier.clickable {  })
+            OutlinedTextField(value = reply, onValueChange = onReplyChange, maxLines = 3, modifier = Modifier.height(40.dp))
+            Icon(imageVector = Icons.Outlined.Send, contentDescription = null, modifier = Modifier.clickable { onSendReply.invoke() })
         }
     }
 }

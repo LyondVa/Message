@@ -25,7 +25,7 @@ private val LightColors = lightColorScheme(
     errorContainer = md_theme_light_errorContainer,
     onError = md_theme_light_onError,
     onErrorContainer = md_theme_light_onErrorContainer,
-    background = md_theme_light_background,
+    background = background_gray/*md_theme_light_background*/,
     onBackground = md_theme_light_onBackground,
     surface = md_theme_light_surface,
     onSurface = md_theme_light_onSurface,
@@ -75,10 +75,10 @@ private val DarkColors = darkColorScheme(
 
 @Composable
 fun AppTheme(
-    useDarkTheme: Boolean = !isSystemInDarkTheme(),
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit,
 ) {
-    val colors = if (!useDarkTheme) {
+    val colors = if (true) {
         LightColors
     } else {
         DarkColors

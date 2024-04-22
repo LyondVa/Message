@@ -2,6 +2,7 @@ package com.nhom9.message.screens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,14 +21,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProgressbar
-import com.nhom9.message.CommonRow
+import com.nhom9.message.CommonImageRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
-import com.nhom9.message.TitleText
+import com.nhom9.message.TitleBar
 import com.nhom9.message.navigateTo
 
 @Composable
@@ -62,8 +64,9 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(it)
+                        .background(Color.White)
                 ) {
-                    TitleText(text = "Status")
+                    TitleBar(text = "Status")
                     if (statuses.isEmpty()) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,7 +79,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                         }
                     } else {
                         if (myStatuses.isNotEmpty()) {
-                            CommonRow(
+                            CommonImageRow(
                                 imageUrl = myStatuses[0].user.imageUrl,
                                 name = myStatuses[0].user.name
                             ) {
@@ -89,7 +92,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                             val uniqueUsers = otherStatuses.map { it.user }.toSet().toList()
                             LazyColumn(modifier = Modifier.weight(1f)) {
                                 items(uniqueUsers) { user ->
-                                    CommonRow(imageUrl = user.imageUrl, name = user.name) {
+                                    CommonImageRow(imageUrl = user.imageUrl, name = user.name) {
                                         navigateTo(
                                             navController = navController,
                                             DestinationScreen.SingleStatus.createRoute(user.userId!!)

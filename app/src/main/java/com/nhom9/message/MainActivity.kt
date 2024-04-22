@@ -20,6 +20,10 @@ import com.nhom9.message.screens.SignUpScreen
 import com.nhom9.message.screens.SingleChatScreen
 import com.nhom9.message.screens.SingleStatusScreen
 import com.nhom9.message.screens.StatusScreen
+import com.nhom9.message.screens.subsettingscreens.AccountSettingScreen
+import com.nhom9.message.screens.subsettingscreens.DisplaySettingScreen
+import com.nhom9.message.screens.subsettingscreens.NotificationAndSoundSettingScreen
+import com.nhom9.message.screens.subsettingscreens.PrivacyAndSecuritySettingScreen
 import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,6 +41,10 @@ sealed class DestinationScreen(var route : String){
     object SingleStatus: DestinationScreen(route = "singleStatus/{userId}"){
         fun createRoute(userId : String) = "singleStatus/$userId"
     }
+    object AccountSetting : DestinationScreen(route = "accountSetting")
+    object DisplaySetting : DestinationScreen(route = "displaySetting")
+    object NotificationAndSoundSetting : DestinationScreen(route = "notificationAndSoundSetting")
+    object PrivacyAndSecuritySetting : DestinationScreen(route = "privacyAndSecuritySetting")
 }
 
 @AndroidEntryPoint
@@ -91,6 +99,18 @@ fun ChatAppNavigation(){
         }
         composable(DestinationScreen.Profile.route){
             ProfileScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.AccountSetting.route){
+            AccountSettingScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.DisplaySetting.route){
+            DisplaySettingScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.NotificationAndSoundSetting.route){
+            NotificationAndSoundSettingScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.PrivacyAndSecuritySetting.route){
+            PrivacyAndSecuritySettingScreen(navController, viewModel)
         }
     }
 }
