@@ -63,7 +63,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         var name by rememberSaveable {
             mutableStateOf(userData?.name ?: "")
         }
-        var number by rememberSaveable {
+        var phoneNumber by rememberSaveable {
             mutableStateOf(userData?.phoneNumber ?: "")
         }
         var imageUrl by rememberSaveable {
@@ -79,13 +79,13 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         }
         val onCancel: () -> Unit = {
             name = tempUserData?.name!!
-            number = tempUserData?.phoneNumber!!
+            phoneNumber = tempUserData?.phoneNumber!!
             allowEdit.value = false
         }
         val onSave: () -> Unit = {
             viewModel.saveProfile(
                 name = name,
-                phoneNumber = number,
+                phoneNumber = phoneNumber,
                 uri = Uri.parse(imageUrl)
             )
         }
@@ -107,7 +107,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                     viewModel = viewModel,
                     onChangeImage
                 )
-                InfoCard(number = number)
+                InfoCard(phoneNumber = phoneNumber)
                 SettingCard(navController)
                 LogOutCard(navController, viewModel)
             }
@@ -127,7 +127,7 @@ fun ProfileContent(
     allowEdit: Boolean,
     viewModel: MViewModel,
     name: String,
-    number: String,
+    phoneNumber: String,
     onNameChange: (String) -> Unit,
     onNumberChange: (String) -> Unit,
     onEdit: () -> Unit,
@@ -201,7 +201,7 @@ fun ProfileContent(
                 modifier = Modifier.width(100.dp)
             )
             TextField(
-                value = number,
+                value = phoneNumber,
                 onValueChange = onNumberChange,
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = Color.Black,
@@ -278,7 +278,7 @@ fun ProfileImageBar(
 
 @Composable
 fun InfoCard(
-    number: String,
+    phoneNumber: String,
     //handle: String? = null
 ) {
     Surface(
@@ -294,8 +294,8 @@ fun InfoCard(
                 fontSize = 20.sp,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-            Text(text = "number", color = Color.Gray)
-            Text(text = number)
+            Text(text = "Phone Number", color = Color.Gray)
+            Text(text = phoneNumber)
             /*CommonDivider()
             Text(text = "handle", color = Color.Gray)*/
             /*Text(text = handle ?: "N/A")*/

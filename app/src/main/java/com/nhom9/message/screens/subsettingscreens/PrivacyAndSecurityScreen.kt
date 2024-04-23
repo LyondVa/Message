@@ -20,7 +20,7 @@ fun PrivacyAndSecuritySettingScreen(navController: NavController, viewModel: MVi
     var name by rememberSaveable {
         mutableStateOf(userData?.name ?: "")
     }
-    var number by rememberSaveable {
+    var phoneNumber by rememberSaveable {
         mutableStateOf(userData?.phoneNumber ?: "")
     }
     var imageUrl by rememberSaveable {

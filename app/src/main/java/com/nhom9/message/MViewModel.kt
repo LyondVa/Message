@@ -171,7 +171,7 @@ class MViewModel @Inject constructor(
     }
 
     fun handleException(exception: Exception? = null, customMessage: String = "") {
-        Log.e("MessageApp", "Message exception", exception)
+        Log.e("MessageApp", customMessage, exception)
         exception?.printStackTrace()
         val errorMessage = exception?.localizedMessage ?: ""
         val message = if (customMessage.isNullOrEmpty()) errorMessage else customMessage
@@ -188,25 +188,26 @@ class MViewModel @Inject constructor(
         eventMutableState.value = Event("Logged Out")
     }
 
-    fun onAddChat(number: String) {
-        if (number.isEmpty()) {
+    fun onAddChat(phoneNumber: String) {
+        if (phoneNumber.isEmpty()) {
             handleException(customMessage = "Number can only contain digits")
         } else {
             db.collection(CHATS).where(
                 Filter.or(
                     Filter.and(
-                        Filter.equalTo("user1.number", number),
-                        Filter.equalTo("user2.number", userData.value?.phoneNumber)
+                        Filter.equalTo("user1.phoneNumber", phoneNumber),
+                        Filter.equalTo("user2.phoneNumber", userData.value?.phoneNumber)
                     ),
                     Filter.and(
-                        Filter.equalTo("user1.number", userData.value?.phoneNumber),
-                        Filter.equalTo("user2.number", number)
+                        Filter.equalTo("user1.phoneNumber", userData.value?.phoneNumber),
+                        Filter.equalTo("user2.phoneNumber", phoneNumber)
                     )
                 )
             ).get().addOnSuccessListener {
                 if (it.isEmpty) {
-                    db.collection(USER_NODE).whereEqualTo("number", number).get()
+                    db.collection(USER_NODE).whereEqualTo("phoneNumber", phoneNumber).get()
                         .addOnSuccessListener {
+                            Log.d("Message Error", "phoneNumber: $phoneNumber")
                             if (it.isEmpty) {
                                 handleException(customMessage = "The number provided cannot be found")
                             } else {
@@ -346,6 +347,7 @@ class MViewModel @Inject constructor(
 
                 }
             }
+            inProgressStatus.value = false
         }
     }
 }
