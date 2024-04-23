@@ -2,16 +2,12 @@ package com.nhom9.message
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.auth.User
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
@@ -57,19 +53,19 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun signUp(name: String, number: String, email: String, password: String) {
-        if (name.isEmpty() || number.isEmpty() || email.isEmpty() || password.isEmpty()) {
+    fun signUp(name: String, phoneNumber: String, email: String, password: String) {
+        if (name.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
             return
         } else {
-            db.collection(USER_NODE).whereEqualTo("number", number).get().addOnSuccessListener {
+            db.collection(USER_NODE).whereEqualTo("phoneNumber", phoneNumber).get().addOnSuccessListener {
                 if (it.isEmpty) {
                     auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
                         if (it.isSuccessful) {
                             Log.d("TAG", "signUp: User Logged In")
                             signIn.value = true
                             inProcess.value = false
-                            createOrUpdateProfile(name, number)
+                            createOrUpdateProfile(name, phoneNumber)
                         } else {
                             Log.d("SIGNUP-ERROR", "auth unsuccessful")
                             handleException(it.exception, "Sign Up failed")
@@ -103,14 +99,14 @@ class MViewModel @Inject constructor(
 
     fun createOrUpdateProfile(
         name: String? = null,
-        number: String? = null,
-        imageUrl: String? = null
+        phoneNumber: String? = null,
+        imageUrl: String? = null,
     ) {
         val uid = auth.currentUser?.uid
         val userData = UserData(
             userId = uid,
             name = name ?: userData.value?.name,
-            number = number ?: userData.value?.number,
+            phoneNumber = phoneNumber ?: userData.value?.phoneNumber,
             imageUrl = imageUrl ?: userData.value?.imageUrl
         )
         uid?.let {
@@ -119,7 +115,7 @@ class MViewModel @Inject constructor(
                 .addOnSuccessListener {
                     if (it.exists()) {
                         db.collection(USER_NODE).document(uid)
-                            .update("name", name, "number", number, "imageUrl", imageUrl)
+                            .update("name", name, "phoneNumber", phoneNumber, "imageUrl", imageUrl)
                         getUserData(uid)
                         inProcess.value = false //custom
                     } else {
@@ -134,9 +130,9 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun saveProfile(name: String, number: String, uri: Uri) {
+    fun saveProfile(name: String, phoneNumber: String, uri: Uri) {
         uploadImage(uri) {
-            createOrUpdateProfile(name = name, number = number, imageUrl = it.toString())
+            createOrUpdateProfile(name = name, phoneNumber = phoneNumber, imageUrl = it.toString())
         }
     }
 
@@ -200,10 +196,10 @@ class MViewModel @Inject constructor(
                 Filter.or(
                     Filter.and(
                         Filter.equalTo("user1.number", number),
-                        Filter.equalTo("user2.number", userData.value?.number)
+                        Filter.equalTo("user2.number", userData.value?.phoneNumber)
                     ),
                     Filter.and(
-                        Filter.equalTo("user1.number", userData.value?.number),
+                        Filter.equalTo("user1.number", userData.value?.phoneNumber),
                         Filter.equalTo("user2.number", number)
                     )
                 )
@@ -222,13 +218,13 @@ class MViewModel @Inject constructor(
                                         userData.value?.userId,
                                         userData.value?.name,
                                         userData.value?.imageUrl,
-                                        userData.value?.number
+                                        userData.value?.phoneNumber
                                     ),
                                     ChatUser(
                                         chatPartner.userId,
                                         chatPartner.name,
                                         chatPartner.imageUrl,
-                                        chatPartner.number
+                                        chatPartner.phoneNumber
                                     )
                                 )
                                 db.collection(CHATS).document(id).set(chat)
@@ -303,7 +299,7 @@ class MViewModel @Inject constructor(
                 userData.value?.userId,
                 userData.value?.name,
                 userData.value?.imageUrl,
-                userData.value?.number
+                userData.value?.phoneNumber
             ),
             imageUrl,
             System.currentTimeMillis()
@@ -340,7 +336,6 @@ class MViewModel @Inject constructor(
                         .addSnapshotListener { value, error ->
                             if (error != null) {
                                 handleException(error)
-
                                 inProgressStatus.value = false
                             }
                             if (value!=null) {

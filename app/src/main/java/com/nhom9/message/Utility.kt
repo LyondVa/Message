@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -139,6 +140,37 @@ fun TitleBarWithBack(text: String) {
 }
 
 @Composable
+fun TitleBarWithBackAndRightButton(text: String, buttonText: String, onButtonClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = bar_gray)
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.ArrowBack,
+            contentDescription = null,
+            modifier = Modifier.align(Alignment.CenterStart)
+        )
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.Center)
+        )
+        Button(
+            onClick = { onButtonClick.invoke() },
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+        ) {
+            Text(text = buttonText)
+        }
+    }
+
+}
+
+@Composable
 fun CommonImageRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -198,15 +230,15 @@ fun CommonSettingRow(
 }
 
 @Composable
-fun CommonSubSettingRow(title: String, text: String = "") {
+fun CommonSubSettingRow(title: String, text: String = "", onItemClick: () -> Unit = {}) {
     Box(modifier = Modifier.background(Color.White)) {
         CommonSettingRow(name = title) {
-
+            onItemClick.invoke()
         }
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
 
             if (text != "") {
-                Text(text = text)
+                Text(text = text, color = Color.LightGray)
             } else {
                 Text(text = "Error!")
             }

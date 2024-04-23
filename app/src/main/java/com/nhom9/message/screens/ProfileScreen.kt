@@ -22,10 +22,7 @@ import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material.icons.rounded.ExitToApp
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -60,11 +57,14 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
     } else {
         val userData = viewModel.userData.value
         var tempUserData = userData
+        var userId by rememberSaveable {
+            mutableStateOf(userData?.userId?:"")
+        }
         var name by rememberSaveable {
             mutableStateOf(userData?.name ?: "")
         }
         var number by rememberSaveable {
-            mutableStateOf(userData?.number ?: "")
+            mutableStateOf(userData?.phoneNumber ?: "")
         }
         var imageUrl by rememberSaveable {
             mutableStateOf(userData?.imageUrl ?: "")
@@ -79,13 +79,13 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         }
         val onCancel: () -> Unit = {
             name = tempUserData?.name!!
-            number = tempUserData?.number!!
+            number = tempUserData?.phoneNumber!!
             allowEdit.value = false
         }
         val onSave: () -> Unit = {
             viewModel.saveProfile(
                 name = name,
-                number = number,
+                phoneNumber = number,
                 uri = Uri.parse(imageUrl)
             )
         }
@@ -103,10 +103,11 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                     allowEdit = allowEdit.value,
                     imageUrl = imageUrl,
                     name = name,
+                    userId = userId,
                     viewModel = viewModel,
                     onChangeImage
                 )
-                InfoCard(number = number, "@25")
+                InfoCard(number = number)
                 SettingCard(navController)
                 LogOutCard(navController, viewModel)
             }
@@ -221,6 +222,7 @@ fun ProfileImageBar(
     allowEdit: Boolean,
     imageUrl: String?,
     name: String,
+    userId: String?,
     viewModel: MViewModel,
     onChangeImage: (Uri) -> Unit
 ) {
@@ -260,13 +262,12 @@ fun ProfileImageBar(
                     CommonImage(data = imageUrl)
                 }
             }
-            Column(modifier = Modifier.padding(8.dp)) {
+            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(8.dp)) {
                 Text(
                     text = name,
                     fontSize = 24.sp,
-                    modifier = Modifier
                 )
-                Text(text = "Message id: $name", color = Color.Gray)
+                Text(text = "Message id: $userId", color = Color.Gray, fontSize = 12.sp)
             }
         }
         if (viewModel.inProcess.value) {
@@ -278,7 +279,7 @@ fun ProfileImageBar(
 @Composable
 fun InfoCard(
     number: String,
-    handle: String? = null
+    //handle: String? = null
 ) {
     Surface(
         shadowElevation = 2.dp,
@@ -295,9 +296,9 @@ fun InfoCard(
             )
             Text(text = "number", color = Color.Gray)
             Text(text = number)
-            CommonDivider()
-            Text(text = "handle", color = Color.Gray)
-            Text(text = handle ?: "N/A")
+            /*CommonDivider()
+            Text(text = "handle", color = Color.Gray)*/
+            /*Text(text = handle ?: "N/A")*/
         }
     }
 }

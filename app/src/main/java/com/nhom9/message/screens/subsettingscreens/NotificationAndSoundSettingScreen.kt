@@ -21,7 +21,7 @@ fun NotificationAndSoundSettingScreen(navController: NavController, viewModel: M
         mutableStateOf(userData?.name ?: "")
     }
     var number by rememberSaveable {
-        mutableStateOf(userData?.number ?: "")
+        mutableStateOf(userData?.phoneNumber ?: "")
     }
     var imageUrl by rememberSaveable {
         mutableStateOf(userData?.imageUrl ?: "")

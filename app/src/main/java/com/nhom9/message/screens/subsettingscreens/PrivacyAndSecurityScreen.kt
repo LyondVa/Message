@@ -21,7 +21,7 @@ fun PrivacyAndSecuritySettingScreen(navController: NavController, viewModel: MVi
         mutableStateOf(userData?.name ?: "")
     }
     var number by rememberSaveable {
-        mutableStateOf(userData?.number ?: "")
+        mutableStateOf(userData?.phoneNumber ?: "")
     }
     var imageUrl by rememberSaveable {
         mutableStateOf(userData?.imageUrl ?: "")
@@ -40,9 +40,13 @@ fun PASSettings(){
 
     Column {
         CommonSubSettingRow("Passcode Lock")
-        CommonDivider()
+        CommonDivider(0)
         CommonSubSettingRow("Blocked Users")
-        CommonDivider()
+        CommonDivider(0)
+        CommonSubSettingRow("Email")
+        CommonDivider(0)
+        CommonSubSettingRow("Password")
+        CommonDivider(0)
     }
 
 }

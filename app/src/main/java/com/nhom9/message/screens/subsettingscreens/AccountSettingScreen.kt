@@ -28,8 +28,10 @@ import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
 import com.nhom9.message.CommonSubSettingRow
+import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.TitleBarWithBack
+import com.nhom9.message.navigateTo
 
 @Composable
 fun AccountSettingScreen(navController: NavController, viewModel: MViewModel) {
@@ -39,44 +41,52 @@ fun AccountSettingScreen(navController: NavController, viewModel: MViewModel) {
     var name by rememberSaveable {
         mutableStateOf(userData?.name ?: "")
     }
-    var number by rememberSaveable {
-        mutableStateOf(userData?.number ?: "")
+    var phoneNumber by rememberSaveable {
+        mutableStateOf(userData?.phoneNumber ?: "")
     }
     var imageUrl by rememberSaveable {
         mutableStateOf(userData?.imageUrl ?: "")
     }
-    var email = "" /*by rememberSaveable {
-        mutableStateOf(userData?.email ?: "")
-    }*/
+    var userId by rememberSaveable {
+        mutableStateOf(userData?.userId ?: "")
+    }
     val allowEdit = remember {
         mutableStateOf(false)
     }
     Column {
         TitleBarWithBack(text = "Account")
-        AccountInfoCard(imageUrl, name, "N/A", "N/A", number, email)
+        AccountInfoCard(navController, imageUrl, name, "N/A", userId, phoneNumber)
     }
 
 
 }
 
 @Composable
-fun AccountInfoCard(imageUrl: String, name: String, handle: String, messageId: String, phoneNumber: String, email: String) {
+fun AccountInfoCard(
+    navController: NavController,
+    imageUrl: String,
+    name: String,
+    handle: String,
+    userId: String,
+    phoneNumber: String
+) {
 
+    val onNameClick: () -> Unit = {
+        navigateTo(navController, DestinationScreen.EditName.route)
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         AccountSettingImageRow(imageUrl = imageUrl)
         CommonDivider(0)
-        CommonSubSettingRow("Name", name)
+        CommonSubSettingRow("Name", name, onNameClick)
         CommonDivider(0)
-        CommonSubSettingRow("Handle", handle)
+        /*CommonSubSettingRow("Handle", handle)
+        CommonDivider(0)*/
+        CommonSubSettingRow("Message Id", userId, {})
         CommonDivider(0)
-        CommonSubSettingRow("Message Id", messageId)
-        CommonDivider(0)
-        CommonSubSettingRow("Phone Number", phoneNumber)
-        CommonDivider(0)
-        CommonSubSettingRow("Email", email)
+        CommonSubSettingRow("Phone Number", phoneNumber, {})
         CommonDivider(0)
     }
 
@@ -102,10 +112,12 @@ fun AccountSettingImageRow(imageUrl: String) {
                 modifier = Modifier.padding(start = 20.dp)
             )
         }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .padding(8.dp)) {
-            Card (shape = RoundedCornerShape(8.dp)){
+        Row(
+            verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(8.dp)
+        ) {
+            Card(shape = RoundedCornerShape(8.dp)) {
                 CommonImage(data = imageUrl, modifier = Modifier.size(80.dp))
             }
             Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = null)

@@ -3,14 +3,16 @@ package com.nhom9.message.data
 data class UserData(
     var userId: String? = "",
     var name: String? = "",
-    var number: String? = "",
-    var imageUrl: String? = ""
+    var phoneNumber: String? = "",
+    var imageUrl: String? = "",
+    //var handle: String?=""
 ) {
     fun toMap() = mapOf(
         "userId" to userId,
         "name" to name,
-        "number" to number,
-        "imageUrl" to imageUrl
+        "phoneNumber" to phoneNumber,
+        "imageUrl" to imageUrl,
+        //"handle" to handle
     )
 
 }
@@ -25,7 +27,7 @@ data class ChatUser(
     val userId: String? = "",
     val name: String? = "",
     val imageUrl: String? = "",
-    val number: String? = ""
+    val phoneNumber: String? = ""
 )
 
 data class Message(

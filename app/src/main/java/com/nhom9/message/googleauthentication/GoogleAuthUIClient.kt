@@ -8,7 +8,6 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdToken
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.auth.User
 import com.google.firebase.ktx.Firebase
 import com.nhom9.message.R
 import com.nhom9.message.data.UserData
@@ -46,7 +45,7 @@ class GoogleAuthUIClient(
                         userId = uid,
                         name = displayName,
                         imageUrl = photoUrl?.toString(),
-                        number = phoneNumber
+                        phoneNumber = phoneNumber
                     )
                 },
                 errorMessage = null
@@ -76,7 +75,7 @@ class GoogleAuthUIClient(
             userId = uid,
             name = displayName,
             imageUrl = photoUrl?.toString(),
-            number = phoneNumber
+            phoneNumber = phoneNumber
         )
     }
 
