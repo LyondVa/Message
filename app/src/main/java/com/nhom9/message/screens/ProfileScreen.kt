@@ -56,14 +56,13 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         CommonProgressbar()
     } else {
         val userData = viewModel.userData.value
-        var tempUserData = userData
-        var userId by rememberSaveable {
+        val userId by rememberSaveable {
             mutableStateOf(userData?.userId?:"")
         }
-        var name by rememberSaveable {
+        val name by rememberSaveable {
             mutableStateOf(userData?.name ?: "")
         }
-        var phoneNumber by rememberSaveable {
+        val phoneNumber by rememberSaveable {
             mutableStateOf(userData?.phoneNumber ?: "")
         }
         var imageUrl by rememberSaveable {
@@ -71,23 +70,6 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         }
         val allowEdit = remember {
             mutableStateOf(false)
-        }
-
-        val onEdit: () -> Unit = {
-            tempUserData = userData
-            allowEdit.value = true
-        }
-        val onCancel: () -> Unit = {
-            name = tempUserData?.name!!
-            phoneNumber = tempUserData?.phoneNumber!!
-            allowEdit.value = false
-        }
-        val onSave: () -> Unit = {
-            viewModel.saveProfile(
-                name = name,
-                phoneNumber = phoneNumber,
-                uri = Uri.parse(imageUrl)
-            )
         }
         val onChangeImage: (Uri) -> Unit = {
             imageUrl = it.toString()
@@ -253,14 +235,14 @@ fun ProfileImageBar(
                         launcher.launch("image/*")
                     }
             ) {
-                if (allowEdit) {
+                /*if (allowEdit) {
                     ProfileImagePreview(localImageUrl = localImageUrl, data = imageUrl)
                     if (localImageUrl != null) {
                         onChangeImage.invoke(localImageUrl!!)
                     }
-                } else {
+                } else {*/
                     CommonImage(data = imageUrl)
-                }
+                //}
             }
             Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(8.dp)) {
                 Text(
@@ -303,23 +285,7 @@ fun InfoCard(
     }
 }
 
-@Composable
-fun ProfileImagePreview(
-    localImageUrl: Uri?,
-    data: String?,
-    contentScale: ContentScale = ContentScale.Crop,
-) {
-    if (localImageUrl != null) {
-        AsyncImage(
-            model = localImageUrl,
-            contentScale = contentScale,
-            contentDescription = "Profile Image Preview",
-            modifier = Modifier.wrapContentSize()
-        )
-    } else {
-        CommonImage(data = data)
-    }
-}
+
 
 @Composable
 fun SettingCard(navController: NavController) {

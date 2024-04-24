@@ -25,6 +25,8 @@ import com.nhom9.message.screens.subsettingscreens.DisplaySettingScreen
 import com.nhom9.message.screens.subsettingscreens.NotificationAndSoundSettingScreen
 import com.nhom9.message.screens.subsettingscreens.PrivacyAndSecuritySettingScreen
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditNameScreen
+import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditPhoneNumberScreen
+import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditProfileImageScreen
 import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,6 +49,8 @@ sealed class DestinationScreen(var route : String){
     object NotificationAndSoundSetting : DestinationScreen(route = "notificationAndSoundSetting")
     object PrivacyAndSecuritySetting : DestinationScreen(route = "privacyAndSecuritySetting")
     object EditName : DestinationScreen(route = "editName")
+    object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
+    object EditProfileImage : DestinationScreen(route = "editProfileImage")
 }
 
 @AndroidEntryPoint
@@ -116,6 +120,12 @@ fun ChatAppNavigation(){
         }
         composable(DestinationScreen.EditName.route){
             EditNameScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.EditPhoneNumber.route){
+            EditPhoneNumberScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.EditProfileImage.route){
+            EditProfileImageScreen(navController, viewModel)
         }
     }
 }

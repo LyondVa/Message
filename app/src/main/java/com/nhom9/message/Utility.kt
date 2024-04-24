@@ -116,7 +116,7 @@ fun TitleBar(text: String) {
 }
 
 @Composable
-fun TitleBarWithBack(text: String) {
+fun TitleBarWithBack(navController: NavController, text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -125,7 +125,7 @@ fun TitleBarWithBack(text: String) {
         Icon(
             imageVector = Icons.Outlined.ArrowBack,
             contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.align(Alignment.CenterStart).padding(16.dp).clickable { navController.popBackStack() }
         )
         Text(
             text = text,
@@ -140,7 +140,12 @@ fun TitleBarWithBack(text: String) {
 }
 
 @Composable
-fun TitleBarWithBackAndRightButton(text: String, buttonText: String, onButtonClick: () -> Unit) {
+fun TitleBarWithBackAndRightButton(
+    navController: NavController,
+    text: String,
+    buttonText: String,
+    onButtonClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,7 +154,10 @@ fun TitleBarWithBackAndRightButton(text: String, buttonText: String, onButtonCli
         Icon(
             imageVector = Icons.Outlined.ArrowBack,
             contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 16.dp)
+                .clickable { navController.popBackStack() }
         )
         Text(
             text = text,
@@ -160,7 +168,10 @@ fun TitleBarWithBackAndRightButton(text: String, buttonText: String, onButtonCli
                 .align(Alignment.Center)
         )
         Button(
-            onClick = { onButtonClick.invoke() },
+            onClick = {
+                onButtonClick.invoke()
+                navController.popBackStack()
+            },
             modifier = Modifier
                 .align(Alignment.CenterEnd)
         ) {

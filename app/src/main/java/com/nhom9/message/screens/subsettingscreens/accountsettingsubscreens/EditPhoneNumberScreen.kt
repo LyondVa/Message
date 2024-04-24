@@ -16,29 +16,28 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.MViewModel
-import com.nhom9.message.TitleBarWithBack
 import com.nhom9.message.TitleBarWithBackAndRightButton
 
 @Composable
-fun EditNameScreen(navController: NavController, viewModel: MViewModel){
+fun EditPhoneNumberScreen(navController: NavController, viewModel: MViewModel){
     val inProcess = viewModel.inProcess.value
     if (inProcess) {
         CommonProgressbar()
     }
     else{
-        var name by rememberSaveable {
-            mutableStateOf(viewModel.userData.value?.name ?: "")
+        var phoneNumber by rememberSaveable {
+            mutableStateOf(viewModel.userData.value?.phoneNumber ?: "")
         }
 
         val onButtonClick:()->Unit={
-            viewModel.createOrUpdateProfile(name = name)
+            viewModel.createOrUpdateProfile(phoneNumber = phoneNumber)
         }
         Column {
-            TitleBarWithBackAndRightButton(navController, "Edit Name", "Save", onButtonClick)
-            Column(modifier  =Modifier.padding(8.dp)) {
+            TitleBarWithBackAndRightButton(navController, "Edit Phone Number", "Save", onButtonClick)
+            Column(modifier  = Modifier.padding(8.dp)) {
 
-                OutlinedTextField(value = name, onValueChange = {name = it}, modifier = Modifier.fillMaxWidth())
-                Text(text = "Choose a good name for yourself!", color = Color.LightGray, modifier = Modifier.padding(top = 8.dp))
+                OutlinedTextField(value = phoneNumber, onValueChange = {phoneNumber = it}, modifier = Modifier.fillMaxWidth())
+                Text(text = "Make sure it's a number you have access to!", color = Color.LightGray, modifier = Modifier.padding(top = 8.dp))
             }
         }
 

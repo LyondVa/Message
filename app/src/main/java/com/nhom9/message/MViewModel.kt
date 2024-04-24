@@ -115,7 +115,7 @@ class MViewModel @Inject constructor(
                 .addOnSuccessListener {
                     if (it.exists()) {
                         db.collection(USER_NODE).document(uid)
-                            .update("name", name, "phoneNumber", phoneNumber, "imageUrl", imageUrl)
+                            .update("name", userData.name, "phoneNumber", userData.phoneNumber, "imageUrl", userData.imageUrl)
                         getUserData(uid)
                         inProcess.value = false //custom
                     } else {

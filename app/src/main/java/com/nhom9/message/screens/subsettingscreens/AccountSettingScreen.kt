@@ -54,7 +54,7 @@ fun AccountSettingScreen(navController: NavController, viewModel: MViewModel) {
         mutableStateOf(false)
     }
     Column {
-        TitleBarWithBack(text = "Account")
+        TitleBarWithBack(navController = navController, text = "Account")
         AccountInfoCard(navController, imageUrl, name, "N/A", userId, phoneNumber)
     }
 
@@ -74,11 +74,17 @@ fun AccountInfoCard(
     val onNameClick: () -> Unit = {
         navigateTo(navController, DestinationScreen.EditName.route)
     }
+    val onPhoneNumberClick: () -> Unit = {
+        navigateTo(navController, DestinationScreen.EditPhoneNumber.route)
+    }
+    val onProfileImageClick: () -> Unit = {
+        navigateTo(navController, DestinationScreen.EditProfileImage.route)
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        AccountSettingImageRow(imageUrl = imageUrl)
+        AccountSettingImageRow(imageUrl = imageUrl, onProfileImageClick)
         CommonDivider(0)
         CommonSubSettingRow("Name", name, onNameClick)
         CommonDivider(0)
@@ -86,18 +92,18 @@ fun AccountInfoCard(
         CommonDivider(0)*/
         CommonSubSettingRow("Message Id", userId, {})
         CommonDivider(0)
-        CommonSubSettingRow("Phone Number", phoneNumber, {})
+        CommonSubSettingRow("Phone Number", phoneNumber, onPhoneNumberClick)
         CommonDivider(0)
     }
 
 }
 
 @Composable
-fun AccountSettingImageRow(imageUrl: String) {
+fun AccountSettingImageRow(imageUrl: String, onItemClick:()->Unit) {
     Box(modifier = Modifier
         .background(Color.White)
         .clickable {
-            //onItemClick.invoke()
+            onItemClick.invoke()
         }
     ) {
         Row(
