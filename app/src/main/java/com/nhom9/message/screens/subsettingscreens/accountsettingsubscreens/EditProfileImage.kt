@@ -53,7 +53,9 @@ fun EditProfileImageScreen(navController: NavController, viewModel: MViewModel) 
             allowEdit = false
         }
         val onSaveClick: () -> Unit = {
-            viewModel.createOrUpdateProfile(imageUrl = imageUrl)
+            viewModel.saveProfileImage(
+                uri = Uri.parse(imageUrl)
+            )
             allowEdit = false
         }
         val onChangeImage: (Uri) -> Unit = {

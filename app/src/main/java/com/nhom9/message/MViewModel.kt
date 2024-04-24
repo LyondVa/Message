@@ -130,9 +130,9 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun saveProfile(name: String, phoneNumber: String, uri: Uri) {
+    fun saveProfileImage(uri: Uri) {
         uploadImage(uri) {
-            createOrUpdateProfile(name = name, phoneNumber = phoneNumber, imageUrl = it.toString())
+            createOrUpdateProfile(imageUrl = it.toString())
         }
     }
 
