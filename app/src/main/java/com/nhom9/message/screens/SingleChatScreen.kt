@@ -77,8 +77,8 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
 
     Column {
         ChatHeader(name = chatUser.name ?: "", imageUrl = chatUser.imageUrl ?: "") {
-            navController.popBackStack()
             viewModel.depopulateMessages()
+            navController.popBackStack()
         }
         CommonDivider(0)
         MessageBox(

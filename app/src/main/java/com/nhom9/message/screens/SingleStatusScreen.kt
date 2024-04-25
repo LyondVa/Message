@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,12 +33,15 @@ enum class State {
 
 @Composable
 fun SingleStatusScreen(navController: NavController, viewModel: MViewModel, userId: String) {
-    Log.d("SINGLE STATUS", userId)
     val statuses = viewModel.status.value.filter { it.user.userId == userId }
     if (statuses.isNotEmpty()) {
         val currentStatus = remember {
             mutableIntStateOf(0)
         }
+        val onStatusComplete: () -> Unit = {
+            if (currentStatus.intValue < statuses.size - 1) currentStatus.intValue++ else navController.popBackStack()
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -45,7 +49,9 @@ fun SingleStatusScreen(navController: NavController, viewModel: MViewModel, user
         ) {
             CommonImage(
                 data = statuses[currentStatus.intValue].imageUrl,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { onStatusComplete.invoke() },
                 contentScale = ContentScale.Fit
             )
             Row(
@@ -59,13 +65,12 @@ fun SingleStatusScreen(navController: NavController, viewModel: MViewModel, user
                             .padding(1.dp),
                         state = if (currentStatus.intValue < index) State.INITIAL else if (currentStatus.intValue == index) State.ACTIVE else State.COMPLETED
                     ) {
-                        if (currentStatus.intValue < statuses.size - 1) currentStatus.intValue++ else navController.popBackStack()
+                        onStatusComplete.invoke()
                     }
                 }
             }
         }
-    }
-    else{
+    } else {
         Text(text = "Issue")
     }
 }
@@ -91,5 +96,5 @@ fun CustomProgressIndicator(modifier: Modifier, state: State, onComplete: () -> 
         )
         progress = p
     }
-    LinearProgressIndicator(modifier = Modifier, color = Color.Red, progress = progress)
+    LinearProgressIndicator(modifier = modifier, color = Color.Red, progress = progress)
 }

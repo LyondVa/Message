@@ -58,23 +58,24 @@ class MViewModel @Inject constructor(
             handleException(customMessage = "Please Fill In All Fields")
             return
         } else {
-            db.collection(USER_NODE).whereEqualTo("phoneNumber", phoneNumber).get().addOnSuccessListener {
-                if (it.isEmpty) {
-                    auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            Log.d("TAG", "signUp: User Logged In")
-                            signIn.value = true
-                            inProcess.value = false
-                            createOrUpdateProfile(name, phoneNumber)
-                        } else {
-                            Log.d("SIGNUP-ERROR", "auth unsuccessful")
-                            handleException(it.exception, "Sign Up failed")
+            db.collection(USER_NODE).whereEqualTo("phoneNumber", phoneNumber).get()
+                .addOnSuccessListener {
+                    if (it.isEmpty) {
+                        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                Log.d("TAG", "signUp: User Logged In")
+                                signIn.value = true
+                                inProcess.value = false
+                                createOrUpdateProfile(name, phoneNumber)
+                            } else {
+                                Log.d("SIGNUP-ERROR", "auth unsuccessful")
+                                handleException(it.exception, "Sign Up failed")
+                            }
                         }
+                    } else {
+                        handleException(customMessage = "number already exists")
                     }
-                } else {
-                    handleException(customMessage = "number already exists")
                 }
-            }
         }
     }
 
@@ -115,7 +116,14 @@ class MViewModel @Inject constructor(
                 .addOnSuccessListener {
                     if (it.exists()) {
                         db.collection(USER_NODE).document(uid)
-                            .update("name", userData.name, "phoneNumber", userData.phoneNumber, "imageUrl", userData.imageUrl)
+                            .update(
+                                "name",
+                                userData.name,
+                                "phoneNumber",
+                                userData.phoneNumber,
+                                "imageUrl",
+                                userData.imageUrl
+                            )
                         getUserData(uid)
                         inProcess.value = false //custom
                     } else {
@@ -291,7 +299,9 @@ class MViewModel @Inject constructor(
     fun uploadStatus(uri: Uri) {
         uploadImage(uri) {
             createStatus(it.toString())
+            populateStatuses()
         }
+
     }
 
     fun createStatus(imageUrl: String) {
@@ -339,7 +349,7 @@ class MViewModel @Inject constructor(
                                 handleException(error)
                                 inProgressStatus.value = false
                             }
-                            if (value!=null) {
+                            if (value != null) {
                                 status.value = value.toObjects()
                                 inProgressStatus.value = false
                             }
