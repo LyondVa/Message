@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,7 +58,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
     } else {
         val userData = viewModel.userData.value
         val userId by rememberSaveable {
-            mutableStateOf(userData?.userId?:"")
+            mutableStateOf(userData?.userId ?: "")
         }
         val name by rememberSaveable {
             mutableStateOf(userData?.name ?: "")
@@ -86,8 +87,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                     imageUrl = imageUrl,
                     name = name,
                     userId = userId,
-                    viewModel = viewModel,
-                    onChangeImage
+                    viewModel = viewModel
                 )
                 InfoCard(phoneNumber = phoneNumber)
                 SettingCard(navController)
@@ -102,7 +102,158 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
     }
 }
 
+@Composable
+fun ProfileImageBar(
+    allowEdit: Boolean,
+    imageUrl: String?,
+    name: String,
+    userId: String?,
+    viewModel: MViewModel
+) {
+    var localImageUrl by remember { mutableStateOf<Uri?>(null) }
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                localImageUrl = it
+            }
+        }
+    Surface(
+        shadowElevation = 2.dp,
+        modifier = Modifier
+            .height(intrinsicSize = IntrinsicSize.Min)
+            .padding(bottom = 8.dp)
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Card(
+                shape = CircleShape,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clickable(allowEdit) {
+                        launcher.launch("image/*")
+                    }
+            ) {
+                CommonImage(data = imageUrl)
+            }
+            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                Text(
+                    text = "Message id: $userId",
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+        if (viewModel.inProcess.value) {
+            CommonProgressbar()
+        }
+    }
+}
 
+@Composable
+fun InfoCard(
+    phoneNumber: String,
+    //handle: String? = null
+) {
+    Surface(
+        shadowElevation = 2.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp))
+        {
+            Text(
+                text = "Info",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "Phone Number", color = Color.Gray,
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = phoneNumber,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+    }
+}
+
+
+@Composable
+fun SettingCard(navController: NavController) {
+    Surface(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Column(
+            Modifier
+                .padding(top = 20.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Settings",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 20.dp)
+            )
+            CommonSettingRow(name = "Account", Icons.Outlined.Person) {
+                navigateTo(navController, DestinationScreen.AccountSetting.route)
+            }
+            CommonDivider(0)
+            CommonSettingRow(name = "Display", Icons.Outlined.Settings) {
+                navigateTo(navController, DestinationScreen.DisplaySetting.route)
+            }
+            CommonDivider(0)
+            CommonSettingRow(name = "Notification and Sound", Icons.Outlined.Notifications) {
+                navigateTo(navController, DestinationScreen.NotificationAndSoundSetting.route)
+            }
+            CommonDivider(0)
+            CommonSettingRow(name = "Privacy and Security", Icons.Outlined.Warning) {
+                navigateTo(navController, DestinationScreen.PrivacyAndSecuritySetting.route)
+            }
+        }
+    }
+}
+
+@Composable
+fun LogOutCard(navController: NavController, viewModel: MViewModel) {
+    Box(modifier = Modifier.padding(top = 8.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp)
+                .background(Color.White)
+                .clickable {
+                    viewModel.logOut()
+                    navigateTo(navController, DestinationScreen.Entry.route)
+                }
+        ) {
+            Icon(Icons.Outlined.ExitToApp, null)
+            Text(
+                text = "Log Out",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+            )
+
+        }
+    }
+}
+
+/*------------IMPORTANT JUNK------------*/
+
+/*
 @Composable
 fun ProfileContent(
     modifier: Modifier,
@@ -197,149 +348,4 @@ fun ProfileContent(
         CommonDivider()
     }*/
     }
-}
-
-@Composable
-fun ProfileImageBar(
-    allowEdit: Boolean,
-    imageUrl: String?,
-    name: String,
-    userId: String?,
-    viewModel: MViewModel,
-    onChangeImage: (Uri) -> Unit
-) {
-    var localImageUrl by remember { mutableStateOf<Uri?>(null) }
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
-            uri?.let {
-                localImageUrl = it
-            }
-        }
-    Surface(
-        shadowElevation = 2.dp,
-        modifier = Modifier
-            .height(intrinsicSize = IntrinsicSize.Min)
-            .padding(bottom = 8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Card(
-                shape = CircleShape,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clickable(allowEdit) {
-                        launcher.launch("image/*")
-                    }
-            ) {
-                /*if (allowEdit) {
-                    ProfileImagePreview(localImageUrl = localImageUrl, data = imageUrl)
-                    if (localImageUrl != null) {
-                        onChangeImage.invoke(localImageUrl!!)
-                    }
-                } else {*/
-                    CommonImage(data = imageUrl)
-                //}
-            }
-            Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(8.dp)) {
-                Text(
-                    text = name,
-                    fontSize = 24.sp,
-                )
-                Text(text = "Message id: $userId", color = Color.Gray, fontSize = 12.sp)
-            }
-        }
-        if (viewModel.inProcess.value) {
-            CommonProgressbar()
-        }
-    }
-}
-
-@Composable
-fun InfoCard(
-    phoneNumber: String,
-    //handle: String? = null
-) {
-    Surface(
-        shadowElevation = 2.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-    ) {
-        Column(modifier = Modifier.padding(20.dp))
-        {
-            Text(
-                text = "Info",
-                fontSize = 20.sp,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(text = "Phone Number", color = Color.Gray)
-            Text(text = phoneNumber)
-            /*CommonDivider()
-            Text(text = "handle", color = Color.Gray)*/
-            /*Text(text = handle ?: "N/A")*/
-        }
-    }
-}
-
-
-
-@Composable
-fun SettingCard(navController: NavController) {
-    Column(
-        Modifier
-            .background(Color.White)
-            .padding(top = 20.dp)
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = "Settings",
-            fontSize = 20.sp,
-            modifier = Modifier.padding(start = 20.dp)
-        )
-        CommonSettingRow(name = "Account", Icons.Outlined.Person) {
-            navigateTo(navController, DestinationScreen.AccountSetting.route)
-        }
-        CommonDivider(0)
-        CommonSettingRow(name = "Display",Icons.Outlined.Settings) {
-            navigateTo(navController, DestinationScreen.DisplaySetting.route)
-        }
-        CommonDivider(0)
-        CommonSettingRow(name = "Notification and Sound", Icons.Outlined.Notifications) {
-            navigateTo(navController, DestinationScreen.NotificationAndSoundSetting.route)
-        }
-        CommonDivider(0)
-        CommonSettingRow(name = "Privacy and Security", Icons.Outlined.Warning) {
-            navigateTo(navController, DestinationScreen.PrivacyAndSecuritySetting.route)
-        }
-    }
-}
-
-@Composable
-fun LogOutCard(navController: NavController, viewModel: MViewModel){
-    Box(modifier = Modifier.padding(top = 8.dp)){
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .background(Color.White)
-                .clickable {
-                    viewModel.logOut()
-                    navigateTo(navController, DestinationScreen.Entry.route)
-                }
-        ) {
-                Icon(Icons.Outlined.ExitToApp, null)
-                Text(
-                    text = "Log Out",
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                )
-
-        }
-    }
-}
+}*/

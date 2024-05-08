@@ -1,5 +1,6 @@
 package com.nhom9.message
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,7 +34,9 @@ import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.Edit
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditProfileImageScreen
 import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "darkMode")
 sealed class DestinationScreen(var route : String){
     object Entry : DestinationScreen(route = "entry")
     object SignUp : DestinationScreen(route = "signup")
@@ -58,9 +65,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme {
+            AppTheme (
+            ){
+
                 // A surface container using the 'background' color from the theme
                 Surface(
+                    tonalElevation = 5.dp,
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {

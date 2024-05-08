@@ -3,9 +3,16 @@ package com.nhom9.message.ui.theme
 import android.graphics.fonts.FontFamily
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.ViewModel
+import com.nhom9.message.MViewModel
 
 
 private val LightColors = lightColorScheme(
@@ -25,7 +32,7 @@ private val LightColors = lightColorScheme(
     errorContainer = md_theme_light_errorContainer,
     onError = md_theme_light_onError,
     onErrorContainer = md_theme_light_onErrorContainer,
-    background = background_gray/*md_theme_light_background*/,
+    background = md_theme_light_background,
     onBackground = md_theme_light_onBackground,
     surface = md_theme_light_surface,
     onSurface = md_theme_light_onSurface,
@@ -75,10 +82,10 @@ private val DarkColors = darkColorScheme(
 
 @Composable
 fun AppTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    useDarkTheme: Boolean = true,
     content: @Composable() () -> Unit,
 ) {
-    val colors = if (true) {
+    val colors = if (!useDarkTheme) {
         LightColors
     } else {
         DarkColors
@@ -87,5 +94,7 @@ fun AppTheme(
     MaterialTheme(
         colorScheme = colors,
         content = content,
+        typography = typography,
+        shapes = shapes
     )
 }

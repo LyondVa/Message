@@ -9,3 +9,7 @@ const val USERNAME = "name"
 const val IMAGEURL = "imageUrl"
 const val PHONENUMBER = "phoneNumber"
 const val USERID = "userId"
+
+
+const val IMAGE_MESSAGE = "image"
+const val TEXT_MESSAGE = "text"

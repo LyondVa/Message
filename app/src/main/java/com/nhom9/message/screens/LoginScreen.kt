@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -89,7 +90,7 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                         )
                         Text(
                             text = "Login",
-                            fontSize = 40.sp,
+                            style = MaterialTheme.typography.displayMedium,
                             fontWeight = FontWeight.Bold,
                             color = md_theme_light_onPrimaryContainer,
                             fontFamily = FontFamily.SansSerif,
@@ -97,6 +98,7 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                         )
                         Text(
                             text = "Sign in to continue",
+                            style = MaterialTheme.typography.headlineSmall,
                             color = md_theme_light_onPrimaryContainer
                         )
                         Row(
@@ -120,7 +122,12 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                                     emailState.value = it
                                 },
 
-                                label = { Text(text = "Email") },
+                                label = {
+                                    Text(
+                                        text = "Email",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                },
                                 shape = RoundedCornerShape(40.dp),
                                 modifier = Modifier
                                     .padding(end = 8.dp)
@@ -147,7 +154,12 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                                 onValueChange = {
                                     passwordState.value = it
                                 },
-                                label = { Text(text = "Password") },
+                                label = {
+                                    Text(
+                                        text = "Password",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                },
                                 shape = RoundedCornerShape(40.dp),
                                 modifier = Modifier
                                     .padding(end = 8.dp)
@@ -163,10 +175,14 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                                 .fillMaxWidth()
                         ) {
 
-                            Text(text = "Log in")
+                            Text(
+                                text = "Log in",
+                                style = MaterialTheme.typography.labelMedium
+                            )
                         }
                         Text(text = "Forgotten password?",
                             color = Color.Blue,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier
                                 .padding(8.dp)
                                 .clickable {

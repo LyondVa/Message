@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -115,6 +116,7 @@ fun AccountSettingImageRow(imageUrl: String, onItemClick:()->Unit) {
         ) {
             Text(
                 text = "Profile Image",
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 20.dp)
             )
         }

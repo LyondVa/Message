@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -68,7 +69,7 @@ fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavC
                 )
                 Text(
                     text = item.title,
-                    fontSize = 12.sp,
+                    style = MaterialTheme.typography.labelSmall,
                     color = if (selectedItem == item) Color.Black else Color.Gray
                 )
             }

@@ -76,7 +76,10 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                                 .fillMaxWidth()
                                 .weight(1f)
                         ) {
-                            Text(text = "No Statuses Available")
+                            Text(
+                                text = "No Statuses Available",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
                         }
                     } else {
                         if (myStatuses.isNotEmpty()) {
@@ -87,7 +90,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                                 navigateTo(
                                     navController = navController,
                                     DestinationScreen.SingleStatus.createRoute(myStatuses[0].user.userId!!)
-                                   )
+                                )
                             }
                             CommonDivider()
                             val uniqueUsers = otherStatuses.map { it.user }.toSet().toList()

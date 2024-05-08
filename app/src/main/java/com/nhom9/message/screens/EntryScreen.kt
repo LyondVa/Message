@@ -25,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,7 +86,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
             )
             Text(
                 text = "Welcome",
-                fontSize = 40.sp,
+                style = MaterialTheme.typography.displayLarge,
                 fontWeight = FontWeight.Bold,
                 color = md_theme_light_onPrimaryContainer,
                 fontFamily = FontFamily.SansSerif,
@@ -101,6 +102,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
                 Text(
                     text = "Login",
                     color = Color.White,
+                    style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier
                 )
             }
@@ -120,12 +122,14 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
             ) {
                 Text(
                     text = "Sign Up",
-                    color = Color.Black
+                    color = Color.Black,
+                    style = MaterialTheme.typography.labelMedium
                 )
             }
             Text(
                 text = "-Or log in with-",
                 color = md_theme_light_onPrimaryContainer,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                 .padding(8.dp)
             )

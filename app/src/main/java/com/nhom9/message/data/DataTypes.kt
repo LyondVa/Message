@@ -31,8 +31,9 @@ data class ChatUser(
 )
 
 data class Message(
+    var type: String? = "",
     var sendBy: String? = "",
-    val message: String? = "",
+    val content: String? = "",
     val timeStamp: String? = ""
 )
 

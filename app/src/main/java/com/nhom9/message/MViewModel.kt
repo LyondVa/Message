@@ -11,6 +11,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.nhom9.message.data.CHATS
 import com.nhom9.message.data.ChatData
 import com.nhom9.message.data.ChatUser
@@ -44,6 +45,9 @@ class MViewModel @Inject constructor(
     var currentChatMessageListener: ListenerRegistration? = null
     val status = mutableStateOf<List<Status>>(listOf())
     val inProgressStatus = mutableStateOf(false)
+    val onToggleTheme = {
+
+    }
 
     init {
         val currentUser = auth.currentUser
@@ -172,6 +176,7 @@ class MViewModel @Inject constructor(
                 val user = value.toObject<UserData>()
                 userData.value = user
                 inProcess.value = false
+                UpdateName("hi")
                 populateChats()
                 populateStatuses()
             }
@@ -269,10 +274,19 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun onSendReply(chatId: String, message: String) {
+    fun onSendReply(chatId: String, content: String) {
         val time = Calendar.getInstance().time.toString()
-        val message = Message(userData.value?.userId, message, time)
+        val message = Message("text", userData.value?.userId, content, time)
         db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(message)
+    }
+
+    fun onSendImage(chatId: String, imageUri: Uri){
+        val time = Calendar.getInstance().time.toString()
+        uploadImage(imageUri){
+            val imageMessage = Message("image", userData.value?.userId, it.toString(), time)
+            db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(imageMessage)
+        }
+
     }
 
     fun populateMessages(chatID: String) {
@@ -359,6 +373,26 @@ class MViewModel @Inject constructor(
             }
             inProgressStatus.value = false
         }
+    }
+
+
+    fun UpdateName(name: String) {
+        val uid = auth.currentUser?.uid
+        /*db.collection(USER_NODE).document(uid!!)
+            .update(
+                "name",
+                name
+            )*/
+        db.collection(CHATS).whereEqualTo("USERNAME", userData.value?.name).get()
+            .addOnSuccessListener { documents->
+                for(document in documents){
+                    Log.d("chats", "${document.id} => ${document.data}")
+                }
+            }
+
+
+
+
     }
 }
 

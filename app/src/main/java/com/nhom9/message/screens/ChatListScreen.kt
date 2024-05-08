@@ -99,7 +99,8 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                                 .fillMaxWidth()
                                 .weight(1f)
                         ) {
-                            Text(text = "No Chats Available")
+                            Text(text = "No Chats Available",
+                                style = MaterialTheme.typography.titleMedium,)
                         }
                     } else {
                         LazyColumn(
@@ -157,10 +158,14 @@ fun FAB(
                     onAddChat(addChatNumber.value)
                     addChatNumber.value = ""
                 }) {
-                    Text(text = "Add Chat")
+                    Text(
+                        text = "Add Chat",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
             },
-            title = { Text(text = "Add Chat") },
+            title = { Text(text = "Add Chat",
+                style = MaterialTheme.typography.titleLarge,) },
             text = {
                 OutlinedTextField(
                     value = addChatNumber.value,

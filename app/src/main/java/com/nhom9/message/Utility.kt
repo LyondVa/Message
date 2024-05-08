@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.nhom9.message.ui.theme.bar_gray
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 fun navigateTo(navController: NavController, route: String) {
     navController.navigate(route) {
@@ -79,7 +83,7 @@ fun CommonImage(
     AsyncImage(
         model = data,
         contentScale = contentScale,
-        contentDescription = "Profile Image Preview",
+        contentDescription = "null",
         modifier = modifier
     )
 }
@@ -107,7 +111,7 @@ fun TitleBar(text: String) {
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
                 .padding(8.dp)
         )
@@ -125,12 +129,15 @@ fun TitleBarWithBack(navController: NavController, text: String) {
         Icon(
             imageVector = Icons.Outlined.ArrowBack,
             contentDescription = null,
-            modifier = Modifier.align(Alignment.CenterStart).padding(16.dp).clickable { navController.popBackStack() }
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(16.dp)
+                .clickable { navController.popBackStack() }
         )
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
                 .padding(8.dp)
                 .align(Alignment.Center)
@@ -162,6 +169,7 @@ fun TitleBarWithBackAndRightButton(
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineSmall,
             fontSize = 20.sp,
             modifier = Modifier
                 .padding(8.dp)
@@ -175,7 +183,10 @@ fun TitleBarWithBackAndRightButton(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
         ) {
-            Text(text = buttonText)
+            Text(
+                text = buttonText,
+                style = MaterialTheme.typography.labelMedium,
+            )
         }
     }
 
@@ -202,6 +213,7 @@ fun CommonImageRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
         )
         Text(
             text = name ?: "---",
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(start = 4.dp)
         )
@@ -228,12 +240,14 @@ fun CommonSettingRow(
             Icon(icon, null, modifier = Modifier.padding(start = 20.dp))
             Text(
                 text = name,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .padding(start = 8.dp)
             )
         } else {
             Text(
                 text = name,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 20.dp)
             )
         }
@@ -249,9 +263,15 @@ fun CommonSubSettingRow(title: String, text: String = "", onItemClick: () -> Uni
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
 
             if (text != "") {
-                Text(text = text, color = Color.LightGray)
+                Text(
+                    text = text, color = Color.LightGray,
+                    style = MaterialTheme.typography.titleMedium,
+                )
             } else {
-                Text(text = "Error!")
+                Text(
+                    text = "Error!",
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
             Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = null)
         }

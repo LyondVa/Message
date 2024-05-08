@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,7 +79,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             )
             Text(
                 text = "Sign Up",
-                fontSize = 40.sp,
+                style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
                 color = md_theme_light_onPrimaryContainer,
                 fontFamily = FontFamily.SansSerif,
@@ -89,7 +90,12 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 onValueChange = {
                     nameState.value = it
                 },
-                label = { Text(text = "Name") },
+                label = {
+                    Text(
+                        text = "Name",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -98,7 +104,12 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 onValueChange = {
                     phoneNumberState.value = it
                 },
-                label = { Text(text = "Phone number") },
+                label = {
+                    Text(
+                        text = "Phone number",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -107,7 +118,12 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 onValueChange = {
                     emailState.value = it
                 },
-                label = { Text(text = "Email") },
+                label = {
+                    Text(
+                        text = "Email",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -116,7 +132,12 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 onValueChange = {
                     passwordState.value = it
                 },
-                label = { Text(text = "Password") },
+                label = {
+                    Text(
+                        text = "Password",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
                 modifier = Modifier
                     .padding(8.dp)
             )
@@ -133,7 +154,10 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                     .padding(8.dp)
             ) {
 
-                Text(text = "SIGN UP")
+                Text(
+                    text = "Sign Up",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
