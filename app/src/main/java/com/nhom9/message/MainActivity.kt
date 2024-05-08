@@ -2,6 +2,9 @@ package com.nhom9.message
 
 import android.content.Context
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nhom9.message.screens.ChatListScreen
+import com.nhom9.message.screens.ChatProfileScreen
 import com.nhom9.message.screens.EntryScreen
 import com.nhom9.message.screens.LoginScreen
 import com.nhom9.message.screens.ProfileScreen
@@ -37,20 +41,22 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "darkMode")
-sealed class DestinationScreen(var route : String){
+
+sealed class DestinationScreen(var route: String) {
     object Entry : DestinationScreen(route = "entry")
     object SignUp : DestinationScreen(route = "signup")
     object Login : DestinationScreen(route = "login")
     object Profile : DestinationScreen(route = "profile")
     object ChatList : DestinationScreen(route = "chatList")
-    object SingleChat: DestinationScreen(route = "singleChat/{chatId}"){
-        fun createRoute(id : String?) = "singleChat/$id" //custom??x
+    object SingleChat : DestinationScreen(route = "singleChat/{chatId}") {
+        fun createRoute(id: String?) = "singleChat/$id" //custom??x
     }
 
     object StatusList : DestinationScreen(route = "statusList")
-    object SingleStatus: DestinationScreen(route = "singleStatus/{userId}"){
-        fun createRoute(userId : String) = "singleStatus/$userId"
+    object SingleStatus : DestinationScreen(route = "singleStatus/{userId}") {
+        fun createRoute(userId: String) = "singleStatus/$userId"
     }
+
     object AccountSetting : DestinationScreen(route = "accountSetting")
     object DisplaySetting : DestinationScreen(route = "displaySetting")
     object NotificationAndSoundSetting : DestinationScreen(route = "notificationAndSoundSetting")
@@ -58,6 +64,9 @@ sealed class DestinationScreen(var route : String){
     object EditName : DestinationScreen(route = "editName")
     object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
     object EditProfileImage : DestinationScreen(route = "editProfileImage")
+    object ChatProfile : DestinationScreen(route = "chatProfile/{userId}"){
+        fun createRoute(userId: String) = "chatProfile/$userId"
+    }
 }
 
 @AndroidEntryPoint
@@ -65,8 +74,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme (
-            ){
+            AppTheme(
+            ) {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -82,60 +91,66 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun ChatAppNavigation(){
+fun ChatAppNavigation() {
     val viewModel = hiltViewModel<MViewModel>()
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = DestinationScreen.Entry.route){
-        composable(DestinationScreen.Entry.route){
+    NavHost(navController = navController, startDestination = DestinationScreen.Entry.route) {
+        composable(DestinationScreen.Entry.route) {
             EntryScreen(navController, viewModel)
         }
-        composable(DestinationScreen.SignUp.route){
+        composable(DestinationScreen.SignUp.route) {
             SignUpScreen(navController, viewModel)
         }
-        composable(DestinationScreen.Login.route){
+        composable(DestinationScreen.Login.route) {
             LoginScreen(navController, viewModel)
         }
-        composable(DestinationScreen.ChatList.route){
+        composable(DestinationScreen.ChatList.route) {
             ChatListScreen(navController, viewModel)
         }
-        composable(DestinationScreen.SingleChat.route){
+        composable(DestinationScreen.SingleChat.route) {
             val chatId = it.arguments?.getString("chatId")
-            chatId?.let{
+            chatId?.let {
                 SingleChatScreen(navController, viewModel, chatId)
             }
         }
-        composable(DestinationScreen.StatusList.route){
+        composable(DestinationScreen.StatusList.route) {
             StatusScreen(navController, viewModel)
         }
-        composable(DestinationScreen.SingleStatus.route){
+        composable(DestinationScreen.SingleStatus.route) {
             val userId = it.arguments?.getString("userId")
             userId?.let {
                 SingleStatusScreen(navController, viewModel, userId)
             }
         }
-        composable(DestinationScreen.Profile.route){
+        composable(DestinationScreen.Profile.route) {
             ProfileScreen(navController, viewModel)
         }
-        composable(DestinationScreen.AccountSetting.route){
+        composable(DestinationScreen.AccountSetting.route) {
             AccountSettingScreen(navController, viewModel)
         }
-        composable(DestinationScreen.DisplaySetting.route){
+        composable(DestinationScreen.DisplaySetting.route) {
             DisplaySettingScreen(navController, viewModel)
         }
-        composable(DestinationScreen.NotificationAndSoundSetting.route){
+        composable(DestinationScreen.NotificationAndSoundSetting.route) {
             NotificationAndSoundSettingScreen(navController, viewModel)
         }
-        composable(DestinationScreen.PrivacyAndSecuritySetting.route){
+        composable(DestinationScreen.PrivacyAndSecuritySetting.route) {
             PrivacyAndSecuritySettingScreen(navController, viewModel)
         }
-        composable(DestinationScreen.EditName.route){
+        composable(DestinationScreen.EditName.route) {
             EditNameScreen(navController, viewModel)
         }
-        composable(DestinationScreen.EditPhoneNumber.route){
+        composable(DestinationScreen.EditPhoneNumber.route) {
             EditPhoneNumberScreen(navController, viewModel)
         }
-        composable(DestinationScreen.EditProfileImage.route){
+        composable(DestinationScreen.EditProfileImage.route) {
             EditProfileImageScreen(navController, viewModel)
+        }
+        composable(DestinationScreen.ChatProfile.route) {
+            val userId = it.arguments?.getString("userId")
+            userId?.let {
+            ChatProfileScreen(navController, viewModel, userId)
+            }
         }
     }
 }

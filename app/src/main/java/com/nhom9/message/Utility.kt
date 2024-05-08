@@ -15,10 +15,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -106,7 +109,6 @@ fun TitleBar(text: String) {
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = bar_gray)
     ) {
         Text(
             text = text,
@@ -124,16 +126,12 @@ fun TitleBarWithBack(navController: NavController, text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = bar_gray)
     ) {
-        Icon(
-            imageVector = Icons.Outlined.ArrowBack,
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(16.dp)
-                .clickable { navController.popBackStack() }
-        )
+        IconButton(
+            onClick = {navController.popBackStack()}
+        ) {
+            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
+        }
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
@@ -156,16 +154,12 @@ fun TitleBarWithBackAndRightButton(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = bar_gray)
     ) {
-        Icon(
-            imageVector = Icons.Outlined.ArrowBack,
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 16.dp)
-                .clickable { navController.popBackStack() }
-        )
+        IconButton(
+            onClick = {navController.popBackStack()}
+        ) {
+            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
+        }
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
@@ -231,7 +225,6 @@ fun CommonSettingRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(Color.White)
             .clickable {
                 onItemClick.invoke()
             }
@@ -256,15 +249,14 @@ fun CommonSettingRow(
 
 @Composable
 fun CommonSubSettingRow(title: String, text: String = "", onItemClick: () -> Unit = {}) {
-    Box(modifier = Modifier.background(Color.White)) {
+    Box() {
         CommonSettingRow(name = title) {
             onItemClick.invoke()
         }
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
-
             if (text != "") {
                 Text(
-                    text = text, color = Color.LightGray,
+                    text = text,
                     style = MaterialTheme.typography.titleMedium,
                 )
             } else {
@@ -276,5 +268,20 @@ fun CommonSubSettingRow(title: String, text: String = "", onItemClick: () -> Uni
             Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = null)
         }
     }
+}
 
+@Composable
+fun CallBox() {
+    Row {
+        IconButton(
+            onClick = {}
+        ) {
+            Icon(imageVector = Icons.Outlined.Phone, contentDescription = null)
+        }
+        IconButton(
+            onClick = {}
+        ) {
+            Icon(painterResource(id = R.drawable.outline_video_call_24), contentDescription = null)
+        }
+    }
 }

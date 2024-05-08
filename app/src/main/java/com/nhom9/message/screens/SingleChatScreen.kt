@@ -24,12 +24,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -52,17 +54,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.nhom9.message.CallBox
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
+import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.data.Message
+import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import com.nhom9.message.ui.theme.md_theme_light_primaryContainer
 
 @Composable
 fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId: String) {
-    var localImageUrl by remember { mutableStateOf<Uri?>(null) }
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
@@ -87,6 +91,12 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         if (myUser?.userId == currentChat.user1.userId) currentChat.user2 else currentChat.user1
     var chatMessages = viewModel.chatMessages
 
+    val onHeaderClick = {
+        navigateTo(
+            navController,
+            DestinationScreen.ChatProfile/*.route*/.createRoute(chatUser.userId!!)
+        )
+    }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.populateMessages(chatId)
@@ -98,7 +108,11 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
 
     Column {
-        ChatHeader(name = chatUser.name ?: "", imageUrl = chatUser.imageUrl ?: "") {
+        ChatHeader(
+            name = chatUser.name ?: "",
+            imageUrl = chatUser.imageUrl ?: "",
+            onHeaderClick = onHeaderClick
+        ) {
             viewModel.depopulateMessages()
             navController.popBackStack()
         }
@@ -165,21 +179,19 @@ fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: S
 }
 
 @Composable
-fun ChatHeader(name: String, imageUrl: String, onBack: () -> Unit) {
+fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBackClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-
-        Icon(
-            imageVector = Icons.Rounded.ArrowBack,
-            contentDescription = null,
-            modifier = Modifier
-                .clickable { onBack.invoke() }
-                .padding(8.dp)
-        )
+        IconButton(
+            onClick = { onBackClick.invoke() }
+        ) {
+            Icon(Icons.Rounded.ArrowBack, contentDescription = null)
+        }
         ProfileBox(name, imageUrl, modifier = Modifier
             .weight(1f)
-            .clickable { })
+            .clickable { onHeaderClick.invoke() }
+        )
         CallBox()
     }
 }
@@ -204,20 +216,16 @@ fun ReplyBox(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Icon(
-                imageVector = Icons.Outlined.AddCircle,
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable { }
-                    .padding(8.dp)
-            )
-            Icon(
-                painterResource(id = R.drawable.outline_image_24),
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable { onImageClick.invoke() }
-                    .padding(8.dp)
-            )
+            IconButton(
+                onClick = { onSendReply.invoke() }
+            ) {
+                Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = null)
+            }
+            IconButton(
+                onClick = { onImageClick.invoke() }
+            ) {
+                Icon(painterResource(id = R.drawable.outline_image_24), contentDescription = null)
+            }
             OutlinedTextField(
                 value = reply,
                 onValueChange = onReplyChange,
@@ -226,34 +234,15 @@ fun ReplyBox(
                     .height(40.dp)
                     .weight(0.1f)
             )
-            Icon(
-                imageVector = Icons.Outlined.Send,
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable { onSendReply.invoke() }
-                    .padding(8.dp)
-            )
+            IconButton(
+                onClick = { onSendReply.invoke() }
+            ) {
+                Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
+            }
         }
     }
 }
 
-@Composable
-fun CallBox() {
-    Row {
-        Icon(
-            imageVector = Icons.Outlined.Phone, contentDescription = null,
-            modifier = Modifier
-                .clickable { }
-                .padding(8.dp)
-        )
-        Icon(
-            painterResource(id = R.drawable.outline_video_call_24), contentDescription = null,
-            modifier = Modifier
-                .clickable { }
-                .padding(8.dp)
-        )
-    }
-}
 
 @Composable
 fun ProfileBox(name: String, imageUrl: String, modifier: Modifier) {

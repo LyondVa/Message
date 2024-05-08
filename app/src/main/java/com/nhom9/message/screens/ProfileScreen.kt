@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
@@ -37,11 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
 import com.nhom9.message.CommonProgressbar
@@ -161,7 +157,6 @@ fun ProfileImageBar(
 @Composable
 fun InfoCard(
     phoneNumber: String,
-    //handle: String? = null
 ) {
     Surface(
         shadowElevation = 2.dp,
@@ -192,7 +187,9 @@ fun InfoCard(
 @Composable
 fun SettingCard(navController: NavController) {
     Surface(
+        shadowElevation = 2.dp,
         modifier = Modifier
+            .padding(bottom = 8.dp)
             .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
@@ -226,27 +223,31 @@ fun SettingCard(navController: NavController) {
 
 @Composable
 fun LogOutCard(navController: NavController, viewModel: MViewModel) {
-    Box(modifier = Modifier.padding(top = 8.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .background(Color.White)
-                .clickable {
-                    viewModel.logOut()
-                    navigateTo(navController, DestinationScreen.Entry.route)
-                }
-        ) {
-            Icon(Icons.Outlined.ExitToApp, null)
-            Text(
-                text = "Log Out",
-                style = MaterialTheme.typography.titleMedium,
+    Surface(
+        shadowElevation = 2.dp,
+        modifier = Modifier
+    ) {
+        Box(modifier = Modifier.padding(top = 8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .padding(start = 8.dp)
-            )
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .clickable {
+                        viewModel.logOut()
+                        navigateTo(navController, DestinationScreen.Entry.route)
+                    }
+            ) {
+                Icon(Icons.Outlined.ExitToApp, null)
+                Text(
+                    text = "Log Out",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                )
 
+            }
         }
     }
 }

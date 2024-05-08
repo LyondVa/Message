@@ -77,7 +77,6 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(it)
-                        .background(Color.White)
                 ) {
                     Box {
                         TitleBar(text = "Messages")
@@ -137,7 +136,6 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FAB(
     showDialogue: Boolean,

@@ -12,6 +12,8 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.nhom9.message.data.BLOCKED_CHATS
+import com.nhom9.message.data.BlockedChats
 import com.nhom9.message.data.CHATS
 import com.nhom9.message.data.ChatData
 import com.nhom9.message.data.ChatUser
@@ -39,6 +41,7 @@ class MViewModel @Inject constructor(
     var signIn = mutableStateOf(false)
     val userData = mutableStateOf<UserData?>(null)
     val chats = mutableStateOf<List<ChatData>>(listOf())
+    val chatUserIds = mutableStateOf<List<String>>(listOf())
     var inProcessChats = mutableStateOf(false)
     val chatMessages = mutableStateOf<List<Message>>(listOf())
     val inProgressChatMessages = mutableStateOf(false)
@@ -48,6 +51,7 @@ class MViewModel @Inject constructor(
     val onToggleTheme = {
 
     }
+    val blockedChats = mutableStateOf<List<BlockedChats>>(listOf())
 
     init {
         val currentUser = auth.currentUser
@@ -179,6 +183,7 @@ class MViewModel @Inject constructor(
                 UpdateName("hi")
                 populateChats()
                 populateStatuses()
+                getBlockedChats()
             }
         }
     }
@@ -394,5 +399,36 @@ class MViewModel @Inject constructor(
 
 
     }
-}
 
+    fun getChatUser(userId: String): ChatUser? {
+        for(chat in chats.value){
+            return if(chat.user1.userId == userId){
+                chat.user1
+            } else{
+                chat.user2
+            }
+        }
+        return null
+    }
+
+    fun getBlockedChats(){
+        db.collection(BLOCKED_CHATS).where(
+            Filter.or(
+                Filter.equalTo("blocker1Id", userData.value?.userId),
+                Filter.equalTo("blocker2Id", userData.value?.userId)
+            )
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                blockedChats.value = value.documents.mapNotNull {
+                    it.toObject<BlockedChats>()
+                }
+                inProcessChats.value = false
+            }
+        }
+    }
+
+
+}

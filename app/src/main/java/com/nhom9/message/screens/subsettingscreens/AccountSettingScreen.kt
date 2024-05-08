@@ -102,7 +102,6 @@ fun AccountInfoCard(
 @Composable
 fun AccountSettingImageRow(imageUrl: String, onItemClick:()->Unit) {
     Box(modifier = Modifier
-        .background(Color.White)
         .clickable {
             onItemClick.invoke()
         }
@@ -112,7 +111,6 @@ fun AccountSettingImageRow(imageUrl: String, onItemClick:()->Unit) {
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .fillMaxWidth()
-                .background(Color.White)
         ) {
             Text(
                 text = "Profile Image",

@@ -65,7 +65,6 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(it)
-                        .background(Color.White)
                 ) {
                     TitleBar(text = "Status")
                     if (statuses.isEmpty()) {

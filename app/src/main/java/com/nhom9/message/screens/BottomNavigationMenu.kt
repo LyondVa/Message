@@ -43,7 +43,6 @@ fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavC
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(top = 4.dp)
-            .background(color = bar_gray)
     ) {
         for (item in BottomNavigationItem.entries) {
             Column(

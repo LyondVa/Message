@@ -16,7 +16,11 @@ data class UserData(
     )
 
 }
-
+data class BlockedChats(
+    val chatId: String? = "",
+    val user1Id: String?="",
+    val user2Id: String?=""
+)
 data class ChatData(
     val chatId: String? = "",
     val user1: ChatUser = ChatUser(),

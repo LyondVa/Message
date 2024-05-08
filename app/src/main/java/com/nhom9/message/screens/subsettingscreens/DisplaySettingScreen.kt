@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
@@ -51,7 +52,7 @@ fun DisplaySettingScreen(navController: NavController, viewModel: MViewModel) {
 
 
     Column {
-        TitleBarWithBack(navController = navController, text = "Account")
+        TitleBarWithBack(navController = navController, text = "Display")
         DisplaySettings(viewModel.onToggleTheme)
     }
 
@@ -76,8 +77,8 @@ fun DisplaySettings(onToggleTheme: () -> Unit) {
 fun DarkModeRow(onToggleTheme:()->Unit) {
     Box(
         modifier = Modifier
-            .background(Color.White)
             .fillMaxWidth()
+            .height(60.dp)
     ) {
         var checked by remember {
             mutableStateOf(true)
@@ -90,7 +91,7 @@ fun DarkModeRow(onToggleTheme:()->Unit) {
             text = "Dark Mode",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
-                .padding(start = 8.dp)
+                .padding(start = 20.dp)
                 .align(Alignment.CenterStart)
         )
         Switch(
