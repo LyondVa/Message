@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.MViewModel
-import com.nhom9.message.TitleBarWithBack
 import com.nhom9.message.TitleBarWithBackAndRightButton
 
 @Composable

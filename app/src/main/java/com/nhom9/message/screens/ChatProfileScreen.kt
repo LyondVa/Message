@@ -38,7 +38,6 @@ import com.nhom9.message.CallBox
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
 import com.nhom9.message.MViewModel
-import com.nhom9.message.data.UserData
 
 @Composable
 fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userId: String) {

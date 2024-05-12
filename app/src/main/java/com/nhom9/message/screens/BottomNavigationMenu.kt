@@ -1,7 +1,6 @@
 package com.nhom9.message.screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,12 +18,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.R
 import com.nhom9.message.navigateTo
-import com.nhom9.message.ui.theme.bar_gray
 
 enum class BottomNavigationItem(
     val icon: Int,
