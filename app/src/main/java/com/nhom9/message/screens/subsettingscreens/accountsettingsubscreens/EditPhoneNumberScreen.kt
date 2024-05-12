@@ -30,7 +30,7 @@ fun EditPhoneNumberScreen(navController: NavController, viewModel: MViewModel){
         }
 
         val onButtonClick:()->Unit={
-            viewModel.createOrUpdateProfile(phoneNumber = phoneNumber)
+            viewModel.updatePhoneNumber(phoneNumber)
         }
         Column {
             TitleBarWithBackAndRightButton(navController, "Edit Phone Number", "Save", onButtonClick)

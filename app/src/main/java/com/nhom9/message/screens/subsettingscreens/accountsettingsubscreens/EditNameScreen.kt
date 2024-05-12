@@ -31,7 +31,7 @@ fun EditNameScreen(navController: NavController, viewModel: MViewModel){
         }
 
         val onButtonClick:()->Unit={
-            viewModel.createOrUpdateProfile(name = name)
+            viewModel.updateName(name = name)
         }
         Column {
             TitleBarWithBackAndRightButton(navController, "Edit Name", "Save", onButtonClick)

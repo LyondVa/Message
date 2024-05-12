@@ -1,5 +1,7 @@
 package com.nhom9.message.data
 
+import com.google.firebase.Timestamp
+
 data class UserData(
     var userId: String? = "",
     var name: String? = "",
@@ -38,10 +40,11 @@ data class Message(
     var type: String? = "",
     var sendBy: String? = "",
     val content: String? = "",
-    val timeStamp: String? = ""
+    val timeStamp: Timestamp? = Timestamp.now()
 )
 
 data class Status(
+    val statusId: String?="",
     val user: ChatUser = ChatUser(),
     val imageUrl: String? = "",
     val timeStamp: Long? = null

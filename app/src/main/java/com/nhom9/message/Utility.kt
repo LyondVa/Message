@@ -39,10 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.nhom9.message.ui.theme.bar_gray
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.google.firebase.Timestamp
 
 fun navigateTo(navController: NavController, route: String) {
     navController.navigate(route) {
@@ -284,4 +281,14 @@ fun CallBox() {
             Icon(painterResource(id = R.drawable.outline_video_call_24), contentDescription = null)
         }
     }
+}
+
+fun getTimeFromTimestamp(timestamp: Timestamp): String {
+    val time = timestamp.toDate().toString()
+    return time.substring(11, 16)
+}
+
+fun getDateFromTimestamp(timestamp: Timestamp): String{
+    val time = timestamp.toDate().toString()
+    return time.substring(4, 9)
 }

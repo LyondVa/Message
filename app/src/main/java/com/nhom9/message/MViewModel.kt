@@ -4,24 +4,29 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.nhom9.message.data.BLOCKED_CHATS
 import com.nhom9.message.data.BlockedChats
 import com.nhom9.message.data.CHATS
 import com.nhom9.message.data.ChatData
 import com.nhom9.message.data.ChatUser
 import com.nhom9.message.data.Event
+import com.nhom9.message.data.IMAGEURL
 import com.nhom9.message.data.MESSAGE
 import com.nhom9.message.data.Message
+import com.nhom9.message.data.PHONENUMBER
 import com.nhom9.message.data.STATUS
 import com.nhom9.message.data.Status
+import com.nhom9.message.data.USERID
+import com.nhom9.message.data.USERNAME
 import com.nhom9.message.data.USER_NODE
 import com.nhom9.message.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,7 +46,8 @@ class MViewModel @Inject constructor(
     var signIn = mutableStateOf(false)
     val userData = mutableStateOf<UserData?>(null)
     val chats = mutableStateOf<List<ChatData>>(listOf())
-    val chatUserIds = mutableStateOf<List<String>>(listOf())
+
+    //val chatUserIds = mutableStateOf<List<String>>(listOf())
     var inProcessChats = mutableStateOf(false)
     val chatMessages = mutableStateOf<List<Message>>(listOf())
     val inProgressChatMessages = mutableStateOf(false)
@@ -148,7 +154,7 @@ class MViewModel @Inject constructor(
 
     fun saveProfileImage(uri: Uri) {
         uploadImage(uri) {
-            createOrUpdateProfile(imageUrl = it.toString())
+            updateImageUrl(it.toString())
         }
     }
 
@@ -180,7 +186,7 @@ class MViewModel @Inject constructor(
                 val user = value.toObject<UserData>()
                 userData.value = user
                 inProcess.value = false
-                UpdateName("hi")
+                //UpdateName("hi")
                 populateChats()
                 populateStatuses()
                 getBlockedChats()
@@ -280,14 +286,14 @@ class MViewModel @Inject constructor(
     }
 
     fun onSendReply(chatId: String, content: String) {
-        val time = Calendar.getInstance().time.toString()
+        val time = Timestamp.now()
         val message = Message("text", userData.value?.userId, content, time)
         db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(message)
     }
 
-    fun onSendImage(chatId: String, imageUri: Uri){
-        val time = Calendar.getInstance().time.toString()
-        uploadImage(imageUri){
+    fun onSendImage(chatId: String, imageUri: Uri) {
+        val time = Timestamp(Calendar.getInstance().time)
+        uploadImage(imageUri) {
             val imageMessage = Message("image", userData.value?.userId, it.toString(), time)
             db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(imageMessage)
         }
@@ -324,7 +330,9 @@ class MViewModel @Inject constructor(
     }
 
     fun createStatus(imageUrl: String) {
+        val id = db.collection(STATUS).document().id
         val newStatus = Status(
+            statusId = id,
             ChatUser(
                 userData.value?.userId,
                 userData.value?.name,
@@ -335,7 +343,7 @@ class MViewModel @Inject constructor(
             System.currentTimeMillis()
 
         )
-        db.collection(STATUS).document().set(newStatus)
+        db.collection(STATUS).document(id).set(newStatus)
     }
 
     fun populateStatuses() {
@@ -381,37 +389,137 @@ class MViewModel @Inject constructor(
     }
 
 
-    fun UpdateName(name: String) {
+    fun updateName(name: String) {
         val uid = auth.currentUser?.uid
-        /*db.collection(USER_NODE).document(uid!!)
-            .update(
-                "name",
-                name
-            )*/
-        db.collection(CHATS).whereEqualTo("USERNAME", userData.value?.name).get()
-            .addOnSuccessListener { documents->
-                for(document in documents){
-                    Log.d("chats", "${document.id} => ${document.data}")
+        if (uid != null) {
+            db.collection(USER_NODE).document(uid).update(USERNAME, name)
+        } else {
+            handleException(customMessage = "User Id is null")
+            return
+        }
+        db.collection(CHATS).where(
+            Filter.equalTo("user1.$USERID", uid)
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                for (document in value.documents) {
+                    db.collection(CHATS).document(document.id).update("user1.$USERNAME", name)
                 }
             }
+        }
+        db.collection(CHATS).where(
+            Filter.equalTo("user2.$USERID", uid)
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                for (document in value.documents) {
+                    db.collection(CHATS).document(document.id).update("user2.$USERNAME", name)
+                }
+            }
+        }
+        for (status in status.value) {
+            if (status.user.userId == uid) {
+                db.collection(STATUS).document(status.statusId!!).update("user.$USERNAME", name)
+            }
+        }
+        getUserData(uid)
+    }
+    fun updateImageUrl(imageUrl: String) {
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            db.collection(USER_NODE).document(uid).update(IMAGEURL, imageUrl)
+        } else {
+            handleException(customMessage = "User Id is null")
+            return
+        }
+        db.collection(CHATS).where(
+            Filter.equalTo("user1.$USERID", uid)
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                for (document in value.documents) {
+                    db.collection(CHATS).document(document.id).update("user1.$IMAGEURL", imageUrl)
+                }
+            }
+        }
+        db.collection(CHATS).where(
+            Filter.equalTo("user2.$USERID", uid)
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                for (document in value.documents) {
+                    db.collection(CHATS).document(document.id).update("user2.$IMAGEURL", imageUrl)
+                }
+            }
+        }
+        for (status in status.value) {
+            if (status.user.userId == uid) {
+                db.collection(STATUS).document(status.statusId!!).update("user.$IMAGEURL", imageUrl)
+            }
+        }
+        getUserData(uid)
+    }
 
-
-
-
+    fun updatePhoneNumber(phoneNumber: String) {
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            db.collection(USER_NODE).document(uid).update(PHONENUMBER, phoneNumber)
+        } else {
+            handleException(customMessage = "User Id is null")
+            return
+        }
+        db.collection(CHATS).where(
+            Filter.equalTo("user1.$USERID", uid)
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                for (document in value.documents) {
+                    db.collection(CHATS).document(document.id).update("user1.$PHONENUMBER", phoneNumber)
+                }
+            }
+        }
+        db.collection(CHATS).where(
+            Filter.equalTo("user2.$USERID", uid)
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                for (document in value.documents) {
+                    db.collection(CHATS).document(document.id).update("user2.$PHONENUMBER", phoneNumber)
+                }
+            }
+        }
+        for (status in status.value) {
+            if (status.user.userId == uid) {
+                db.collection(STATUS).document(status.statusId!!).update("user.$PHONENUMBER", phoneNumber)
+            }
+        }
+        getUserData(uid)
     }
 
     fun getChatUser(userId: String): ChatUser? {
-        for(chat in chats.value){
-            return if(chat.user1.userId == userId){
+        for (chat in chats.value) {
+            return if (chat.user1.userId == userId) {
                 chat.user1
-            } else{
+            } else {
                 chat.user2
             }
         }
         return null
     }
 
-    fun getBlockedChats(){
+    fun getBlockedChats() {
         db.collection(BLOCKED_CHATS).where(
             Filter.or(
                 Filter.equalTo("blocker1Id", userData.value?.userId),
