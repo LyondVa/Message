@@ -283,6 +283,11 @@ fun CallBox() {
     }
 }
 
+@Composable
+fun Spacer(space: Int = 16){
+    Box(Modifier.padding(space.dp))
+}
+
 fun getTimeFromTimestamp(timestamp: Timestamp): String {
     val time = timestamp.toDate().toString()
     return time.substring(11, 16)

@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ import com.nhom9.message.CommonImage
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
+import com.nhom9.message.Spacer
 import com.nhom9.message.data.Message
 import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
@@ -131,39 +133,60 @@ fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: S
                     .padding(8.dp)
             ) {
                 Row(
+                    verticalAlignment = Alignment.Bottom,
                     modifier = Modifier
+                        .padding(end = 8.dp)
                         .background(
                             color,
                             MaterialTheme.shapes.medium
                         )
                 ) {
-                    Box() {
-
-                        if (message.sendBy == currentUserId) {
+                    if (message.sendBy == currentUserId) {
+                        Text(
+                            text = getTimeFromTimestamp(message.timeStamp!!),
+                            style = MaterialTheme.typography.labelSmall, modifier = Modifier
+                                .padding(start = 8.dp, bottom = 8.dp)
+                        )
+                        if (message.type == "text") {
                             Text(
-                                text = getTimeFromTimestamp(message.timeStamp!!),
-                                style = MaterialTheme.typography.labelSmall,modifier = Modifier
-                                    .align(if (message.sendBy == currentUserId) Alignment.BottomStart else Alignment.BottomEnd)
+                                text = message.content ?: "",
+                                color = md_theme_light_onPrimaryContainer,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(12.dp)
                             )
-                            if (message.type == "text") {
-                                Text(
-                                    text = message.content ?: "",
-                                    color = md_theme_light_onPrimaryContainer,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                        .padding(12.dp)
-                                        .align(if (message.sendBy == currentUserId) Alignment.CenterEnd else Alignment.CenterStart)
-                                )
-                            } else {
-                                AsyncImage(
-                                    model = message.content,
-                                    contentDescription = "null",
-                                    modifier = Modifier
-                                        .align(if (message.sendBy == currentUserId) Alignment.CenterEnd else Alignment.CenterStart)
-                                )
-                            }
+                        } else {
+                            AsyncImage(
+                                model = message.content,
+                                contentDescription = "null",
+                                modifier = Modifier
+                                    .padding(12.dp)
+                            )
                         }
+                    } else {
+                        if (message.type == "text") {
+                            Text(
+                                text = message.content ?: "",
+                                color = md_theme_light_onPrimaryContainer,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .padding(12.dp)
+                            )
+                        } else {
+                            AsyncImage(
+                                model = message.content,
+                                contentDescription = "null",
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
+                        Text(
+                            text = getTimeFromTimestamp(message.timeStamp!!),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier
+                                .padding(start = 8.dp, bottom = 8.dp)
+                        )
                     }
                 }
             }
@@ -210,7 +233,7 @@ fun ReplyBox(
                 .padding(8.dp)
         ) {
             IconButton(
-                onClick = { onSendReply.invoke() }
+                onClick = { }
             ) {
                 Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = null)
             }
@@ -229,7 +252,9 @@ fun ReplyBox(
             )
             IconButton(
                 onClick = {
-                    onSendReply.invoke()
+                    if (reply != "") {
+                        onSendReply.invoke()
+                    }
                 }
             ) {
                 Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
