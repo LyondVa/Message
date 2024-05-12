@@ -1,5 +1,6 @@
 package com.nhom9.message
 
+import android.app.DownloadManager
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -57,7 +58,6 @@ class MViewModel @Inject constructor(
 
     }
     val blockedChats = mutableStateOf<List<BlockedChats>>(listOf())
-
     init {
         val currentUser = auth.currentUser
         signIn.value = currentUser != null
@@ -285,16 +285,18 @@ class MViewModel @Inject constructor(
     }
 
     fun onSendReply(chatId: String, content: String) {
+        val messageId = db.collection(CHATS).document(chatId).collection(MESSAGE).document().id
         val time = Timestamp.now()
-        val message = Message("text", userData.value?.userId, content, time)
-        db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(message)
+        val message = Message(messageId,"text", userData.value?.userId, content, time)
+        db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId).set(message)
     }
 
     fun onSendImage(chatId: String, imageUri: Uri) {
+        val messageId = db.collection(CHATS).document(chatId).collection(MESSAGE).document().id
         val time = Timestamp(Calendar.getInstance().time)
         uploadImage(imageUri) {
-            val imageMessage = Message("image", userData.value?.userId, it.toString(), time)
-            db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(imageMessage)
+            val imageMessage = Message(messageId,"image", userData.value?.userId, it.toString(), time)
+            db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId).set(imageMessage)
         }
 
     }
@@ -536,6 +538,4 @@ class MViewModel @Inject constructor(
             }
         }
     }
-
-
 }

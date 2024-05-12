@@ -18,11 +18,13 @@ data class UserData(
     )
 
 }
+
 data class BlockedChats(
     val chatId: String? = "",
-    val user1Id: String?="",
-    val user2Id: String?=""
+    val user1Id: String? = "",
+    val user2Id: String? = ""
 )
+
 data class ChatData(
     val chatId: String? = "",
     val user1: ChatUser = ChatUser(),
@@ -37,6 +39,7 @@ data class ChatUser(
 )
 
 data class Message(
+    var messageId: String? = "",
     var type: String? = "",
     var sendBy: String? = "",
     val content: String? = "",
@@ -44,7 +47,7 @@ data class Message(
 )
 
 data class Status(
-    val statusId: String?="",
+    val statusId: String? = "",
     val user: ChatUser = ChatUser(),
     val imageUrl: String? = "",
     val timeStamp: Long? = null

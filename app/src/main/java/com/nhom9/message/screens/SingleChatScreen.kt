@@ -50,6 +50,8 @@ import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import com.nhom9.message.ui.theme.md_theme_light_primaryContainer
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId: String) {
@@ -69,6 +71,10 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
     val onImageClick = {
         launcher.launch("image/*")
+    }
+
+    val onMessageImageClick: (String) -> Unit = {
+        navigateTo(navController, DestinationScreen.ChatImage.createRoute(URLEncoder.encode(it, StandardCharsets.UTF_8.toString())))
     }
 
     val myUser = viewModel.userData.value
@@ -106,7 +112,8 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         MessageBox(
             modifier = Modifier.weight(1f),
             chatMessages = chatMessages.value,
-            currentUserId = myUser?.userId ?: ""
+            currentUserId = myUser?.userId ?: "",
+            onMessageImageClick = onMessageImageClick
         )
         ReplyBox(
             reply = reply,
@@ -118,7 +125,12 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
 }
 
 @Composable
-fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: String?) {
+fun MessageBox(
+    modifier: Modifier,
+    chatMessages: List<Message>,
+    currentUserId: String?,
+    onMessageImageClick: (String) -> Unit
+) {
     LazyColumn(modifier = modifier) {
         items(chatMessages) { message ->
             val alignment = if (message.sendBy == currentUserId) Alignment.End else Alignment.Start
@@ -159,6 +171,7 @@ fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: S
                                 contentDescription = "null",
                                 modifier = Modifier
                                     .padding(12.dp)
+                                    .clickable { onMessageImageClick(message.content!!) }
                             )
                         }
                     } else {
@@ -175,7 +188,9 @@ fun MessageBox(modifier: Modifier, chatMessages: List<Message>, currentUserId: S
                             AsyncImage(
                                 model = message.content,
                                 contentDescription = "null",
-                                modifier = Modifier.padding(12.dp)
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .clickable { onMessageImageClick(message.content!!) }
                             )
                         }
                         Text(

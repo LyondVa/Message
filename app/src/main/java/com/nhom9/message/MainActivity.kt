@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.nhom9.message.screens.ChatImageScreen
 import com.nhom9.message.screens.ChatListScreen
 import com.nhom9.message.screens.ChatProfileScreen
 import com.nhom9.message.screens.EntryScreen
@@ -55,8 +56,12 @@ sealed class DestinationScreen(var route: String) {
     object EditName : DestinationScreen(route = "editName")
     object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
     object EditProfileImage : DestinationScreen(route = "editProfileImage")
-    object ChatProfile : DestinationScreen(route = "chatProfile/{userId}"){
+    object ChatProfile : DestinationScreen(route = "chatProfile/{userId}") {
         fun createRoute(userId: String) = "chatProfile/$userId"
+    }
+
+    object ChatImage : DestinationScreen(route = "chatImage/{imageUrl}") {
+        fun createRoute(imageUrl: String) = "chatImage/$imageUrl"
     }
 }
 
@@ -140,7 +145,13 @@ fun ChatAppNavigation() {
         composable(DestinationScreen.ChatProfile.route) {
             val userId = it.arguments?.getString("userId")
             userId?.let {
-            ChatProfileScreen(navController, viewModel, userId)
+                ChatProfileScreen(navController, viewModel, userId)
+            }
+        }
+        composable(DestinationScreen.ChatImage.route) {
+            val imageUrl = it.arguments?.getString("imageUrl")
+            imageUrl?.let {
+                ChatImageScreen(navController, viewModel, imageUrl)
             }
         }
     }

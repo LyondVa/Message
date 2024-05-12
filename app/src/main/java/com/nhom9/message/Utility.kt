@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -125,7 +126,7 @@ fun TitleBarWithBack(navController: NavController, text: String) {
             .fillMaxWidth()
     ) {
         IconButton(
-            onClick = {navController.popBackStack()}
+            onClick = { navController.popBackStack() }
         ) {
             Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
         }
@@ -153,7 +154,7 @@ fun TitleBarWithBackAndRightButton(
             .fillMaxWidth()
     ) {
         IconButton(
-            onClick = {navController.popBackStack()}
+            onClick = { navController.popBackStack() }
         ) {
             Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
         }
@@ -180,7 +181,43 @@ fun TitleBarWithBackAndRightButton(
             )
         }
     }
+}
 
+@Composable
+fun TitleBarWithBackAndVertIcon(
+    navController: NavController,
+    text: String,
+    onButtonClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterStart)
+        ) {
+            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
+        }
+        Text(
+            text = text,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineSmall,
+            fontSize = 20.sp,
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.Center)
+        )
+        IconButton(
+            onClick = { onButtonClick.invoke() },
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+        ) {
+            Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = null)
+        }
+    }
 }
 
 @Composable
@@ -284,7 +321,7 @@ fun CallBox() {
 }
 
 @Composable
-fun Spacer(space: Int = 16){
+fun Spacer(space: Int = 16) {
     Box(Modifier.padding(space.dp))
 }
 
@@ -293,7 +330,7 @@ fun getTimeFromTimestamp(timestamp: Timestamp): String {
     return time.substring(11, 16)
 }
 
-fun getDateFromTimestamp(timestamp: Timestamp): String{
+fun getDateFromTimestamp(timestamp: Timestamp): String {
     val time = timestamp.toDate().toString()
     return time.substring(4, 9)
 }
