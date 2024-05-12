@@ -1,5 +1,6 @@
 package com.nhom9.message.screens
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -45,16 +48,22 @@ import com.nhom9.message.CommonImage
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
+import com.nhom9.message.audiorecorder.AndroidAudioRecorder
+import com.nhom9.message.audiorecorder.playback.AndroidAudioPlayer
 import com.nhom9.message.data.Message
 import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import com.nhom9.message.ui.theme.md_theme_light_primaryContainer
+import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.internal.cacheGet
+import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
 fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId: String) {
+    val context = LocalContext.current
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
@@ -74,7 +83,13 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
 
     val onMessageImageClick: (String) -> Unit = {
-        navigateTo(navController, DestinationScreen.ChatImage.createRoute(URLEncoder.encode(it, StandardCharsets.UTF_8.toString())))
+        navigateTo(
+            navController, DestinationScreen.ChatImage.createRoute(
+                URLEncoder.encode(
+                    it, StandardCharsets.UTF_8.toString()
+                )
+            )
+        )
     }
 
     val myUser = viewModel.userData.value
@@ -85,8 +100,7 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
 
     val onHeaderClick = {
         navigateTo(
-            navController,
-            DestinationScreen.ChatProfile/*.route*/.createRoute(chatUser.userId!!)
+            navController, DestinationScreen.ChatProfile/*.route*/.createRoute(chatUser.userId!!)
         )
     }
 
@@ -115,6 +129,7 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
             currentUserId = myUser?.userId ?: "",
             onMessageImageClick = onMessageImageClick
         )
+        RecordMic(context = context)
         ReplyBox(
             reply = reply,
             onReplyChange = { reply = it },
@@ -136,8 +151,7 @@ fun MessageBox(
             val alignment = if (message.sendBy == currentUserId) Alignment.End else Alignment.Start
             val color = md_theme_light_primaryContainer
             Column(
-                horizontalAlignment = alignment,
-                modifier = Modifier
+                horizontalAlignment = alignment, modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
@@ -146,15 +160,14 @@ fun MessageBox(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .background(
-                            color,
-                            MaterialTheme.shapes.medium
+                            color, MaterialTheme.shapes.medium
                         )
                 ) {
                     if (message.sendBy == currentUserId) {
                         Text(
                             text = getTimeFromTimestamp(message.timeStamp!!),
-                            style = MaterialTheme.typography.labelSmall, modifier = Modifier
-                                .padding(start = 8.dp, bottom = 8.dp)
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                         )
                         if (message.type == "text") {
                             Text(
@@ -162,17 +175,14 @@ fun MessageBox(
                                 color = md_theme_light_onPrimaryContainer,
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .padding(12.dp)
+                                modifier = Modifier.padding(12.dp)
                             )
                         } else {
-                            AsyncImage(
-                                model = message.content,
+                            AsyncImage(model = message.content,
                                 contentDescription = "null",
                                 modifier = Modifier
                                     .padding(12.dp)
-                                    .clickable { onMessageImageClick(message.content!!) }
-                            )
+                                    .clickable { onMessageImageClick(message.content!!) })
                         }
                     } else {
                         if (message.type == "text") {
@@ -181,23 +191,19 @@ fun MessageBox(
                                 color = md_theme_light_onPrimaryContainer,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .padding(12.dp)
+                                modifier = Modifier.padding(12.dp)
                             )
                         } else {
-                            AsyncImage(
-                                model = message.content,
+                            AsyncImage(model = message.content,
                                 contentDescription = "null",
                                 modifier = Modifier
                                     .padding(12.dp)
-                                    .clickable { onMessageImageClick(message.content!!) }
-                            )
+                                    .clickable { onMessageImageClick(message.content!!) })
                         }
                         Text(
                             text = getTimeFromTimestamp(message.timeStamp!!),
                             style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier
-                                .padding(start = 8.dp, bottom = 8.dp)
+                            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                         )
                     }
                 }
@@ -211,15 +217,15 @@ fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBack
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(
-            onClick = { onBackClick.invoke() }
-        ) {
+        IconButton(onClick = { onBackClick.invoke() }) {
             Icon(Icons.Rounded.ArrowBack, contentDescription = null)
         }
-        ProfileBox(name, imageUrl, modifier = Modifier
-            .weight(1f)
-            .clickable { onHeaderClick.invoke() }
-        )
+        ProfileBox(
+            name,
+            imageUrl,
+            modifier = Modifier
+                .weight(1f)
+                .clickable { onHeaderClick.invoke() })
         CallBox()
     }
 }
@@ -233,8 +239,7 @@ fun ReplyBox(
     onImageClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     ) {
         CommonDivider()
         Row(
@@ -244,14 +249,10 @@ fun ReplyBox(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            IconButton(
-                onClick = { }
-            ) {
+            IconButton(onClick = { }) {
                 Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = null)
             }
-            IconButton(
-                onClick = { onImageClick.invoke() }
-            ) {
+            IconButton(onClick = { onImageClick.invoke() }) {
                 Icon(painterResource(id = R.drawable.outline_image_24), contentDescription = null)
             }
             OutlinedTextField(
@@ -262,13 +263,11 @@ fun ReplyBox(
                     .height(40.dp)
                     .weight(0.1f)
             )
-            IconButton(
-                onClick = {
-                    if (reply != "") {
-                        onSendReply.invoke()
-                    }
+            IconButton(onClick = {
+                if (reply != "") {
+                    onSendReply.invoke()
                 }
-            ) {
+            }) {
                 Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
             }
         }
@@ -279,9 +278,7 @@ fun ReplyBox(
 @Composable
 fun ProfileBox(name: String, imageUrl: String, modifier: Modifier) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .wrapContentHeight()
+        verticalAlignment = Alignment.CenterVertically, modifier = modifier.wrapContentHeight()
     ) {
         CommonImage(
             data = imageUrl, modifier = Modifier
@@ -290,9 +287,50 @@ fun ProfileBox(name: String, imageUrl: String, modifier: Modifier) {
                 .clip(CircleShape)
         )
         Text(
-            text = name,
-            style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+            text = name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
         )
 
+    }
+}
+
+@Composable
+fun RecordMic(context: Context) {
+    val recorder by lazy {
+        AndroidAudioRecorder(context)
+    }
+    val player by lazy {
+        AndroidAudioPlayer(context)
+    }
+    var audioFile: File? = null
+
+    Column() {
+        Row {
+            Button(onClick = {
+                File(context.cacheDir, "audio.mp3").also {
+                    recorder.start(it)
+                    audioFile = it
+                }
+            }) {
+                Text(text = "Start")
+            }
+            Button(onClick = {
+                recorder.stop()
+            }) {
+                Text(text = "Stop")
+            }
+        }
+        Row {
+
+            Button(onClick = {
+                player.playFile(audioFile ?: return@Button)
+            }) {
+                Text(text = "Play")
+            }
+            Button(onClick = {
+                player.stop()
+            }) {
+                Text(text = "Stop Player")
+            }
+        }
     }
 }
