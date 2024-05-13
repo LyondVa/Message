@@ -1,6 +1,5 @@
 package com.nhom9.message
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -296,7 +296,7 @@ fun CommonSubSettingRow(title: String, text: String = "", onItemClick: () -> Uni
                 )
             } else {
                 Text(
-                    text = "Error!",
+                    text = stringResource(R.string.error),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
@@ -336,6 +336,3 @@ fun getDateFromTimestamp(timestamp: Timestamp): String {
     return time.substring(4, 9)
 }
 
-@Composable
-fun WaveformBox(context: Context){
-}

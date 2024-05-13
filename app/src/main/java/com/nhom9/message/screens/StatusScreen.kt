@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
@@ -27,6 +28,7 @@ import com.nhom9.message.CommonImageRow
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.TitleBar
 import com.nhom9.message.navigateTo
 
@@ -63,7 +65,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                         .fillMaxSize()
                         .padding(it)
                 ) {
-                    TitleBar(text = "Status")
+                    TitleBar(text = stringResource(R.string.status))
                     if (statuses.isEmpty()) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,7 +75,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                                 .weight(1f)
                         ) {
                             Text(
-                                text = "No Statuses Available",
+                                text = stringResource(R.string.no_statuses_available),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                         }

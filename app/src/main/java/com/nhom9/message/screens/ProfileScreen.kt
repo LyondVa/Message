@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
@@ -44,6 +45,7 @@ import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.CommonSettingRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.navigateTo
 
 @Composable
@@ -62,17 +64,13 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         val phoneNumber by rememberSaveable {
             mutableStateOf(userData?.phoneNumber ?: "")
         }
-        var imageUrl by rememberSaveable {
+        val imageUrl by rememberSaveable {
             mutableStateOf(userData?.imageUrl ?: "")
         }
         val allowEdit = remember {
             mutableStateOf(false)
         }
-        val onChangeImage: (Uri) -> Unit = {
-            imageUrl = it.toString()
-        }
-
-        Column() {
+        Column {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -142,7 +140,7 @@ fun ProfileImageBar(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
-                    text = "Message id: $userId",
+                    text = stringResource(R.string.message_id) +":"+ userId,
                     color = Color.Gray,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -167,12 +165,12 @@ fun InfoCard(
         Column(modifier = Modifier.padding(20.dp))
         {
             Text(
-                text = "Info",
+                text = stringResource(R.string.info),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
             Text(
-                text = "Phone Number", color = Color.Gray,
+                text = stringResource(R.string.phone_number), color = Color.Gray,
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
@@ -198,23 +196,23 @@ fun SettingCard(navController: NavController) {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Settings",
+                text = stringResource(R.string.settings),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(start = 20.dp)
             )
-            CommonSettingRow(name = "Account", Icons.Outlined.Person) {
+            CommonSettingRow(name = stringResource(R.string.account), Icons.Outlined.Person) {
                 navigateTo(navController, DestinationScreen.AccountSetting.route)
             }
             CommonDivider(0)
-            CommonSettingRow(name = "Display", Icons.Outlined.Settings) {
+            CommonSettingRow(name = stringResource(R.string.display), Icons.Outlined.Settings) {
                 navigateTo(navController, DestinationScreen.DisplaySetting.route)
             }
             CommonDivider(0)
-            CommonSettingRow(name = "Notification and Sound", Icons.Outlined.Notifications) {
+            CommonSettingRow(name = stringResource(R.string.notification_and_sound), Icons.Outlined.Notifications) {
                 navigateTo(navController, DestinationScreen.NotificationAndSoundSetting.route)
             }
             CommonDivider(0)
-            CommonSettingRow(name = "Privacy and Security", Icons.Outlined.Warning) {
+            CommonSettingRow(name = stringResource(R.string.privacy_and_security), Icons.Outlined.Warning) {
                 navigateTo(navController, DestinationScreen.PrivacyAndSecuritySetting.route)
             }
         }
@@ -241,7 +239,7 @@ fun LogOutCard(navController: NavController, viewModel: MViewModel) {
             ) {
                 Icon(Icons.Outlined.ExitToApp, null)
                 Text(
-                    text = "Log Out",
+                    text = stringResource(R.string.log_out),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .padding(start = 8.dp)

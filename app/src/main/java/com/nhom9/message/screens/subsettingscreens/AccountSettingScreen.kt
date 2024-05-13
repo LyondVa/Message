@@ -17,9 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,22 +33,18 @@ import com.nhom9.message.navigateTo
 @Composable
 fun AccountSettingScreen(navController: NavController, viewModel: MViewModel) {
     val userData = viewModel.userData.value
-    val tempUserData = userData
 
-    var name by rememberSaveable {
+    val name by rememberSaveable {
         mutableStateOf(userData?.name ?: "")
     }
-    var phoneNumber by rememberSaveable {
+    val phoneNumber by rememberSaveable {
         mutableStateOf(userData?.phoneNumber ?: "")
     }
-    var imageUrl by rememberSaveable {
+    val imageUrl by rememberSaveable {
         mutableStateOf(userData?.imageUrl ?: "")
     }
-    var userId by rememberSaveable {
+    val userId by rememberSaveable {
         mutableStateOf(userData?.userId ?: "")
-    }
-    val allowEdit = remember {
-        mutableStateOf(false)
     }
     Column {
         TitleBarWithBack(navController = navController, text = "Account")

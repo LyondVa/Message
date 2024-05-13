@@ -43,7 +43,7 @@ import com.nhom9.message.MViewModel
 fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userId: String) {
     val chatUser = viewModel.getChatUser(userId)
 
-    Column() {
+    Column {
         Column(
             modifier = Modifier
                 .fillMaxSize()

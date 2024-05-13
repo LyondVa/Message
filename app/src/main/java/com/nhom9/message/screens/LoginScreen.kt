@@ -64,7 +64,6 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                 Box(modifier = Modifier.padding(padding)) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        //verticalArrangement = Arran,
                         modifier = Modifier
                             .fillMaxSize()
                             .wrapContentHeight()

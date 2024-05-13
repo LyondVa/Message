@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -23,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -38,7 +36,6 @@ import com.nhom9.message.R
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
     CheckSignedIn(viewModel, navController)
@@ -62,7 +59,6 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             val passwordState = remember {
                 mutableStateOf(TextFieldValue())
             }
-            val focus = LocalFocusManager.current
 
             BackHandler {
                 navigateTo(navController, DestinationScreen.Entry.route)

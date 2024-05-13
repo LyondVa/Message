@@ -4,12 +4,12 @@ plugins {
     id("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id ("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
     namespace = "com.nhom9.message"
     compileSdk = 34
-
     defaultConfig {
         applicationId = "com.nhom9.message"
         minSdk = 24
@@ -113,4 +113,8 @@ dependencies {
 
     // optional - RxJava3 support
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.1")
+
+    implementation ("androidx.datastore:datastore:1.0.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 }

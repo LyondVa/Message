@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome">Xin Chào!</string>
+    <string name="login">Đăng Nhập</string>
+    <string name="sign_up">Đăng ký</string>
+    <string name="or_log_in_with">-Hoặc đăng nhập bằng-</string>
+    <string name="sign_in_to_continue">Đang nhập để tiếp tục</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="forgotten_password">Quên mật khẩu?</string>
+    <string name="messages">Messages</string>
+    <string name="no_chats_available">Không Có Chat</string>
+    <string name="add_chat">Thêm CHat</string>
+    <string name="recording">Đang Ghi Âm</string>
+    <string name="chats">Chats</string>
+    <string name="statuses">Statuses</string>
+    <string name="profile">Profile</string>
+    <string name="message_id">Id</string>
+    <string name="info">Thông tin</string>
+    <string name="phone_number">Số điện thoai</string>
+    <string name="settings">Tùy Chỉnh</string>
+    <string name="account">Tài Khoản</string>
+    <string name="display">Hiển Thị</string>
+    <string name="notification_and_sound">Thông Báo Và Âm Thanh</string>
+    <string name="privacy_and_security">Bảo Mật Và An Toàn</string>
+    <string name="a_problem_has_occurred">Đã Xảy Ra Vấn Đề</string>
+    <string name="status">Status</string>
+    <string name="no_statuses_available">Không có Status</string>
+    <string name="error">Lỗi!</string>
+    <string name="log_out">Đăng Xuất</string>
+</resources>

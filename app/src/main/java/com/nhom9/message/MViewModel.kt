@@ -33,7 +33,6 @@ import com.nhom9.message.data.USERNAME
 import com.nhom9.message.data.USER_NODE
 import com.nhom9.message.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.File
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
@@ -214,7 +213,6 @@ class MViewModel @Inject constructor(
     }
 
     fun handleException(exception: Exception? = null, customMessage: String = "") {
-        Log.e("MessageApp", customMessage, exception)
         exception?.printStackTrace()
         val errorMessage = exception?.localizedMessage ?: ""
         val message = if (customMessage.isNullOrEmpty()) errorMessage else customMessage

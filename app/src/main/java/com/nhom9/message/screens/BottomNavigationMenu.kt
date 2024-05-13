@@ -1,5 +1,6 @@
 package com.nhom9.message.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -25,16 +27,17 @@ import com.nhom9.message.navigateTo
 
 enum class BottomNavigationItem(
     val icon: Int,
-    val title: String,
+    val title: (Context) -> String,
     val navDestination: DestinationScreen
 ) {
-    CHATLIST(R.drawable.bubble_chat, "Chats", DestinationScreen.ChatList),
-    STATUSLIST(R.drawable.status, "Statuses", DestinationScreen.StatusList),
-    PROFILE(R.drawable.user, "Profile", DestinationScreen.Profile)
+    CHATLIST(R.drawable.bubble_chat, { context: Context -> context.getString(R.string.chats) }, DestinationScreen.ChatList),
+    STATUSLIST(R.drawable.status, { context: Context -> context.getString(R.string.statuses) }, DestinationScreen.StatusList),
+    PROFILE(R.drawable.user, { context: Context -> context.getString(R.string.profile) }, DestinationScreen.Profile)
 }
 
 @Composable
 fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavController) {
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -46,11 +49,11 @@ fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavC
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(4.dp)
                     .weight(1f)
                     .clickable {
                         navigateTo(navController, item.navDestination.route)
                     }
+                    .padding(4.dp)
 
             ) {
                 Image(
@@ -64,7 +67,7 @@ fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavC
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    text = item.title,
+                    text = item.title.invoke(context),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (selectedItem == item) Color.Black else Color.Gray
                 )

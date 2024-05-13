@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Message</string>
-    <string name="default_web_client_id">895068357618-ntmens285ir6o6vb21comsm1nk3chtmm.apps.googleusercontent.com</string>
-    <string name="block">Block</string>
+    <string name="app_name" translatable="false">Message</string>
+    <string name="default_web_client_id" translatable="false">895068357618-ntmens285ir6o6vb21comsm1nk3chtmm.apps.googleusercontent.com</string>
+    <string name="block" translatable="false">Block</string>
     <string name="welcome">Welcome</string>
     <string name="login">Login</string>
     <string name="sign_up">Sign Up</string>
@@ -10,4 +10,24 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="forgotten_password">Forgotten password?</string>
+    <string name="messages">Messages</string>
+    <string name="no_chats_available">No Chats Available</string>
+    <string name="add_chat">Add Chat</string>
+    <string name="recording">Recording</string>
+    <string name="chats">Chats</string>
+    <string name="statuses">Statuses</string>
+    <string name="profile">Profile</string>
+    <string name="message_id">Message id</string>
+    <string name="info">Info</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="settings">Settings</string>
+    <string name="account">Account</string>
+    <string name="display">Display</string>
+    <string name="notification_and_sound">Notification and Sound</string>
+    <string name="privacy_and_security">Privacy and Security</string>
+    <string name="a_problem_has_occurred">A Problem Has Occurred</string>
+    <string name="status">Status</string>
+    <string name="no_statuses_available">No Statuses Available</string>
+    <string name="error">Error!</string>
+    <string name="log_out">Log Out</string>
 </resources>

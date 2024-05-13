@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -37,10 +37,10 @@ import com.nhom9.message.CommonImageRow
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.TitleBar
 import com.nhom9.message.navigateTo
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
     val inProgress = viewModel.inProcessChats.value
@@ -62,7 +62,7 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
             viewModel.onAddChat(it)
             showDialogue.value = false
         }
-        var searchText = remember {
+        val searchText = remember {
             mutableStateOf(TextFieldValue())
         }
         val search = {
@@ -89,14 +89,14 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                     onAddChat = onAddChat
                 )
             },
-            content = {
+            content = { it ->
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(it)
                 ) {
                     Box {
-                        TitleBar(text = "Messages")
+                        TitleBar(text = stringResource(R.string.messages))
                         IconButton(
                             onClick = { },
                             modifier = Modifier.align(Alignment.CenterEnd)
@@ -125,7 +125,7 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                                 .weight(1f)
                         ) {
                             Text(
-                                text = "No Chats Available",
+                                text = stringResource(R.string.no_chats_available),
                                 style = MaterialTheme.typography.titleMedium,
                             )
                         }
@@ -185,14 +185,14 @@ fun FAB(
                     addChatNumber.value = ""
                 }) {
                     Text(
-                        text = "Add Chat",
+                        text = stringResource(R.string.add_chat),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
             },
             title = {
                 Text(
-                    text = "Add Chat",
+                    text = stringResource(R.string.add_chat),
                     style = MaterialTheme.typography.titleLarge,
                 )
             },

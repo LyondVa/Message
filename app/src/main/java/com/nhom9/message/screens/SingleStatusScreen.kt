@@ -22,10 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonImage
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 
 enum class State {
     INITIAL, ACTIVE, COMPLETED
@@ -72,7 +74,7 @@ fun SingleStatusScreen(navController: NavController, viewModel: MViewModel, user
         }
     } else {
         Text(
-            text = "Issue",
+            text = stringResource(R.string.a_problem_has_occurred),
             style = MaterialTheme.typography.titleMedium,
         )
     }

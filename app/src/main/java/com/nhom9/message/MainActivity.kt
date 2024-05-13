@@ -1,5 +1,6 @@
 package com.nhom9.message
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,9 +32,9 @@ import com.nhom9.message.screens.subsettingscreens.PrivacyAndSecuritySettingScre
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditNameScreen
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditPhoneNumberScreen
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditProfileImageScreen
+import com.nhom9.message.screens.subsettingscreens.displaysettingsubscreens.ChangeLanguageScreen
 import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
-
 
 sealed class DestinationScreen(var route: String) {
     object Entry : DestinationScreen(route = "entry")
@@ -63,6 +65,8 @@ sealed class DestinationScreen(var route: String) {
     object ChatImage : DestinationScreen(route = "chatImage/{imageUrl}") {
         fun createRoute(imageUrl: String) = "chatImage/$imageUrl"
     }
+
+    object ChangeLanguage : DestinationScreen(route = "changeLanguage")
 }
 
 @AndroidEntryPoint
@@ -72,7 +76,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme(
             ) {
-
                 // A surface container using the 'background' color from the theme
                 Surface(
                     tonalElevation = 5.dp,
@@ -151,8 +154,11 @@ fun ChatAppNavigation() {
         composable(DestinationScreen.ChatImage.route) {
             val imageUrl = it.arguments?.getString("imageUrl")
             imageUrl?.let {
-                ChatImageScreen(navController, viewModel, imageUrl)
+                ChatImageScreen(navController, imageUrl)
             }
+        }
+        composable(DestinationScreen.ChangeLanguage.route) {
+            ChangeLanguageScreen(navController, viewModel)
         }
     }
 }
