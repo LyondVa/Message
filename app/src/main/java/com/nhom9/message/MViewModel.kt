@@ -1,6 +1,5 @@
 package com.nhom9.message
 
-import android.app.DownloadManager
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +12,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import com.nhom9.message.data.BLOCKED_CHATS
 import com.nhom9.message.data.BlockedChats
 import com.nhom9.message.data.CHATS
@@ -21,6 +21,9 @@ import com.nhom9.message.data.ChatUser
 import com.nhom9.message.data.Event
 import com.nhom9.message.data.IMAGEURL
 import com.nhom9.message.data.MESSAGE
+import com.nhom9.message.data.MESSAGE_AUDIO
+import com.nhom9.message.data.MESSAGE_IMAGE
+import com.nhom9.message.data.MESSAGE_TEXT
 import com.nhom9.message.data.Message
 import com.nhom9.message.data.PHONENUMBER
 import com.nhom9.message.data.STATUS
@@ -30,6 +33,7 @@ import com.nhom9.message.data.USERNAME
 import com.nhom9.message.data.USER_NODE
 import com.nhom9.message.data.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.File
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
@@ -58,6 +62,7 @@ class MViewModel @Inject constructor(
 
     }
     val blockedChats = mutableStateOf<List<BlockedChats>>(listOf())
+
     init {
         val currentUser = auth.currentUser
         signIn.value = currentUser != null
@@ -174,6 +179,21 @@ class MViewModel @Inject constructor(
 
     }
 
+    fun uploadAudio(uri: Uri,metadata: StorageMetadata, onSuccess: (Uri) -> Unit) {
+        inProcess.value = true
+        val storageReference = storage.reference
+        val uuid = UUID.randomUUID()
+        val audioReference = storageReference.child("audio/$uuid")
+        val uploadTask = audioReference.putFile(uri, metadata)
+        uploadTask.addOnSuccessListener {
+            val result = it.metadata?.reference?.downloadUrl
+            result?.addOnSuccessListener(onSuccess)
+            inProcess.value = false
+        }
+            .addOnFailureListener {
+                handleException(it)
+            }
+    }
 
     fun getUserData(uid: String) {
         inProcess.value = true
@@ -284,10 +304,10 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun onSendReply(chatId: String, content: String) {
+    fun onSendText(chatId: String, content: String) {
         val messageId = db.collection(CHATS).document(chatId).collection(MESSAGE).document().id
         val time = Timestamp.now()
-        val message = Message(messageId,"text", userData.value?.userId, content, time)
+        val message = Message(messageId, MESSAGE_TEXT, userData.value?.userId, content, time)
         db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId).set(message)
     }
 
@@ -295,8 +315,27 @@ class MViewModel @Inject constructor(
         val messageId = db.collection(CHATS).document(chatId).collection(MESSAGE).document().id
         val time = Timestamp(Calendar.getInstance().time)
         uploadImage(imageUri) {
-            val imageMessage = Message(messageId,"image", userData.value?.userId, it.toString(), time)
-            db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId).set(imageMessage)
+            val imageMessage = Message(
+                messageId,
+                MESSAGE_IMAGE,
+                userData.value?.userId, it.toString(), time
+            )
+            db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId)
+                .set(imageMessage)
+        }
+    }
+
+    fun onSendAudio(chatId: String,metadata: StorageMetadata, audioUri: Uri) {
+        val messageId = db.collection(CHATS).document(chatId).collection(MESSAGE).document().id
+        val time = Timestamp(Calendar.getInstance().time)
+        uploadAudio(audioUri, metadata) {
+            val audioMessage = Message(
+                messageId,
+                MESSAGE_AUDIO,
+                userData.value?.userId, it.toString(), time
+            )
+            db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId)
+                .set(audioMessage)
         }
 
     }
@@ -429,6 +468,7 @@ class MViewModel @Inject constructor(
         }
         getUserData(uid)
     }
+
     fun updateImageUrl(imageUrl: String) {
         val uid = auth.currentUser?.uid
         if (uid != null) {
@@ -485,7 +525,8 @@ class MViewModel @Inject constructor(
             }
             if (value != null) {
                 for (document in value.documents) {
-                    db.collection(CHATS).document(document.id).update("user1.$PHONENUMBER", phoneNumber)
+                    db.collection(CHATS).document(document.id)
+                        .update("user1.$PHONENUMBER", phoneNumber)
                 }
             }
         }
@@ -497,13 +538,15 @@ class MViewModel @Inject constructor(
             }
             if (value != null) {
                 for (document in value.documents) {
-                    db.collection(CHATS).document(document.id).update("user2.$PHONENUMBER", phoneNumber)
+                    db.collection(CHATS).document(document.id)
+                        .update("user2.$PHONENUMBER", phoneNumber)
                 }
             }
         }
         for (status in status.value) {
             if (status.user.userId == uid) {
-                db.collection(STATUS).document(status.statusId!!).update("user.$PHONENUMBER", phoneNumber)
+                db.collection(STATUS).document(status.statusId!!)
+                    .update("user.$PHONENUMBER", phoneNumber)
             }
         }
         getUserData(uid)

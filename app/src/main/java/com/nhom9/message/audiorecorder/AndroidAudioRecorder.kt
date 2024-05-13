@@ -14,11 +14,19 @@ class AndroidAudioRecorder(private val context: Context) : AudioRecorder {
         } else MediaRecorder()
     }
 
+    override fun resume() {
+        recorder?.resume()
+    }
+
+    override fun pause() {
+        recorder?.pause()
+    }
+
     override fun start(outputFile: File) {
         createRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.AMR_NB)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             setOutputFile(FileOutputStream(outputFile).fd)
 
             prepare()

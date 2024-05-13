@@ -2,4 +2,12 @@
     <string name="app_name">Message</string>
     <string name="default_web_client_id">895068357618-ntmens285ir6o6vb21comsm1nk3chtmm.apps.googleusercontent.com</string>
     <string name="block">Block</string>
+    <string name="welcome">Welcome</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="or_log_in_with">-Or log in with-</string>
+    <string name="sign_in_to_continue">Sign in to continue</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="forgotten_password">Forgotten password?</string>
 </resources>

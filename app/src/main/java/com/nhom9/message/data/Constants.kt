@@ -12,8 +12,10 @@ const val PHONENUMBER = "phoneNumber"
 const val USERID = "userId"
 
 
-const val IMAGE_MESSAGE = "image"
-const val TEXT_MESSAGE = "text"
+const val MESSAGE_IMAGE = "image"
+const val MESSAGE_TEXT = "text"
+const val MESSAGE_AUDIO = "audio"
+
 
 const val TIME_HM_12H = "h:mm a"
 const val TIME_ISO_8601 = "yyyy-MM-dd'T'HH:mm:ssZ"

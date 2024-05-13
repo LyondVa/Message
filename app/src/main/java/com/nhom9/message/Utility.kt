@@ -1,5 +1,6 @@
 package com.nhom9.message
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -333,4 +334,8 @@ fun getTimeFromTimestamp(timestamp: Timestamp): String {
 fun getDateFromTimestamp(timestamp: Timestamp): String {
     val time = timestamp.toDate().toString()
     return time.substring(4, 9)
+}
+
+@Composable
+fun WaveformBox(context: Context){
 }

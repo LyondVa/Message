@@ -1,6 +1,6 @@
 package com.nhom9.message.screens
 
-import android.content.Context
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,10 +18,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddCircle
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.google.firebase.storage.StorageMetadata
+import com.google.firebase.storage.storageMetadata
 import com.nhom9.message.CallBox
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
@@ -50,20 +52,20 @@ import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.audiorecorder.AndroidAudioRecorder
 import com.nhom9.message.audiorecorder.playback.AndroidAudioPlayer
+import com.nhom9.message.data.MESSAGE_AUDIO
+import com.nhom9.message.data.MESSAGE_IMAGE
+import com.nhom9.message.data.MESSAGE_TEXT
 import com.nhom9.message.data.Message
 import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import com.nhom9.message.ui.theme.md_theme_light_primaryContainer
-import dagger.hilt.android.qualifiers.ApplicationContext
-import okhttp3.internal.cacheGet
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
 fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId: String) {
-    val context = LocalContext.current
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
@@ -75,7 +77,7 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         mutableStateOf("")
     }
     val onSendReply = {
-        viewModel.onSendReply(chatId, reply)
+        viewModel.onSendText(chatId, reply)
         reply = ""
     }
     val onImageClick = {
@@ -93,10 +95,10 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
 
     val myUser = viewModel.userData.value
-    var currentChat = viewModel.chats.value.first { it.chatId == chatId }
+    val currentChat = viewModel.chats.value.first { it.chatId == chatId }
     val chatUser =
         if (myUser?.userId == currentChat.user1.userId) currentChat.user2 else currentChat.user1
-    var chatMessages = viewModel.chatMessages
+    val chatMessages = viewModel.chatMessages
 
     val onHeaderClick = {
         navigateTo(
@@ -104,11 +106,20 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         )
     }
 
+    val onSendAudio: (String, StorageMetadata) -> Unit = { string, metadata ->
+        viewModel.onSendAudio(chatId, metadata, Uri.parse(string))
+    }
+    var isRecording by remember {
+        mutableStateOf(false)
+    }
+    val onRecordChange: (Boolean) -> Unit = {
+        isRecording = it
+    }
     LaunchedEffect(key1 = Unit) {
         viewModel.populateMessages(chatId)
     }
 
-    BackHandler() {
+    BackHandler {
         viewModel.depopulateMessages()
         navController.popBackStack()
     }
@@ -129,13 +140,18 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
             currentUserId = myUser?.userId ?: "",
             onMessageImageClick = onMessageImageClick
         )
-        RecordMic(context = context)
-        ReplyBox(
-            reply = reply,
-            onReplyChange = { reply = it },
-            onSendReply = onSendReply,
-            onImageClick = onImageClick
-        )
+        CommonDivider(0)
+        if (!isRecording) {
+            ReplyBox(
+                reply = reply,
+                onRecordStart = onRecordChange,
+                onReplyChange = { reply = it },
+                onSendReply = onSendReply,
+                onImageClick = onImageClick,
+            )
+        } else {
+            RecordBar(onRecordChange, onSendAudio)
+        }
     }
 }
 
@@ -169,36 +185,40 @@ fun MessageBox(
                             style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                         )
-                        if (message.type == "text") {
-                            Text(
+                        when (message.type) {
+                            MESSAGE_TEXT -> Text(
                                 text = message.content ?: "",
                                 color = md_theme_light_onPrimaryContainer,
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(12.dp)
                             )
-                        } else {
-                            AsyncImage(model = message.content,
+
+                            MESSAGE_IMAGE -> AsyncImage(model = message.content,
                                 contentDescription = "null",
                                 modifier = Modifier
                                     .padding(12.dp)
                                     .clickable { onMessageImageClick(message.content!!) })
+
+                            MESSAGE_AUDIO -> AudioMessage(message.content!!)
                         }
                     } else {
-                        if (message.type == "text") {
-                            Text(
+                        when (message.type) {
+                            MESSAGE_TEXT -> Text(
                                 text = message.content ?: "",
                                 color = md_theme_light_onPrimaryContainer,
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(12.dp)
                             )
-                        } else {
-                            AsyncImage(model = message.content,
+
+                            MESSAGE_IMAGE -> AsyncImage(model = message.content,
                                 contentDescription = "null",
                                 modifier = Modifier
                                     .padding(12.dp)
                                     .clickable { onMessageImageClick(message.content!!) })
+
+                            MESSAGE_AUDIO -> AudioMessage(message.content!!)
                         }
                         Text(
                             text = getTimeFromTimestamp(message.timeStamp!!),
@@ -220,8 +240,7 @@ fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBack
         IconButton(onClick = { onBackClick.invoke() }) {
             Icon(Icons.Rounded.ArrowBack, contentDescription = null)
         }
-        ProfileBox(
-            name,
+        ProfileBox(name,
             imageUrl,
             modifier = Modifier
                 .weight(1f)
@@ -234,6 +253,7 @@ fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBack
 @Composable
 fun ReplyBox(
     reply: String,
+    onRecordStart: (Boolean) -> Unit,
     onReplyChange: (String) -> Unit,
     onSendReply: () -> Unit,
     onImageClick: () -> Unit
@@ -241,7 +261,6 @@ fun ReplyBox(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        CommonDivider()
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -249,8 +268,8 @@ fun ReplyBox(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            IconButton(onClick = { }) {
-                Icon(imageVector = Icons.Outlined.AddCircle, contentDescription = null)
+            IconButton(onClick = { onRecordStart.invoke(true) }) {
+                Icon(painterResource(id = R.drawable.outline_mic_24), contentDescription = null)
             }
             IconButton(onClick = { onImageClick.invoke() }) {
                 Icon(painterResource(id = R.drawable.outline_image_24), contentDescription = null)
@@ -294,42 +313,77 @@ fun ProfileBox(name: String, imageUrl: String, modifier: Modifier) {
 }
 
 @Composable
-fun RecordMic(context: Context) {
+fun RecordBar(onRecordStop: (Boolean) -> Unit, onSendAudio: (String, StorageMetadata) -> Unit) {
+    val context = LocalContext.current
+    var isPaused by remember {
+        mutableStateOf(false)
+    }
     val recorder by lazy {
         AndroidAudioRecorder(context)
     }
+    var audioFile: File
+    val metadata = storageMetadata {
+        setContentType("audio/aac")
+    }
+    File(context.cacheDir, "audio.mp3").also {
+        recorder.start(it)
+        audioFile = it
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        IconButton(onClick = {
+            audioFile.delete()
+            recorder.stop()
+            isPaused = true
+            onRecordStop.invoke(false)
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_pause_24),
+                contentDescription = null
+            )
+        }
+        Text(text = "Recording")
+        IconButton(onClick = {
+            recorder.stop()
+            onSendAudio.invoke(audioFile.toURI().toString(), metadata)
+            onRecordStop.invoke(false)
+        }) {
+            Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
+        }
+    }
+}
+
+@Composable
+fun AudioMessage(content: String) {
+    val context = LocalContext.current
     val player by lazy {
         AndroidAudioPlayer(context)
     }
-    var audioFile: File? = null
-
-    Column() {
-        Row {
-            Button(onClick = {
-                File(context.cacheDir, "audio.mp3").also {
-                    recorder.start(it)
-                    audioFile = it
-                }
+    var hasStarted by remember {
+        mutableStateOf(false)
+    }
+    Row {
+        if (!hasStarted) {
+            IconButton(onClick = {
+                player.playFromUrl(content)
+                hasStarted = true
             }) {
-                Text(text = "Start")
+                Icon(Icons.Outlined.PlayArrow, contentDescription = null)
             }
-            Button(onClick = {
-                recorder.stop()
-            }) {
-                Text(text = "Stop")
-            }
-        }
-        Row {
-
-            Button(onClick = {
-                player.playFile(audioFile ?: return@Button)
-            }) {
-                Text(text = "Play")
-            }
-            Button(onClick = {
+        } else {
+            IconButton(onClick = {
                 player.stop()
+                hasStarted = false
             }) {
-                Text(text = "Stop Player")
+                Icon(
+                    painterResource(id = R.drawable.baseline_pause_24),
+                    contentDescription = null
+                )
             }
         }
     }

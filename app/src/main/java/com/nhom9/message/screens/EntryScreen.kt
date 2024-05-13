@@ -19,19 +19,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CheckSignedIn
@@ -43,21 +40,13 @@ import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import com.nhom9.message.ui.theme.md_theme_light_primary
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EntryScreen(navController: NavController, viewModel: MViewModel) {
-    val emailState = remember {
-        mutableStateOf(TextFieldValue())
-    }
-    val passwordState = remember {
-        mutableStateOf(TextFieldValue())
-    }
 
     CheckSignedIn(viewModel, navController)
     Box(modifier = Modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            //verticalArrangement = Arran,
             modifier = Modifier
                 .fillMaxSize()
                 .wrapContentHeight()
@@ -73,7 +62,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
                     .padding(8.dp)
             )
             Text(
-                text = "Welcome",
+                text = stringResource(R.string.welcome),
                 style = MaterialTheme.typography.displayLarge,
                 fontWeight = FontWeight.Bold,
                 color = md_theme_light_onPrimaryContainer,
@@ -88,7 +77,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
                     .fillMaxWidth()
             ) {
                 Text(
-                    text = "Login",
+                    text = stringResource(R.string.login),
                     color = Color.White,
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier
@@ -109,13 +98,13 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
 
             ) {
                 Text(
-                    text = "Sign Up",
+                    text = stringResource(R.string.sign_up),
                     color = Color.Black,
                     style = MaterialTheme.typography.labelMedium
                 )
             }
             Text(
-                text = "-Or log in with-",
+                text = stringResource(R.string.or_log_in_with),
                 color = md_theme_light_onPrimaryContainer,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
