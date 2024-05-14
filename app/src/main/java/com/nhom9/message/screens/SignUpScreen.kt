@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,7 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CheckSignedIn
@@ -59,7 +65,9 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             val passwordState = remember {
                 mutableStateOf(TextFieldValue())
             }
-
+            val passwordVisible = remember {
+                mutableStateOf(false)
+            }
             BackHandler {
                 navigateTo(navController, DestinationScreen.Entry.route)
             }
@@ -132,6 +140,17 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                         text = "Password",
                         style = MaterialTheme.typography.bodyMedium
                     )
+                },
+                visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    val image = if (passwordVisible.value)
+                        painterResource(id = R.drawable.outline_visibility_24)
+                    else
+                        painterResource(id = R.drawable.outline_visibility_off_24)
+                    IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
+                        Icon(painter = image, contentDescription = null)
+                    }
                 },
                 modifier = Modifier
                     .padding(8.dp)
