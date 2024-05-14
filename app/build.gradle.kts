@@ -117,4 +117,8 @@ dependencies {
     implementation ("androidx.datastore:datastore:1.0.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+
+    implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
 }

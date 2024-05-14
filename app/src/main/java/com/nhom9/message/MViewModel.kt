@@ -2,6 +2,7 @@ package com.nhom9.message
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
@@ -43,7 +44,7 @@ class MViewModel @Inject constructor(
     var db: FirebaseFirestore,
     var storage: FirebaseStorage
 ) : ViewModel() {
-
+    val visiblePermissionDialogQueue = mutableStateListOf<String>()
     var inProcess = mutableStateOf(false)
     val eventMutableState = mutableStateOf<Event<String>?>(null)
     var signIn = mutableStateOf(false)
@@ -204,7 +205,6 @@ class MViewModel @Inject constructor(
                 val user = value.toObject<UserData>()
                 userData.value = user
                 inProcess.value = false
-                //UpdateName("hi")
                 populateChats()
                 populateStatuses()
                 getBlockedChats()
@@ -577,6 +577,19 @@ class MViewModel @Inject constructor(
                 }
                 inProcessChats.value = false
             }
+        }
+    }
+
+    fun dismissDialog() {
+        visiblePermissionDialogQueue.removeFirst()
+    }
+
+    fun onPermissionResult(
+        permission: String,
+        isGranted: Boolean
+    ) {
+        if(!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
+            visiblePermissionDialogQueue.add(permission)
         }
     }
 }

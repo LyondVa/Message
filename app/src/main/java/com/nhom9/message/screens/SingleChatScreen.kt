@@ -1,5 +1,6 @@
 package com.nhom9.message.screens
 
+import android.Manifest
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -43,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.storageMetadata
 import com.nhom9.message.CallBox
@@ -251,6 +254,7 @@ fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBack
 }
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ReplyBox(
     reply: String,
@@ -259,6 +263,8 @@ fun ReplyBox(
     onSendReply: () -> Unit,
     onImageClick: () -> Unit
 ) {
+    val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
+    //MicPermission(permissionState = permissionState)
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -269,7 +275,14 @@ fun ReplyBox(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            IconButton(onClick = { onRecordStart.invoke(true) }) {
+            IconButton(onClick = {
+                if(permissionState.hasPermission){
+                    onRecordStart.invoke(true)
+                }
+                else{
+                    permissionState.launchPermissionRequest()
+                }
+            }) {
                 Icon(painterResource(id = R.drawable.outline_mic_24), contentDescription = null)
             }
             IconButton(onClick = { onImageClick.invoke() }) {

@@ -19,3 +19,5 @@ const val MESSAGE_AUDIO = "audio"
 
 const val TIME_HM_12H = "h:mm a"
 const val TIME_ISO_8601 = "yyyy-MM-dd'T'HH:mm:ssZ"
+
+const val PERMISSION_AUDIO = "Manifest.permission.RECORD_AUDIO"
