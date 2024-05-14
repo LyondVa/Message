@@ -43,7 +43,9 @@ data class Message(
     var type: String? = "",
     var sendBy: String? = "",
     val content: String? = "",
-    val timeStamp: Timestamp? = Timestamp.now()
+    val timeStamp: Timestamp? = Timestamp.now(),
+    var isEdited: Boolean = false,
+    var isDeleted: Boolean = false
 )
 
 data class Status(
@@ -51,4 +53,9 @@ data class Status(
     val user: ChatUser = ChatUser(),
     val imageUrl: String? = "",
     val timeStamp: Long? = null
+)
+
+data class DropDownItem(
+    val text: String,
+    val onItemClick:()->Unit
 )

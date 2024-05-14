@@ -335,4 +335,3 @@ fun getDateFromTimestamp(timestamp: Timestamp): String {
     val time = timestamp.toDate().toString()
     return time.substring(4, 9)
 }
-

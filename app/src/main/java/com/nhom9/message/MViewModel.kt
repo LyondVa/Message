@@ -179,7 +179,7 @@ class MViewModel @Inject constructor(
 
     }
 
-    fun uploadAudio(uri: Uri,metadata: StorageMetadata, onSuccess: (Uri) -> Unit) {
+    fun uploadAudio(uri: Uri, metadata: StorageMetadata, onSuccess: (Uri) -> Unit) {
         inProcess.value = true
         val storageReference = storage.reference
         val uuid = UUID.randomUUID()
@@ -323,7 +323,7 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun onSendAudio(chatId: String,metadata: StorageMetadata, audioUri: Uri) {
+    fun onSendAudio(chatId: String, metadata: StorageMetadata, audioUri: Uri) {
         val messageId = db.collection(CHATS).document(chatId).collection(MESSAGE).document().id
         val time = Timestamp(Calendar.getInstance().time)
         uploadAudio(audioUri, metadata) {
@@ -588,8 +588,31 @@ class MViewModel @Inject constructor(
         permission: String,
         isGranted: Boolean
     ) {
-        if(!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
+        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
             visiblePermissionDialogQueue.add(permission)
         }
+    }
+
+    private fun updateMessage(chatId: String, message: Message, content: String = "") {
+        if (content == "") {
+            db.collection(CHATS).document(chatId).collection(MESSAGE).document(message.messageId!!)
+                .update("deleted", true)
+        } else {
+            db.collection(CHATS).document(chatId).collection(MESSAGE).document(message.messageId!!)
+                .update("edited", true)
+            db.collection(CHATS).document(chatId).collection(MESSAGE).document(message.messageId!!)
+                .update("content", content)
+        }
+        populateMessages(chatId)
+    }
+
+    fun deleteMessage(chatId: String, message: Message) {
+        message.isDeleted = true
+        updateMessage(chatId, message)
+    }
+
+    fun editMessage(chatId: String, message: Message, content: String) {
+        message.isEdited = true
+        updateMessage(chatId, message, content)
     }
 }

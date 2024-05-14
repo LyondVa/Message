@@ -2,11 +2,13 @@ package com.nhom9.message.screens
 
 import android.Manifest
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -102,7 +107,9 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     val currentChat = viewModel.chats.value.first { it.chatId == chatId }
     val chatUser =
         if (myUser?.userId == currentChat.user1.userId) currentChat.user2 else currentChat.user1
-    val chatMessages = viewModel.chatMessages
+    val chatMessages = remember {
+        viewModel.chatMessages
+    }
 
     val onHeaderClick = {
         navigateTo(
@@ -118,6 +125,9 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
     val onRecordChange: (Boolean) -> Unit = {
         isRecording = it
+    }
+    val onMessageDelete:(Message)->Unit={
+        viewModel.deleteMessage(chatId, it)
     }
     LaunchedEffect(key1 = Unit) {
         viewModel.populateMessages(chatId)
@@ -142,7 +152,8 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
             modifier = Modifier.weight(1f),
             chatMessages = chatMessages.value,
             currentUserId = myUser?.userId ?: "",
-            onMessageImageClick = onMessageImageClick
+            onMessageImageClick = onMessageImageClick,
+            onMessageDelete = onMessageDelete
         )
         CommonDivider(0)
         if (!isRecording) {
@@ -164,75 +175,177 @@ fun MessageBox(
     modifier: Modifier,
     chatMessages: List<Message>,
     currentUserId: String?,
-    onMessageImageClick: (String) -> Unit
+    onMessageImageClick: (String) -> Unit,
+    onMessageDelete:(Message)->Unit
 ) {
     LazyColumn(modifier = modifier) {
-        items(chatMessages) { message ->
-            val alignment = if (message.sendBy == currentUserId) Alignment.End else Alignment.Start
-            val color = md_theme_light_primaryContainer
-            Column(
-                horizontalAlignment = alignment, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .background(
-                            color, MaterialTheme.shapes.medium
-                        )
-                ) {
-                    if (message.sendBy == currentUserId) {
-                        Text(
-                            text = getTimeFromTimestamp(message.timeStamp!!),
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                        )
-                        when (message.type) {
-                            MESSAGE_TEXT -> Text(
-                                text = message.content ?: "",
-                                color = md_theme_light_onPrimaryContainer,
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(12.dp)
-                            )
+        items(chatMessages) {
+            val alignment = if (it.sendBy == currentUserId) Alignment.End else Alignment.Start
+            if (it.isDeleted) {
+                DeletedMessage(message = it, currentUserId = currentUserId, alignment = alignment)
+            } else {
+                Message(
+                    message = it,
+                    currentUserId = currentUserId!!,
+                    onMessageImageClick = onMessageImageClick,
+                    alignment = alignment,
+                    onMessageDelete = onMessageDelete
+                )
 
-                            MESSAGE_IMAGE -> AsyncImage(model = message.content,
-                                contentDescription = "null",
-                                modifier = Modifier
-                                    .padding(12.dp)
-                                    .clickable { onMessageImageClick(message.content!!) })
-
-                            MESSAGE_AUDIO -> AudioMessage(message.content!!)
-                        }
-                    } else {
-                        when (message.type) {
-                            MESSAGE_TEXT -> Text(
-                                text = message.content ?: "",
-                                color = md_theme_light_onPrimaryContainer,
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(12.dp)
-                            )
-
-                            MESSAGE_IMAGE -> AsyncImage(model = message.content,
-                                contentDescription = "null",
-                                modifier = Modifier
-                                    .padding(12.dp)
-                                    .clickable { onMessageImageClick(message.content!!) })
-
-                            MESSAGE_AUDIO -> AudioMessage(message.content!!)
-                        }
-                        Text(
-                            text = getTimeFromTimestamp(message.timeStamp!!),
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                        )
-                    }
-                }
             }
         }
+    }
+}
+
+
+@Composable
+fun DeletedMessage(
+    message: Message,
+    currentUserId: String?,
+    alignment: Alignment.Horizontal
+) {
+    val color = md_theme_light_primaryContainer
+    Column(
+        horizontalAlignment = alignment, modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .background(
+                    color, MaterialTheme.shapes.medium
+                )
+        ) {
+            if (message.sendBy == currentUserId) {
+                Text(
+                    text = getTimeFromTimestamp(message.timeStamp!!),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                )
+                Text(
+                    text = "Message Deleted",
+                    color = md_theme_light_onPrimaryContainer,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(12.dp)
+                )
+            } else {
+                Text(
+                    text = "Message Deleted",
+                    color = md_theme_light_onPrimaryContainer,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(12.dp)
+                )
+                Text(
+                    text = getTimeFromTimestamp(message.timeStamp!!),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun Message(
+    message: Message,
+    currentUserId: String?,
+    alignment: Alignment.Horizontal,
+    onMessageImageClick: (String) -> Unit,
+    onMessageDelete:(Message)->Unit
+) {
+    val color = md_theme_light_primaryContainer
+    var mDisplayMenu by remember { mutableStateOf(false) }
+    Column(
+        horizontalAlignment = alignment, modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .background(
+                    color, MaterialTheme.shapes.medium
+                )
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            mDisplayMenu = !mDisplayMenu
+                        }
+                    )
+                }
+
+        ) {
+            if (message.sendBy == currentUserId) {
+                Text(
+                    text = getTimeFromTimestamp(message.timeStamp!!),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                )
+                when (message.type) {
+                    MESSAGE_TEXT -> Text(
+                        text = message.content ?: "",
+                        color = md_theme_light_onPrimaryContainer,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(12.dp)
+                    )
+
+                    MESSAGE_IMAGE -> AsyncImage(model = message.content,
+                        contentDescription = "null",
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .clickable { onMessageImageClick(message.content!!) })
+
+                    MESSAGE_AUDIO -> AudioMessage(message.content!!)
+                }
+            } else {
+                when (message.type) {
+                    MESSAGE_TEXT -> Text(
+                        text = message.content ?: "",
+                        color = md_theme_light_onPrimaryContainer,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(12.dp)
+                    )
+
+                    MESSAGE_IMAGE -> AsyncImage(model = message.content,
+                        contentDescription = "null",
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .clickable { onMessageImageClick(message.content!!) })
+
+                    MESSAGE_AUDIO -> AudioMessage(message.content!!)
+                }
+                Text(
+                    text = getTimeFromTimestamp(message.timeStamp!!),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                )
+            }
+        }
+    }
+    DropdownMenu(
+        expanded = mDisplayMenu,
+        onDismissRequest = { mDisplayMenu = false }
+    ) {
+        DropdownMenuItem(
+            {
+                Text(
+                    text = "Delete",
+                    style = MaterialTheme.typography.labelMedium
+                )
+            },
+            {
+                onMessageDelete.invoke(message)
+                mDisplayMenu = false
+                Log.d("MenuItem", message.content.toString())
+            }
+        )
     }
 }
 
@@ -276,10 +389,9 @@ fun ReplyBox(
                 .padding(8.dp)
         ) {
             IconButton(onClick = {
-                if(permissionState.hasPermission){
+                if (permissionState.hasPermission) {
                     onRecordStart.invoke(true)
-                }
-                else{
+                } else {
                     permissionState.launchPermissionRequest()
                 }
             }) {
