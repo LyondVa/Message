@@ -74,6 +74,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme(
             ) {
+                //WindowCompat.setDecorFitsSystemWindows(window, false)
                 // A surface container using the 'background' color from the theme
                 Surface(
                     tonalElevation = 5.dp,

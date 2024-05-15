@@ -40,7 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
-import com.nhom9.message.CommonImage
+import com.nhom9.message.CommonProfileImage
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.CommonSettingRow
 import com.nhom9.message.DestinationScreen
@@ -132,7 +132,7 @@ fun ProfileImageBar(
                         launcher.launch("image/*")
                     }
             ) {
-                CommonImage(data = imageUrl)
+                CommonProfileImage(imageUrl = imageUrl)
             }
             Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(8.dp)) {
                 Text(

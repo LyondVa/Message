@@ -1,15 +1,11 @@
 package com.nhom9.message.screens
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -38,6 +35,7 @@ import com.nhom9.message.CheckSignedIn
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.ProfileImageCard
 import com.nhom9.message.R
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
@@ -68,25 +66,26 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             val passwordVisible = remember {
                 mutableStateOf(false)
             }
+            val imageUrl = rememberSaveable {
+                mutableStateOf("")
+            }
+            val onChangeImage: (Uri) -> Unit = {
+                imageUrl.value = it.toString()
+            }
             BackHandler {
                 navigateTo(navController, DestinationScreen.Entry.route)
             }
-
-            Image(
-                painter = painterResource(id = R.drawable.undraw_welcome_cats_thqn),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(200.dp)
-                    .padding(top = 16.dp)
-                    .padding(8.dp)
-            )
             Text(
                 text = "Sign Up",
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
                 color = md_theme_light_onPrimaryContainer,
                 fontFamily = FontFamily.SansSerif,
-                modifier = Modifier
+                modifier = Modifier.padding(16.dp)
+            )
+            ProfileImageCard(
+                imageUrl = null,
+                onChangeImage = onChangeImage
             )
             OutlinedTextField(
                 value = nameState.value,
@@ -157,11 +156,17 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             )
             Button(
                 onClick = {
+                    if (imageUrl.value != "") {
+                        viewModel.uploadImage(Uri.parse(imageUrl.value)) {
+                            imageUrl.value = it.toString()
+                        }
+                    }
                     viewModel.signUp(
                         name = nameState.value.text,
                         phoneNumber = phoneNumberState.value.text,
                         email = emailState.value.text,
-                        password = passwordState.value.text
+                        password = passwordState.value.text,
+                        imageUrl = imageUrl.value
                     )
                 },
                 modifier = Modifier
@@ -175,23 +180,8 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             }
         }
     }
-    Row(
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.left_corner),
-            contentDescription = null,
-            modifier = Modifier.size(68.dp)
-        )
-        Image(
-            painter = painterResource(id = R.drawable.right_corner),
-            contentDescription = null,
-            modifier = Modifier.size(68.dp)
-        )
-    }
     if (viewModel.inProcess.value) {
         CommonProgressbar()
     }
 }
+

@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
-import com.nhom9.message.CommonImage
+import com.nhom9.message.CommonProfileImage
 import com.nhom9.message.CommonSubSettingRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
@@ -48,7 +48,7 @@ fun AccountSettingScreen(navController: NavController, viewModel: MViewModel) {
     }
     Column {
         TitleBarWithBack(navController = navController, text = "Account")
-        AccountInfoCard(navController, imageUrl, name, "N/A", userId, phoneNumber)
+        AccountInfoCard(navController, imageUrl, name, userId, phoneNumber)
     }
 
 
@@ -59,7 +59,6 @@ fun AccountInfoCard(
     navController: NavController,
     imageUrl: String,
     name: String,
-    handle: String,
     userId: String,
     phoneNumber: String
 ) {
@@ -81,8 +80,6 @@ fun AccountInfoCard(
         CommonDivider(0)
         CommonSubSettingRow("Name", name, onNameClick)
         CommonDivider(0)
-        /*CommonSubSettingRow("Handle", handle)
-        CommonDivider(0)*/
         CommonSubSettingRow("Message Id", userId, {})
         CommonDivider(0)
         CommonSubSettingRow("Phone Number", phoneNumber, onPhoneNumberClick)
@@ -116,7 +113,7 @@ fun AccountSettingImageRow(imageUrl: String, onItemClick:()->Unit) {
                 .padding(8.dp)
         ) {
             Card(shape = RoundedCornerShape(8.dp)) {
-                CommonImage(data = imageUrl, modifier = Modifier.size(80.dp))
+                CommonProfileImage(imageUrl = imageUrl, modifier = Modifier.size(80.dp))
             }
             Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = null)
         }

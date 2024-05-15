@@ -1,5 +1,6 @@
 package com.nhom9.message.screens
 
+import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -51,6 +52,7 @@ import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: MViewModel) {
+    WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
     val emailState = remember {
         mutableStateOf(TextFieldValue())
     }
@@ -201,26 +203,7 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                         )
                     }
                 }
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.left_corner),
-                        contentDescription = null,
-                        modifier = Modifier.size(68.dp)
-                    )
-                    Image(
-                        painter = painterResource(id = R.drawable.right_corner),
-                        contentDescription = null,
-                        modifier = Modifier.size(68.dp)
-                    )
-                }
             }
-
         }
     )
     if (viewModel.inProcess.value) {

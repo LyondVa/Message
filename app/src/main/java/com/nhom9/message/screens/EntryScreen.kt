@@ -4,10 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -108,7 +106,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
                 color = md_theme_light_onPrimaryContainer,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
-                .padding(8.dp)
+                    .padding(8.dp)
             )
             Image(
                 painter = painterResource(id = R.drawable.google__g__logo),
@@ -121,24 +119,6 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
             )
         }
     }
-
-    Row(
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.left_corner),
-            contentDescription = null,
-            modifier = Modifier.size(68.dp)
-        )
-        Image(
-            painter = painterResource(id = R.drawable.right_corner),
-            contentDescription = null,
-            modifier = Modifier.size(68.dp)
-        )
-    }
-
     if (viewModel.inProcess.value) {
         CommonProgressbar()
     }

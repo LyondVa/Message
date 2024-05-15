@@ -1,13 +1,19 @@
 package com.nhom9.message
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -18,6 +24,7 @@ import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
@@ -25,8 +32,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -334,4 +346,63 @@ fun getTimeFromTimestamp(timestamp: Timestamp): String {
 fun getDateFromTimestamp(timestamp: Timestamp): String {
     val time = timestamp.toDate().toString()
     return time.substring(4, 9)
+}
+
+@Composable
+fun keyboardAsState(): State<Boolean> {
+    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    return rememberUpdatedState(isImeVisible)
+}
+
+@Composable
+fun ProfileImageCard(
+    isInEdit: Boolean = true,
+    imageUrl: String?,
+    onChangeImage: (Uri) -> Unit
+) {
+    var localImageUrl by remember { mutableStateOf<Uri?>(null) }
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+            uri?.let {
+                localImageUrl = it
+            }
+        }
+    Card(
+        shape = CircleShape,
+        modifier = Modifier
+            .size(160.dp)
+            .clickable(isInEdit) {
+                launcher.launch("image/*")
+            }
+    ) {
+        if (isInEdit) {
+            ProfileImagePreview(localImageUrl = localImageUrl, data = imageUrl)
+            if (localImageUrl != null) {
+                onChangeImage.invoke(localImageUrl!!)
+            }
+        } else CommonProfileImage(imageUrl = imageUrl)
+    }
+}
+
+@Composable
+fun ProfileImagePreview(
+    localImageUrl: Uri?,
+    data: String?,
+) {
+    if (localImageUrl != null) {
+        CommonImage(data = localImageUrl.toString())
+    } else CommonProfileImage(imageUrl = data)
+}
+
+@Composable
+fun CommonProfileImage(imageUrl: String?, modifier: Modifier = Modifier) {
+    if (imageUrl == null || imageUrl == "") {
+        Image(
+            painter = painterResource(id = R.drawable.blank_profile_picture),
+            contentDescription = null,
+            modifier = modifier.wrapContentSize()
+        )
+    } else {
+        CommonImage(data = imageUrl, modifier = modifier)
+    }
 }

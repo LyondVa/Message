@@ -71,7 +71,7 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun signUp(name: String, phoneNumber: String, email: String, password: String) {
+    fun signUp(name: String, phoneNumber: String, email: String, password: String, imageUrl: String) {
         if (name.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
             return
@@ -84,7 +84,7 @@ class MViewModel @Inject constructor(
                                 Log.d("TAG", "signUp: User Logged In")
                                 signIn.value = true
                                 inProcess.value = false
-                                createOrUpdateProfile(name, phoneNumber)
+                                createOrUpdateProfile(name, phoneNumber, imageUrl)
                             } else {
                                 Log.d("SIGNUP-ERROR", "auth unsuccessful")
                                 handleException(it.exception, "Sign Up failed")
