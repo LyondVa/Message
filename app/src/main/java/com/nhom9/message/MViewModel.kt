@@ -84,7 +84,13 @@ class MViewModel @Inject constructor(
                                 Log.d("TAG", "signUp: User Logged In")
                                 signIn.value = true
                                 inProcess.value = false
-                                createOrUpdateProfile(name, phoneNumber, imageUrl)
+                                if(imageUrl==""){
+
+                                    createOrUpdateProfile(name, phoneNumber)
+                                }
+                                else{
+                                    createOrUpdateProfile(name, phoneNumber, imageUrl)
+                                }
                             } else {
                                 Log.d("SIGNUP-ERROR", "auth unsuccessful")
                                 handleException(it.exception, "Sign Up failed")
@@ -615,4 +621,12 @@ class MViewModel @Inject constructor(
         message.isEdited = true
         updateMessage(chatId, message, content)
     }
+    fun getChatPhotos( photoList: MutableList<String>) {
+        for (message in chatMessages.value) {
+            if (message.type == MESSAGE_IMAGE) {
+                photoList.add(message.content!!)
+            }
+        }
+    }
 }
+

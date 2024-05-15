@@ -1,5 +1,6 @@
 package com.nhom9.message.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,12 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -28,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,13 +35,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CallBox
 import com.nhom9.message.CommonDivider
-import com.nhom9.message.CommonImage
 import com.nhom9.message.MViewModel
 
 @Composable
 fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userId: String) {
     val chatUser = viewModel.getChatUser(userId)
-
+    Log.d("'ChatUSer", chatUser?.name!!)
+    Log.d("'ChatUSer",  chatUser.imageUrl!!)
+    val photoIds = rememberSaveable {
+        mutableListOf<String>()
+    }
+    viewModel.getChatPhotos(photoIds)
+    Log.d("ChatProfile", photoIds.size.toString())
     Column {
         Column(
             modifier = Modifier
@@ -51,14 +55,15 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
         ) {
             FloatingBar(navController = navController)
             CommonDivider(0)
-            ChatUserCard(chatUser?.name!!, chatUser.imageUrl!!)
+            //ChatUserCard(chatUser?.name!!, chatUser.imageUrl!!)
             ProfileInfoCard("")
+            //PhotoGrid()
         }
     }
 }
 
 @Composable
-fun ChatUserCard(name: String, imageUrl: String) {
+fun ChatUserCard(name: String?, imageUrl: String?) {
     Surface(
         shadowElevation = 2.dp,
         modifier = Modifier
@@ -73,19 +78,19 @@ fun ChatUserCard(name: String, imageUrl: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-        ) {
+        ) {/*
             Card(
                 shape = CircleShape,
                 modifier = Modifier
                     .size(160.dp)
             ) {
-                CommonImage(data =imageUrl)
-            }
+                CommonImage(data = imageUrl)
+            }*//*
             Text(
-                text = name,
+                text = name!!,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(8.dp)
-            )
+            )*/
 
         }
     }
@@ -147,3 +152,22 @@ fun DropDownMenuButton() {
         )
     }
 }
+
+/*
+@Composable
+private fun PhotoGrid(viewModel: MViewModel) {
+    val photos by rememberSaveable { mutableStateOf(List(100) { 0..99 }) }
+
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 128.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        items(photos) {
+            Surface(
+                tonalElevation = 3.dp,
+                modifier = Modifier.aspectRatio(1f)
+            ) {}
+        }
+    }
+}*/

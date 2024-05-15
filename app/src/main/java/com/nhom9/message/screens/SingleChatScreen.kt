@@ -55,7 +55,7 @@ import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.storageMetadata
 import com.nhom9.message.CallBox
 import com.nhom9.message.CommonDivider
-import com.nhom9.message.CommonImage
+import com.nhom9.message.CommonProfileImage
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
@@ -126,7 +126,7 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     val onRecordChange: (Boolean) -> Unit = {
         isRecording = it
     }
-    val onMessageDelete:(Message)->Unit={
+    val onMessageDelete: (Message) -> Unit = {
         viewModel.deleteMessage(chatId, it)
     }
     LaunchedEffect(key1 = Unit) {
@@ -176,7 +176,7 @@ fun MessageBox(
     chatMessages: List<Message>,
     currentUserId: String?,
     onMessageImageClick: (String) -> Unit,
-    onMessageDelete:(Message)->Unit
+    onMessageDelete: (Message) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
         items(chatMessages) {
@@ -255,7 +255,7 @@ fun Message(
     currentUserId: String?,
     alignment: Alignment.Horizontal,
     onMessageImageClick: (String) -> Unit,
-    onMessageDelete:(Message)->Unit
+    onMessageDelete: (Message) -> Unit
 ) {
     val color = md_theme_light_primaryContainer
     var mDisplayMenu by remember { mutableStateOf(false) }
@@ -425,8 +425,8 @@ fun ProfileBox(name: String, imageUrl: String, modifier: Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = modifier.wrapContentHeight()
     ) {
-        CommonImage(
-            data = imageUrl, modifier = Modifier
+        CommonProfileImage(
+            imageUrl = imageUrl, modifier = Modifier
                 .padding(8.dp)
                 .size(52.dp)
                 .clip(CircleShape)
