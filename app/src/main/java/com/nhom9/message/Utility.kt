@@ -244,14 +244,12 @@ fun CommonImageRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
                 onItemClick.invoke()
             }
     ) {
-        CommonImage(
-            data = imageUrl,
+        CommonProfileImage(imageUrl = imageUrl,
             modifier = Modifier
                 .padding(8.dp)
                 .size(50.dp)
                 .clip(CircleShape)
-                .background(Color.Red)
-        )
+                .background(Color.Red))
         Text(
             text = name ?: "---",
             style = MaterialTheme.typography.titleMedium,
