@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
-import com.nhom9.message.CommonImageRow
+import com.nhom9.message.CommonProfileImageRow
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
@@ -81,7 +81,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                         }
                     } else {
                         if (myStatuses.isNotEmpty()) {
-                            CommonImageRow(
+                            CommonProfileImageRow(
                                 imageUrl = myStatuses[0].user.imageUrl,
                                 name = myStatuses[0].user.name
                             ) {
@@ -94,7 +94,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                             val uniqueUsers = otherStatuses.map { it.user }.toSet().toList()
                             LazyColumn(modifier = Modifier.weight(1f)) {
                                 items(uniqueUsers) { user ->
-                                    CommonImageRow(imageUrl = user.imageUrl, name = user.name) {
+                                    CommonProfileImageRow(imageUrl = user.imageUrl, name = user.name) {
                                         navigateTo(
                                             navController = navController,
                                             DestinationScreen.SingleStatus.createRoute(user.userId!!)

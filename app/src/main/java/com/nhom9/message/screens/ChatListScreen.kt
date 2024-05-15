@@ -33,7 +33,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
-import com.nhom9.message.CommonImageRow
+import com.nhom9.message.CommonProfileImageRow
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
@@ -140,7 +140,7 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                                 } else {
                                     chat.user1
                                 }
-                                CommonImageRow(imageUrl = chatUser.imageUrl, name = chatUser.name) {
+                                CommonProfileImageRow(imageUrl = chatUser.imageUrl, name = chatUser.name) {
                                     chat.chatId?.let {
                                         navigateTo(
                                             navController,

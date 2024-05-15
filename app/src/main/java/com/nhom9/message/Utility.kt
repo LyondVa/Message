@@ -234,7 +234,7 @@ fun TitleBarWithBackAndVertIcon(
 }
 
 @Composable
-fun CommonImageRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
+fun CommonProfileImageRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
