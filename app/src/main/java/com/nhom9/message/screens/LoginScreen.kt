@@ -1,6 +1,7 @@
 package com.nhom9.message.screens
 
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -29,9 +30,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -49,6 +52,8 @@ import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: MViewModel) {
@@ -59,153 +64,172 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
     val passwordState = remember {
         mutableStateOf(TextFieldValue())
     }
-
+    val loginFailed = remember {
+        mutableStateOf(false)
+    }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     BackHandler {
         navigateTo(navController, DestinationScreen.Entry.route)
     }
 
     CheckSignedIn(viewModel, navController)
 
-    Scaffold(
-        content = { padding ->
-            Box {
-                Box(modifier = Modifier.padding(padding)) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+    Scaffold { padding ->
+        Box {
+            Box(modifier = Modifier.padding(padding)) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .wrapContentHeight()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    val passwordVisible = remember {
+                        mutableStateOf(false)
+                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.undraw_welcome_re_h3d9),
+                        contentDescription = null,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentHeight()
-                            .padding(16.dp)
-                            .verticalScroll(rememberScrollState())
+                            .height(200.dp)
+                            .padding(top = 16.dp)
+                            .padding(8.dp)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.login),
+                        style = MaterialTheme.typography.displayMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = md_theme_light_onPrimaryContainer,
+                        fontFamily = FontFamily.SansSerif,
+                        modifier = Modifier
+                    )
+                    Text(
+                        text = stringResource(R.string.sign_in_to_continue),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = md_theme_light_onPrimaryContainer
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.wrapContentSize()
                     ) {
-                        val passwordVisible = remember {
-                            mutableStateOf(false)
-                        }
                         Image(
-                            painter = painterResource(id = R.drawable.undraw_welcome_re_h3d9),
+                            painter = painterResource(id = R.drawable.mail_encircled),
                             contentDescription = null,
                             modifier = Modifier
-                                .height(200.dp)
-                                .padding(top = 16.dp)
-                                .padding(8.dp)
+                                .size(60.dp)
+                                .padding(start = 8.dp)
+                                .padding(top = 8.dp)
+                                .padding(end = 8.dp)
                         )
-                        Text(
-                            text = stringResource(id = R.string.login),
-                            style = MaterialTheme.typography.displayMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = md_theme_light_onPrimaryContainer,
-                            fontFamily = FontFamily.SansSerif,
-                            modifier = Modifier
-                        )
-                        Text(
-                            text = stringResource(R.string.sign_in_to_continue),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = md_theme_light_onPrimaryContainer
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .wrapContentSize()
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.mail_encircled),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(60.dp)
-                                    .padding(start = 8.dp)
-                                    .padding(top = 8.dp)
-                                    .padding(end = 8.dp)
-                            )
-                            OutlinedTextField(
-                                value = emailState.value,
-                                onValueChange = {
-                                    emailState.value = it
-                                },
-
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.email),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                },
-                                shape = RoundedCornerShape(40.dp),
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .fillMaxWidth()
-                            )
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .wrapContentSize()
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.key_encircled),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(60.dp)
-                                    .padding(start = 8.dp)
-                                    .padding(top = 8.dp)
-                                    .padding(end = 8.dp)
-                            )
-                            OutlinedTextField(
-                                value = passwordState.value,
-                                onValueChange = {
-                                    passwordState.value = it
-                                },
-                                label = {
-                                    Text(
-                                        text = stringResource(R.string.password),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                },
-                                visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                                trailingIcon = {
-                                    val image = if (passwordVisible.value)
-                                        painterResource(id = R.drawable.outline_visibility_24)
-                                    else
-                                        painterResource(id = R.drawable.outline_visibility_off_24)
-                                    IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
-                                        Icon(painter = image, contentDescription = null)
-                                    }
-                                },
-                                shape = RoundedCornerShape(40.dp),
-                                modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .fillMaxWidth()
-                            )
-                        }
-                        Button(
-                            onClick = {
-                                viewModel.logIn(emailState.value.text, passwordState.value.text)
+                        OutlinedTextField(
+                            value = emailState.value,
+                            onValueChange = {
+                                emailState.value = it
                             },
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxWidth()
-                        ) {
 
-                            Text(
-                                text = stringResource(id = R.string.login),
-                                style = MaterialTheme.typography.labelMedium
-                            )
-                        }
-                        Text(text = stringResource(R.string.forgotten_password),
-                            color = Color.Blue,
-                            style = MaterialTheme.typography.bodyMedium,
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.email),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
+                            shape = RoundedCornerShape(40.dp),
                             modifier = Modifier
-                                .padding(8.dp)
-                                .clickable {
-                                    navigateTo(navController, DestinationScreen.SignUp.route)
-                                }
+                                .padding(end = 8.dp)
+                                .fillMaxWidth()
                         )
                     }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.wrapContentSize()
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.key_encircled),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(60.dp)
+                                .padding(start = 8.dp)
+                                .padding(top = 8.dp)
+                                .padding(end = 8.dp)
+                        )
+                        OutlinedTextField(
+                            value = passwordState.value,
+                            onValueChange = {
+                                passwordState.value = it
+                            },
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.password),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
+                            visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            trailingIcon = {
+                                val image =
+                                    if (passwordVisible.value) painterResource(id = R.drawable.outline_visibility_24)
+                                    else painterResource(id = R.drawable.outline_visibility_off_24)
+                                IconButton(onClick = {
+                                    passwordVisible.value = !passwordVisible.value
+                                }) {
+                                    Icon(painter = image, contentDescription = null)
+                                }
+                            },
+                            shape = RoundedCornerShape(40.dp),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .fillMaxWidth()
+                        )
+                    }
+                    if (loginFailed.value) {
+                        Text(
+                            text = "Please check your login information again",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                    Button(
+                        onClick = {
+                            if (emailState.value.text.isEmpty() || passwordState.value.text.isEmpty()
+                            ) {
+                                Toast.makeText(
+                                    context, "Please fill in all fields!", Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                viewModel.logIn(emailState.value.text, passwordState.value.text) {
+                                    scope.launch {
+                                        loginFailed.value = true
+                                        delay(5000)
+                                        loginFailed.value = false
+                                    }
+                                }
+                            }
+                        }, modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
+                    ) {
+
+                        Text(
+                            text = stringResource(id = R.string.login),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                    Text(text = stringResource(R.string.forgotten_password),
+                        color = Color.Blue,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable {
+                                navigateTo(navController, DestinationScreen.SignUp.route)
+                            })
                 }
             }
         }
-    )
+    }
     if (viewModel.inProcess.value) {
         CommonProgressbar()
     }

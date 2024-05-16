@@ -19,12 +19,12 @@ import com.nhom9.message.screens.ChatProfileScreen
 import com.nhom9.message.screens.EntryScreen
 import com.nhom9.message.screens.LoginScreen
 import com.nhom9.message.screens.ProfileScreen
-import com.nhom9.message.screens.ReportOptionScreen
-import com.nhom9.message.screens.ReportScreen
 import com.nhom9.message.screens.SignUpScreen
 import com.nhom9.message.screens.SingleChatScreen
 import com.nhom9.message.screens.SingleStatusScreen
 import com.nhom9.message.screens.StatusScreen
+import com.nhom9.message.screens.reportscreens.ReportOptionScreen
+import com.nhom9.message.screens.reportscreens.ReportScreen
 import com.nhom9.message.screens.subsettingscreens.AccountSettingScreen
 import com.nhom9.message.screens.subsettingscreens.DisplaySettingScreen
 import com.nhom9.message.screens.subsettingscreens.NotificationAndSoundSettingScreen

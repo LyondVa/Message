@@ -1,4 +1,4 @@
-package com.nhom9.message.screens
+package com.nhom9.message.screens.reportscreens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable

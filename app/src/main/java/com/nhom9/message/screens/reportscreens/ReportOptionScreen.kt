@@ -1,4 +1,4 @@
-package com.nhom9.message.screens
+package com.nhom9.message.screens.reportscreens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box

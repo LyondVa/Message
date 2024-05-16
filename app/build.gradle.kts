@@ -121,4 +121,6 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
 
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
+
+    implementation("com.google.firebase:firebase-auth")
 }

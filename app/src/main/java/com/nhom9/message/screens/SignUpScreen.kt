@@ -1,6 +1,7 @@
 package com.nhom9.message.screens
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,9 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -39,9 +42,16 @@ import com.nhom9.message.ProfileImageCard
 import com.nhom9.message.R
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
+    val context = LocalContext.current
+    val signupFailed = remember {
+        mutableStateOf(false)
+    }
+    val scope = rememberCoroutineScope()
     CheckSignedIn(viewModel, navController)
     Box(modifier = Modifier) {
         Column(
@@ -103,6 +113,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             )
             OutlinedTextField(
                 value = phoneNumberState.value,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 onValueChange = {
                     phoneNumberState.value = it
                 },
@@ -154,20 +165,37 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 modifier = Modifier
                     .padding(8.dp)
             )
+            if (signupFailed.value) {
+                Text(
+                    text = "This number has already been registered",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
             Button(
                 onClick = {
-                    if (imageUrl.value != "") {
+                    if (emailState.value.text.isEmpty() || passwordState.value.text.isEmpty() || nameState.value.text.isEmpty() || phoneNumberState.value.text.isEmpty()) {
+                        Toast.makeText(context, "PLease fill in all fields", Toast.LENGTH_SHORT)
+                            .show()
+                    } else if (imageUrl.value != "") {
                         viewModel.uploadImage(Uri.parse(imageUrl.value)) {
                             imageUrl.value = it.toString()
                         }
+                    } else {
+                        viewModel.signUp(
+                            name = nameState.value.text,
+                            phoneNumber = phoneNumberState.value.text,
+                            email = emailState.value.text,
+                            password = passwordState.value.text,
+                            imageUrl = imageUrl.value,
+                        ) {
+                            scope.launch {
+                                signupFailed.value = true
+                                delay(5000)
+                                signupFailed.value = false
+                            }
+                        }
                     }
-                    viewModel.signUp(
-                        name = nameState.value.text,
-                        phoneNumber = phoneNumberState.value.text,
-                        email = emailState.value.text,
-                        password = passwordState.value.text,
-                        imageUrl = imageUrl.value
-                    )
                 },
                 modifier = Modifier
                     .padding(8.dp)

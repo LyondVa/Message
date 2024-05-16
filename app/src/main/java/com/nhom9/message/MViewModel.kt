@@ -78,7 +78,8 @@ class MViewModel @Inject constructor(
         phoneNumber: String,
         email: String,
         password: String,
-        imageUrl: String
+        imageUrl: String,
+        onLoginFailed: () -> Unit
     ) {
         if (name.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
@@ -103,13 +104,13 @@ class MViewModel @Inject constructor(
                             }
                         }
                     } else {
-                        handleException(customMessage = "number already exists")
+                        onLoginFailed.invoke()
                     }
                 }
         }
     }
 
-    fun logIn(email: String, password: String) {
+    fun logIn(email: String, password: String, onLoginFailed:()->Unit) {
         if (email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
             return
@@ -122,7 +123,7 @@ class MViewModel @Inject constructor(
                         getUserData(it)
                     }
                 } else {
-                    handleException(customMessage = "Login Failed")
+                    onLoginFailed.invoke()
                 }
             }
         }
@@ -645,5 +646,6 @@ class MViewModel @Inject constructor(
         )
         db.collection(REPORTS).document(id).set(userReport)
     }
+
 }
 
