@@ -19,6 +19,8 @@ import com.nhom9.message.screens.ChatProfileScreen
 import com.nhom9.message.screens.EntryScreen
 import com.nhom9.message.screens.LoginScreen
 import com.nhom9.message.screens.ProfileScreen
+import com.nhom9.message.screens.ReportOptionScreen
+import com.nhom9.message.screens.ReportScreen
 import com.nhom9.message.screens.SignUpScreen
 import com.nhom9.message.screens.SingleChatScreen
 import com.nhom9.message.screens.SingleStatusScreen
@@ -35,36 +37,42 @@ import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 sealed class DestinationScreen(var route: String) {
-    object Entry : DestinationScreen(route = "entry")
-    object SignUp : DestinationScreen(route = "signup")
-    object Login : DestinationScreen(route = "login")
-    object Profile : DestinationScreen(route = "profile")
-    object ChatList : DestinationScreen(route = "chatList")
-    object SingleChat : DestinationScreen(route = "singleChat/{chatId}") {
+    data object Entry : DestinationScreen(route = "entry")
+    data object SignUp : DestinationScreen(route = "signup")
+    data object Login : DestinationScreen(route = "login")
+    data object Profile : DestinationScreen(route = "profile")
+    data object ChatList : DestinationScreen(route = "chatList")
+    data object SingleChat : DestinationScreen(route = "singleChat/{chatId}") {
         fun createRoute(id: String?) = "singleChat/$id" //custom??x
     }
 
-    object StatusList : DestinationScreen(route = "statusList")
-    object SingleStatus : DestinationScreen(route = "singleStatus/{userId}") {
+    data object StatusList : DestinationScreen(route = "statusList")
+    data object SingleStatus : DestinationScreen(route = "singleStatus/{userId}") {
         fun createRoute(userId: String) = "singleStatus/$userId"
     }
 
-    object AccountSetting : DestinationScreen(route = "accountSetting")
-    object DisplaySetting : DestinationScreen(route = "displaySetting")
-    object NotificationAndSoundSetting : DestinationScreen(route = "notificationAndSoundSetting")
-    object PrivacyAndSecuritySetting : DestinationScreen(route = "privacyAndSecuritySetting")
-    object EditName : DestinationScreen(route = "editName")
-    object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
-    object EditProfileImage : DestinationScreen(route = "editProfileImage")
-    object ChatProfile : DestinationScreen(route = "chatProfile/{userId}") {
+    data object AccountSetting : DestinationScreen(route = "accountSetting")
+    data object DisplaySetting : DestinationScreen(route = "displaySetting")
+    data object NotificationAndSoundSetting : DestinationScreen(route = "notificationAndSoundSetting")
+    data object PrivacyAndSecuritySetting : DestinationScreen(route = "privacyAndSecuritySetting")
+    data object EditName : DestinationScreen(route = "editName")
+    data object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
+    data object EditProfileImage : DestinationScreen(route = "editProfileImage")
+    data object ChatProfile : DestinationScreen(route = "chatProfile/{userId}") {
         fun createRoute(userId: String) = "chatProfile/$userId"
     }
 
-    object ChatImage : DestinationScreen(route = "chatImage/{imageUrl}") {
+    data object ChatImage : DestinationScreen(route = "chatImage/{imageUrl}") {
         fun createRoute(imageUrl: String) = "chatImage/$imageUrl"
     }
 
-    object ChangeLanguage : DestinationScreen(route = "changeLanguage")
+    data object ChangeLanguage : DestinationScreen(route = "changeLanguage")
+    data object Report : DestinationScreen(route = "report/{userId}") {
+        fun createRoute(userId: String) = "report/$userId"
+    }
+    data object ReportOption : DestinationScreen(route = "reportOption/{reportOptionIndex}/{userId}") {
+        fun createRoute(reportOptionIndex: String, userId: String) = "reportOption/$reportOptionIndex/$userId"
+    }
 }
 
 @AndroidEntryPoint
@@ -72,20 +80,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme(
-            ) {
-                //WindowCompat.setDecorFitsSystemWindows(window, false)
-                // A surface container using the 'background' color from the theme
+            AppTheme {
                 Surface(
                     tonalElevation = 5.dp,
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val viewModel = hiltViewModel<MViewModel>()
-                    if (viewModel.visiblePermissionDialogQueue.isEmpty()) {
-                        ChatAppNavigation(viewModel = viewModel)
-                    } else {
-                    }
+                    ChatAppNavigation()
                 }
             }
         }
@@ -93,7 +94,8 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun ChatAppNavigation(viewModel: MViewModel) {
+    fun ChatAppNavigation() {
+        val viewModel = hiltViewModel<MViewModel>()
         val navController = rememberNavController()
         NavHost(navController = navController, startDestination = DestinationScreen.Entry.route) {
             composable(DestinationScreen.Entry.route) {
@@ -161,6 +163,19 @@ class MainActivity : ComponentActivity() {
             }
             composable(DestinationScreen.ChangeLanguage.route) {
                 ChangeLanguageScreen(navController, viewModel)
+            }
+            composable(DestinationScreen.Report.route) {
+                val userId = it.arguments?.getString("userId")
+                userId?.let {
+                    ReportScreen(navController, userId)
+                }
+            }
+            composable(DestinationScreen.ReportOption.route) {
+                val reportOptionIndex = it.arguments?.getString("reportOptionIndex")
+                val userId = it.arguments?.getString("userId")
+                reportOptionIndex?.let {
+                    ReportOptionScreen(navController,viewModel, reportOptionIndex, userId!!)
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ const val CHATS = "Chats"
 const val MESSAGE = "Message"
 const val STATUS = "Status"
 const val BLOCKED_CHATS = "BlockedChats"
+const val REPORTS = "Reports"
 
 const val USERNAME = "name"
 const val IMAGEURL = "imageUrl"
@@ -21,3 +22,5 @@ const val TIME_HM_12H = "h:mm a"
 const val TIME_ISO_8601 = "yyyy-MM-dd'T'HH:mm:ssZ"
 
 const val PERMISSION_AUDIO = "Manifest.permission.RECORD_AUDIO"
+
+const val TOP_BAR_HEIGHT = 72

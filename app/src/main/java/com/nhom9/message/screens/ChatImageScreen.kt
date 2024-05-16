@@ -12,7 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonImage
-import com.nhom9.message.TitleBarWithBackAndVertIcon
+import com.nhom9.message.R
+import com.nhom9.message.TitleBarWithBackAndRightIcon
 import com.nhom9.message.downloader.AndroidDownloader
 
 @Composable
@@ -23,7 +24,12 @@ fun ChatImageScreen(navController: NavController, imageUrl: String) {
         downloader.downloadFile(imageUrl)
     }
     Column {
-        TitleBarWithBackAndVertIcon(navController = navController, text = "", onButtonClick)
+        TitleBarWithBackAndRightIcon(
+            navController = navController,
+            text = "",
+            onButtonClick = onButtonClick,
+            painterResource = R.drawable.outline_download_24
+        )
         CommonDivider(0)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

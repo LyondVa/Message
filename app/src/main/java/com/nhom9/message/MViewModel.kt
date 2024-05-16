@@ -27,12 +27,14 @@ import com.nhom9.message.data.MESSAGE_IMAGE
 import com.nhom9.message.data.MESSAGE_TEXT
 import com.nhom9.message.data.Message
 import com.nhom9.message.data.PHONENUMBER
+import com.nhom9.message.data.REPORTS
 import com.nhom9.message.data.STATUS
 import com.nhom9.message.data.Status
 import com.nhom9.message.data.USERID
 import com.nhom9.message.data.USERNAME
 import com.nhom9.message.data.USER_NODE
 import com.nhom9.message.data.UserData
+import com.nhom9.message.data.UserReport
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Calendar
 import java.util.UUID
@@ -71,7 +73,13 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun signUp(name: String, phoneNumber: String, email: String, password: String, imageUrl: String) {
+    fun signUp(
+        name: String,
+        phoneNumber: String,
+        email: String,
+        password: String,
+        imageUrl: String
+    ) {
         if (name.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
             return
@@ -84,11 +92,9 @@ class MViewModel @Inject constructor(
                                 Log.d("TAG", "signUp: User Logged In")
                                 signIn.value = true
                                 inProcess.value = false
-                                if(imageUrl==""){
-
+                                if (imageUrl == "") {
                                     createOrUpdateProfile(name, phoneNumber)
-                                }
-                                else{
+                                } else {
                                     createOrUpdateProfile(name, phoneNumber, imageUrl)
                                 }
                             } else {
@@ -558,10 +564,10 @@ class MViewModel @Inject constructor(
 
     fun getChatUser(userId: String): ChatUser? {
         for (chat in chats.value) {
-            return if (chat.user1.userId == userId) {
-                chat.user1
-            } else {
-                chat.user2
+            if (chat.user1.userId == userId) {
+                return chat.user1
+            } else if (chat.user2.userId == userId) {
+                return chat.user2
             }
         }
         return null
@@ -621,12 +627,23 @@ class MViewModel @Inject constructor(
         message.isEdited = true
         updateMessage(chatId, message, content)
     }
-    fun getChatPhotos( photoList: MutableList<String>) {
+
+    fun getChatPhotos(photoList: MutableList<String>) {
         for (message in chatMessages.value) {
             if (message.type == MESSAGE_IMAGE) {
                 photoList.add(message.content!!)
             }
         }
+    }
+
+    fun reportUser(userId: String, reportOption: String, reportContent: String) {
+        val id = db.collection(REPORTS).document().id
+        val userReport = UserReport(
+            userId = userId,
+            reportOption = reportOption,
+            reportContent = reportContent
+        )
+        db.collection(REPORTS).document(id).set(userReport)
     }
 }
 

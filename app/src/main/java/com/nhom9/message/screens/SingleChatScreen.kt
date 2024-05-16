@@ -65,6 +65,7 @@ import com.nhom9.message.data.MESSAGE_AUDIO
 import com.nhom9.message.data.MESSAGE_IMAGE
 import com.nhom9.message.data.MESSAGE_TEXT
 import com.nhom9.message.data.Message
+import com.nhom9.message.data.TOP_BAR_HEIGHT
 import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
@@ -113,7 +114,7 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
 
     val onHeaderClick = {
         navigateTo(
-            navController, DestinationScreen.ChatProfile/*.route*/.createRoute(chatUser.userId!!)
+            navController, DestinationScreen.ChatProfile.createRoute(chatUser.userId!!)
         )
     }
 
@@ -353,6 +354,9 @@ fun Message(
 fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBackClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .height(TOP_BAR_HEIGHT.dp)
+            .fillMaxWidth()
     ) {
         IconButton(onClick = { onBackClick.invoke() }) {
             Icon(Icons.Rounded.ArrowBack, contentDescription = null)
@@ -377,7 +381,6 @@ fun ReplyBox(
     onImageClick: () -> Unit
 ) {
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
-    //MicPermission(permissionState = permissionState)
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {

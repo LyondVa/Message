@@ -1,20 +1,27 @@
 package com.nhom9.message.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -23,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,29 +43,44 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CallBox
 import com.nhom9.message.CommonDivider
+import com.nhom9.message.CommonImage
+import com.nhom9.message.CommonProfileImage
+import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.data.TOP_BAR_HEIGHT
+import com.nhom9.message.navigateTo
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userId: String) {
     val chatUser = viewModel.getChatUser(userId)
-    Log.d("'ChatUSer", chatUser?.name!!)
-    Log.d("'ChatUSer",  chatUser.imageUrl!!)
     val photoIds = rememberSaveable {
         mutableListOf<String>()
     }
-    viewModel.getChatPhotos(photoIds)
-    Log.d("ChatProfile", photoIds.size.toString())
+    val onMessageImageClick: (String) -> Unit = {
+        navigateTo(
+            navController, DestinationScreen.ChatImage.createRoute(
+                URLEncoder.encode(
+                    it, StandardCharsets.UTF_8.toString()
+                )
+            )
+        )
+    }
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getChatPhotos(photoIds)
+    }
     Column {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
         ) {
-            FloatingBar(navController = navController)
+            HeaderBar(navController = navController, userId = userId)
             CommonDivider(0)
-            //ChatUserCard(chatUser?.name!!, chatUser.imageUrl!!)
+            ChatUserCard(chatUser?.name, chatUser?.imageUrl)
             ProfileInfoCard("")
-            //PhotoGrid()
+            PhotoGrid(photoIds, onMessageImageClick)
         }
     }
 }
@@ -78,20 +101,19 @@ fun ChatUserCard(name: String?, imageUrl: String?) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-        ) {/*
+        ) {
             Card(
                 shape = CircleShape,
                 modifier = Modifier
                     .size(160.dp)
             ) {
-                CommonImage(data = imageUrl)
-            }*//*
+                CommonProfileImage(imageUrl = imageUrl)
+            }
             Text(
                 text = name!!,
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(8.dp)
-            )*/
-
+            )
         }
     }
 }
@@ -103,15 +125,18 @@ fun ProfileInfoCard(name: String) {
 }
 
 @Composable
-fun FloatingBar(navController: NavController) {
-
+fun HeaderBar(navController: NavController, userId: String) {
+    val onReportClick={
+        navigateTo(navController, DestinationScreen.Report.createRoute(userId))
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(TOP_BAR_HEIGHT.dp)
     ) {
         IconButton(
-            onClick = { navController.popBackStack() }, modifier = Modifier.align(Alignment.CenterStart)
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.align(Alignment.CenterStart)
         ) {
             Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
         }
@@ -121,13 +146,13 @@ fun FloatingBar(navController: NavController) {
                 .align(Alignment.CenterEnd)
         ) {
             CallBox()
-            DropDownMenuButton()
+            DropDownMenuButton(onReportClick)
         }
     }
 }
 
 @Composable
-fun DropDownMenuButton() {
+fun DropDownMenuButton(onReportClick:()->Unit) {
     val context = LocalContext.current
     var mDisplayMenu by remember { mutableStateOf(false) }
     IconButton(onClick = { mDisplayMenu = !mDisplayMenu }) {
@@ -147,27 +172,40 @@ fun DropDownMenuButton() {
             {
                 Toast.makeText(context, "Block", Toast.LENGTH_SHORT).show()
                 mDisplayMenu = false
-
+            }
+        )
+        DropdownMenuItem(
+            {
+                Text(
+                    text = "Report",
+                    style = MaterialTheme.typography.labelMedium
+                )
+            },
+            {
+                onReportClick.invoke()
+                mDisplayMenu = false
             }
         )
     }
 }
 
-/*
 @Composable
-private fun PhotoGrid(viewModel: MViewModel) {
-    val photos by rememberSaveable { mutableStateOf(List(100) { 0..99 }) }
-
+private fun PhotoGrid(photoIds: MutableList<String>, onMessageImageClick: (String) -> Unit) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 128.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
-        items(photos) {
+        items(photoIds) {
             Surface(
                 tonalElevation = 3.dp,
                 modifier = Modifier.aspectRatio(1f)
-            ) {}
+            ) {
+                CommonImage(
+                    data = it,
+                    modifier = Modifier.clickable { onMessageImageClick.invoke(it) })
+            }
         }
+
     }
-}*/
+}

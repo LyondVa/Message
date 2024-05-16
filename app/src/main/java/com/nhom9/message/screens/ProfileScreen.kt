@@ -42,7 +42,7 @@ import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProfileImage
 import com.nhom9.message.CommonProgressbar
-import com.nhom9.message.CommonSettingRow
+import com.nhom9.message.CommonRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
@@ -98,11 +98,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
 
 @Composable
 fun ProfileImageBar(
-    allowEdit: Boolean,
-    imageUrl: String?,
-    name: String,
-    userId: String?,
-    viewModel: MViewModel
+    allowEdit: Boolean, imageUrl: String?, name: String, userId: String?, viewModel: MViewModel
 ) {
     var localImageUrl by remember { mutableStateOf<Uri?>(null) }
     val launcher =
@@ -124,23 +120,19 @@ fun ProfileImageBar(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Card(
-                shape = CircleShape,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clickable(allowEdit) {
-                        launcher.launch("image/*")
-                    }
-            ) {
+            Card(shape = CircleShape, modifier = Modifier
+                .size(80.dp)
+                .clickable(allowEdit) {
+                    launcher.launch("image/*")
+                }) {
                 CommonProfileImage(imageUrl = imageUrl)
             }
             Column(verticalArrangement = Arrangement.Center, modifier = Modifier.padding(8.dp)) {
                 Text(
-                    text = name,
-                    style = MaterialTheme.typography.headlineMedium
+                    text = name, style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
-                    text = stringResource(R.string.message_id) +":"+ userId,
+                    text = stringResource(R.string.message_id) + ":" + userId,
                     color = Color.Gray,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -157,13 +149,11 @@ fun InfoCard(
     phoneNumber: String,
 ) {
     Surface(
-        shadowElevation = 2.dp,
-        modifier = Modifier
+        shadowElevation = 2.dp, modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
     ) {
-        Column(modifier = Modifier.padding(20.dp))
-        {
+        Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 text = stringResource(R.string.info),
                 style = MaterialTheme.typography.titleLarge,
@@ -200,19 +190,24 @@ fun SettingCard(navController: NavController) {
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(start = 20.dp)
             )
-            CommonSettingRow(name = stringResource(R.string.account), Icons.Outlined.Person) {
+            CommonRow(name = stringResource(R.string.account), icon = Icons.Outlined.Person) {
                 navigateTo(navController, DestinationScreen.AccountSetting.route)
             }
             CommonDivider(0)
-            CommonSettingRow(name = stringResource(R.string.display), Icons.Outlined.Settings) {
+            CommonRow(name = stringResource(R.string.display), icon = Icons.Outlined.Settings) {
                 navigateTo(navController, DestinationScreen.DisplaySetting.route)
             }
             CommonDivider(0)
-            CommonSettingRow(name = stringResource(R.string.notification_and_sound), Icons.Outlined.Notifications) {
+            CommonRow(
+                name = stringResource(R.string.notification_and_sound),
+                icon = Icons.Outlined.Notifications
+            ) {
                 navigateTo(navController, DestinationScreen.NotificationAndSoundSetting.route)
             }
             CommonDivider(0)
-            CommonSettingRow(name = stringResource(R.string.privacy_and_security), Icons.Outlined.Warning) {
+            CommonRow(
+                name = stringResource(R.string.privacy_and_security), icon = Icons.Outlined.Warning
+            ) {
                 navigateTo(navController, DestinationScreen.PrivacyAndSecuritySetting.route)
             }
         }
@@ -222,12 +217,10 @@ fun SettingCard(navController: NavController) {
 @Composable
 fun LogOutCard(navController: NavController, viewModel: MViewModel) {
     Surface(
-        shadowElevation = 2.dp,
-        modifier = Modifier
+        shadowElevation = 2.dp, modifier = Modifier
     ) {
         Box(modifier = Modifier.padding(top = 8.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -235,14 +228,12 @@ fun LogOutCard(navController: NavController, viewModel: MViewModel) {
                     .clickable {
                         viewModel.logOut()
                         navigateTo(navController, DestinationScreen.Entry.route)
-                    }
-            ) {
+                    }) {
                 Icon(Icons.Outlined.ExitToApp, null)
                 Text(
                     text = stringResource(R.string.log_out),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp)
                 )
 
             }

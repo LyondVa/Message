@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.firebase.Timestamp
+import com.nhom9.message.data.TOP_BAR_HEIGHT
 
 fun navigateTo(navController: NavController, route: String) {
     navController.navigate(route) {
@@ -137,8 +138,10 @@ fun TitleBarWithBack(navController: NavController, text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(TOP_BAR_HEIGHT.dp)
     ) {
         IconButton(
+            modifier = Modifier.align(Alignment.CenterStart),
             onClick = { navController.popBackStack() }
         ) {
             Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
@@ -165,8 +168,10 @@ fun TitleBarWithBackAndRightButton(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(TOP_BAR_HEIGHT.dp)
     ) {
         IconButton(
+            modifier = Modifier.align(Alignment.CenterStart),
             onClick = { navController.popBackStack() }
         ) {
             Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
@@ -197,19 +202,21 @@ fun TitleBarWithBackAndRightButton(
 }
 
 @Composable
-fun TitleBarWithBackAndVertIcon(
+fun TitleBarWithBackAndRightIcon(
     navController: NavController,
     text: String,
+    imageVector: ImageVector? = null,
+    painterResource: Int? = null,
     onButtonClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
+            .height(TOP_BAR_HEIGHT.dp)
             .fillMaxWidth()
     ) {
         IconButton(
             onClick = { navController.popBackStack() },
             modifier = Modifier
-                .padding(8.dp)
                 .align(Alignment.CenterStart)
         ) {
             Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
@@ -228,7 +235,12 @@ fun TitleBarWithBackAndVertIcon(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
         ) {
-            Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = null)
+            if (imageVector != null) {
+                Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = null)
+            } else {
+                Icon(painter = painterResource(id = painterResource!!), contentDescription = null)
+            }
+
         }
     }
 }
@@ -244,12 +256,14 @@ fun CommonProfileImageRow(imageUrl: String?, name: String?, onItemClick: () -> U
                 onItemClick.invoke()
             }
     ) {
-        CommonProfileImage(imageUrl = imageUrl,
+        CommonProfileImage(
+            imageUrl = imageUrl,
             modifier = Modifier
                 .padding(8.dp)
                 .size(50.dp)
                 .clip(CircleShape)
-                .background(Color.Red))
+                .background(Color.Red)
+        )
         Text(
             text = name ?: "---",
             style = MaterialTheme.typography.titleMedium,
@@ -260,14 +274,15 @@ fun CommonProfileImageRow(imageUrl: String?, name: String?, onItemClick: () -> U
 }
 
 @Composable
-fun CommonSettingRow(
+fun CommonRow(
     name: String,
+    modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    onItemClick: () -> Unit
+    onItemClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(60.dp)
             .clickable {
@@ -295,7 +310,7 @@ fun CommonSettingRow(
 @Composable
 fun CommonSubSettingRow(title: String, text: String = "", onItemClick: () -> Unit = {}) {
     Box() {
-        CommonSettingRow(name = title) {
+        CommonRow(name = title) {
             onItemClick.invoke()
         }
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {
