@@ -16,13 +16,15 @@ import androidx.navigation.compose.rememberNavController
 import com.nhom9.message.screens.ChatImageScreen
 import com.nhom9.message.screens.ChatListScreen
 import com.nhom9.message.screens.ChatProfileScreen
-import com.nhom9.message.screens.EntryScreen
-import com.nhom9.message.screens.LoginScreen
 import com.nhom9.message.screens.ProfileScreen
-import com.nhom9.message.screens.SignUpScreen
 import com.nhom9.message.screens.SingleChatScreen
 import com.nhom9.message.screens.SingleStatusScreen
 import com.nhom9.message.screens.StatusScreen
+import com.nhom9.message.screens.entryscreens.EntryScreen
+import com.nhom9.message.screens.entryscreens.LogInWithPhoneNumberScreen
+import com.nhom9.message.screens.entryscreens.LoginScreen
+import com.nhom9.message.screens.entryscreens.SignUpScreen
+import com.nhom9.message.screens.entryscreens.SignUpWithPhoneNumberScreen
 import com.nhom9.message.screens.reportscreens.ReportOptionScreen
 import com.nhom9.message.screens.reportscreens.ReportScreen
 import com.nhom9.message.screens.subsettingscreens.AccountSettingScreen
@@ -73,6 +75,8 @@ sealed class DestinationScreen(var route: String) {
     data object ReportOption : DestinationScreen(route = "reportOption/{reportOptionIndex}/{userId}") {
         fun createRoute(reportOptionIndex: String, userId: String) = "reportOption/$reportOptionIndex/$userId"
     }
+    data object SignUpWithPhoneNumber : DestinationScreen(route = "signUpWithPhoneNumber")
+    data object LogInWithPhoneNumber : DestinationScreen(route = "logInWithPhoneNumber")
 }
 
 @AndroidEntryPoint
@@ -176,6 +180,12 @@ class MainActivity : ComponentActivity() {
                 reportOptionIndex?.let {
                     ReportOptionScreen(navController,viewModel, reportOptionIndex, userId!!)
                 }
+            }
+            composable(DestinationScreen.SignUpWithPhoneNumber.route) {
+                SignUpWithPhoneNumberScreen(navController, viewModel)
+            }
+            composable(DestinationScreen.LogInWithPhoneNumber.route) {
+                LogInWithPhoneNumberScreen(navController, viewModel)
             }
         }
     }

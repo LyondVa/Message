@@ -1,5 +1,8 @@
 package com.nhom9.message
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -418,4 +421,9 @@ fun CommonProfileImage(imageUrl: String?, modifier: Modifier = Modifier) {
     } else {
         CommonImage(data = imageUrl, modifier = modifier)
     }
+}
+fun Context.getActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.getActivity()
+    else -> null
 }

@@ -1,5 +1,6 @@
 package com.nhom9.message
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
@@ -7,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -14,6 +17,7 @@ import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
+import com.nhom9.message.authentication.PhoneAuthentication
 import com.nhom9.message.data.BLOCKED_CHATS
 import com.nhom9.message.data.BlockedChats
 import com.nhom9.message.data.CHATS
@@ -42,9 +46,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MViewModel @Inject constructor(
-    val auth: FirebaseAuth,
-    var db: FirebaseFirestore,
-    var storage: FirebaseStorage
+    val auth: FirebaseAuth, var db: FirebaseFirestore, var storage: FirebaseStorage
 ) : ViewModel() {
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
     var inProcess = mutableStateOf(false)
@@ -52,6 +54,7 @@ class MViewModel @Inject constructor(
     var signIn = mutableStateOf(false)
     val userData = mutableStateOf<UserData?>(null)
     val chats = mutableStateOf<List<ChatData>>(listOf())
+    val phoneAuth = PhoneAuthentication(auth)
 
     //val chatUserIds = mutableStateOf<List<String>>(listOf())
     var inProcessChats = mutableStateOf(false)
@@ -73,13 +76,118 @@ class MViewModel @Inject constructor(
         }
     }
 
+    fun sendVerificationCode(
+        context: Context,
+        phoneNumber: String,
+        onCodeSend: () -> Unit,
+        onVerificationFailed: () -> Unit
+    ) {
+        var phoneNumberEdited = phoneNumber
+        if (phoneNumber.startsWith("0")) {
+            phoneNumberEdited = phoneNumber.drop(1)
+        }
+        phoneAuth.sendVerificationCode(
+            context, phoneNumberEdited, onCodeSend, onVerificationFailed
+        )
+    }
+
+    fun signUpWithPhoneNumber(
+        otp: String,
+        name: String,
+        phoneNumber: String,
+        imageUrl: String? = null,
+        onSignupFailed: () -> Unit
+    ) {
+        var phoneNumberDisplay = phoneNumber
+        if (name.isEmpty() || phoneNumber.isEmpty()) {
+            handleException(customMessage = "Please Fill In All Fields")
+            return
+        } else {
+            if (!phoneNumber.startsWith("0")) {
+                phoneNumberDisplay = "0$phoneNumber"
+            }
+            db.collection(USER_NODE).whereEqualTo("phoneNumber", phoneNumber).get()
+                .addOnSuccessListener {
+                    if (it.isEmpty) {
+                        val credential =
+                            PhoneAuthProvider.getCredential(phoneAuth.storedVerificationId, otp)
+                        auth.signInWithCredential(credential).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                signIn.value = true
+                                inProcess.value = false
+                                if (imageUrl == "" || imageUrl == null) {
+                                    createProfileWithPhoneNumber(name, phoneNumberDisplay)
+                                } else {
+                                    createProfileWithPhoneNumber(name, phoneNumberDisplay, imageUrl)
+                                }
+                            } else {
+                                if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                                }
+                            }
+                        }
+                    } else {
+//
+                    }
+                }
+        }
+    }
+
+    fun signInWithPhoneNumber(
+        otp: String,
+        phoneNumber: String,
+        onSignInFailed: () -> Unit
+    ) {
+        if (phoneNumber.isEmpty()) {
+            handleException(customMessage = "Please Fill In All Fields")
+            return
+        } else {
+            val credential =
+                PhoneAuthProvider.getCredential(phoneAuth.storedVerificationId, otp)
+            auth.signInWithCredential(credential).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    signIn.value = true
+                    inProcess.value = false
+                    auth.currentUser?.uid?.let {
+                        getUserData(it)
+                    }
+                } else {
+                    if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                        onSignInFailed.invoke()
+                    } else {
+                        handleException(exception = task.exception)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createProfileWithPhoneNumber(
+        name: String,
+        phoneNumber: String,
+        imageUrl: String? = null,
+    ) {
+        val userId = auth.currentUser?.uid
+        val userData = UserData(
+            userId = userId, name = name, phoneNumber = phoneNumber, imageUrl = imageUrl
+        )
+        try {
+            inProcess.value = true
+            db.collection(USER_NODE).document(userId!!).set(userData)
+            inProcess.value = false
+            getUserData(userId)
+        } catch (e: Exception) {
+            handleException(e)
+        }
+    }
+
+
     fun signUp(
         name: String,
         phoneNumber: String,
         email: String,
         password: String,
         imageUrl: String,
-        onLoginFailed: () -> Unit
+        onSignupFailed: () -> Unit
     ) {
         if (name.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
@@ -104,13 +212,13 @@ class MViewModel @Inject constructor(
                             }
                         }
                     } else {
-                        onLoginFailed.invoke()
+                        onSignupFailed.invoke()
                     }
                 }
         }
     }
 
-    fun logIn(email: String, password: String, onLoginFailed:()->Unit) {
+    fun logIn(email: String, password: String, onLoginFailed: () -> Unit) {
         if (email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
             return
@@ -143,29 +251,26 @@ class MViewModel @Inject constructor(
         )
         uid?.let {
             inProcess.value = true
-            db.collection(USER_NODE).document(uid).get()
-                .addOnSuccessListener {
-                    if (it.exists()) {
-                        db.collection(USER_NODE).document(uid)
-                            .update(
-                                "name",
-                                userData.name,
-                                "phoneNumber",
-                                userData.phoneNumber,
-                                "imageUrl",
-                                userData.imageUrl
-                            )
-                        getUserData(uid)
-                        inProcess.value = false //custom
-                    } else {
-                        db.collection(USER_NODE).document(uid).set(userData)
-                        inProcess.value = false
-                        getUserData(uid)
-                    }
+            db.collection(USER_NODE).document(uid).get().addOnSuccessListener {
+                if (it.exists()) {
+                    db.collection(USER_NODE).document(uid).update(
+                        "name",
+                        userData.name,
+                        "phoneNumber",
+                        userData.phoneNumber,
+                        "imageUrl",
+                        userData.imageUrl
+                    )
+                    getUserData(uid)
+                    inProcess.value = false //custom
+                } else {
+                    db.collection(USER_NODE).document(uid).set(userData)
+                    inProcess.value = false
+                    getUserData(uid)
                 }
-                .addOnFailureListener {
-                    handleException(it, "cannot retrieve user")
-                }
+            }.addOnFailureListener {
+                handleException(it, "cannot retrieve user")
+            }
         }
     }
 
@@ -185,10 +290,9 @@ class MViewModel @Inject constructor(
             val result = it.metadata?.reference?.downloadUrl
             result?.addOnSuccessListener(onSuccess)
             inProcess.value = false
+        }.addOnFailureListener {
+            handleException(it)
         }
-            .addOnFailureListener {
-                handleException(it)
-            }
 
     }
 
@@ -202,10 +306,9 @@ class MViewModel @Inject constructor(
             val result = it.metadata?.reference?.downloadUrl
             result?.addOnSuccessListener(onSuccess)
             inProcess.value = false
+        }.addOnFailureListener {
+            handleException(it)
         }
-            .addOnFailureListener {
-                handleException(it)
-            }
     }
 
     fun getUserData(uid: String) {
@@ -251,8 +354,7 @@ class MViewModel @Inject constructor(
                     Filter.and(
                         Filter.equalTo("user1.phoneNumber", phoneNumber),
                         Filter.equalTo("user2.phoneNumber", userData.value?.phoneNumber)
-                    ),
-                    Filter.and(
+                    ), Filter.and(
                         Filter.equalTo("user1.phoneNumber", userData.value?.phoneNumber),
                         Filter.equalTo("user2.phoneNumber", phoneNumber)
                     )
@@ -268,14 +370,12 @@ class MViewModel @Inject constructor(
                                 val chatPartner = it.toObjects<UserData>()[0]
                                 val id = db.collection(CHATS).document().id
                                 val chat = ChatData(
-                                    chatId = id,
-                                    ChatUser(
+                                    chatId = id, ChatUser(
                                         userData.value?.userId,
                                         userData.value?.name,
                                         userData.value?.imageUrl,
                                         userData.value?.phoneNumber
-                                    ),
-                                    ChatUser(
+                                    ), ChatUser(
                                         chatPartner.userId,
                                         chatPartner.name,
                                         chatPartner.imageUrl,
@@ -284,8 +384,7 @@ class MViewModel @Inject constructor(
                                 )
                                 db.collection(CHATS).document(id).set(chat)
                             }
-                        }
-                        .addOnFailureListener {
+                        }.addOnFailureListener {
                             handleException(customMessage = "Add chat db.collection error")
                         }
                 } else {
@@ -327,9 +426,7 @@ class MViewModel @Inject constructor(
         val time = Timestamp(Calendar.getInstance().time)
         uploadImage(imageUri) {
             val imageMessage = Message(
-                messageId,
-                MESSAGE_IMAGE,
-                userData.value?.userId, it.toString(), time
+                messageId, MESSAGE_IMAGE, userData.value?.userId, it.toString(), time
             )
             db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId)
                 .set(imageMessage)
@@ -341,9 +438,7 @@ class MViewModel @Inject constructor(
         val time = Timestamp(Calendar.getInstance().time)
         uploadAudio(audioUri, metadata) {
             val audioMessage = Message(
-                messageId,
-                MESSAGE_AUDIO,
-                userData.value?.userId, it.toString(), time
+                messageId, MESSAGE_AUDIO, userData.value?.userId, it.toString(), time
             )
             db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId)
                 .set(audioMessage)
@@ -383,15 +478,12 @@ class MViewModel @Inject constructor(
     fun createStatus(imageUrl: String) {
         val id = db.collection(STATUS).document().id
         val newStatus = Status(
-            statusId = id,
-            ChatUser(
+            statusId = id, ChatUser(
                 userData.value?.userId,
                 userData.value?.name,
                 userData.value?.imageUrl,
                 userData.value?.phoneNumber
-            ),
-            imageUrl,
-            System.currentTimeMillis()
+            ), imageUrl, System.currentTimeMillis()
 
         )
         db.collection(STATUS).document(id).set(newStatus)
@@ -593,19 +685,6 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun dismissDialog() {
-        visiblePermissionDialogQueue.removeFirst()
-    }
-
-    fun onPermissionResult(
-        permission: String,
-        isGranted: Boolean
-    ) {
-        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
-            visiblePermissionDialogQueue.add(permission)
-        }
-    }
-
     private fun updateMessage(chatId: String, message: Message, content: String = "") {
         if (content == "") {
             db.collection(CHATS).document(chatId).collection(MESSAGE).document(message.messageId!!)
@@ -640,9 +719,7 @@ class MViewModel @Inject constructor(
     fun reportUser(userId: String, reportOption: String, reportContent: String) {
         val id = db.collection(REPORTS).document().id
         val userReport = UserReport(
-            userId = userId,
-            reportOption = reportOption,
-            reportContent = reportContent
+            userId = userId, reportOption = reportOption, reportContent = reportContent
         )
         db.collection(REPORTS).document(id).set(userReport)
     }

@@ -1,8 +1,7 @@
-package com.nhom9.message.screens
+package com.nhom9.message.screens.entryscreens
 
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -69,9 +68,6 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
     }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    BackHandler {
-        navigateTo(navController, DestinationScreen.Entry.route)
-    }
 
     CheckSignedIn(viewModel, navController)
 

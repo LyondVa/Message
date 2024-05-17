@@ -1,4 +1,4 @@
-package com.nhom9.message.googleauthentication
+package com.nhom9.message.authentication
 
 import android.content.Context
 import android.content.Intent

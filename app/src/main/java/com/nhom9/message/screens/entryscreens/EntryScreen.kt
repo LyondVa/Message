@@ -1,4 +1,4 @@
-package com.nhom9.message.screens
+package com.nhom9.message.screens.entryscreens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -69,7 +69,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
             )
             Button(
                 onClick = {
-                    navigateTo(navController, DestinationScreen.Login.route)
+                    navigateTo(navController, DestinationScreen.LogInWithPhoneNumber.route)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -83,7 +83,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
             }
             Button(
                 onClick = {
-                    navigateTo(navController, DestinationScreen.SignUp.route)
+                    navigateTo(navController, DestinationScreen.SignUpWithPhoneNumber.route)
                 },
 
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
@@ -114,7 +114,7 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
                 modifier = Modifier
                     .size(32.dp)
                     .clickable {
-
+                        navigateTo(navController, DestinationScreen.SignUp.route)
                     }
             )
         }
