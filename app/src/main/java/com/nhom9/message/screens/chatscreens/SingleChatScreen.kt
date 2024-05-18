@@ -1,4 +1,4 @@
-package com.nhom9.message.screens
+package com.nhom9.message.screens.chatscreens
 
 import android.Manifest
 import android.net.Uri

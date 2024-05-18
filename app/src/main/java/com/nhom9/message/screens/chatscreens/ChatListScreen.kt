@@ -1,4 +1,4 @@
-package com.nhom9.message.screens
+package com.nhom9.message.screens.chatscreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +40,8 @@ import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.TitleBar
 import com.nhom9.message.navigateTo
+import com.nhom9.message.screens.BottomNavigationItem
+import com.nhom9.message.screens.BottomNavigationMenu
 
 @Composable
 fun ChatListScreen(navController: NavController, viewModel: MViewModel) {

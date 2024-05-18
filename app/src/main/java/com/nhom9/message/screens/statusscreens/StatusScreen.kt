@@ -1,4 +1,4 @@
-package com.nhom9.message.screens
+package com.nhom9.message.screens.statusscreens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -31,6 +31,8 @@ import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.TitleBar
 import com.nhom9.message.navigateTo
+import com.nhom9.message.screens.BottomNavigationItem
+import com.nhom9.message.screens.BottomNavigationMenu
 
 @Composable
 fun StatusScreen(navController: NavController, viewModel: MViewModel) {
