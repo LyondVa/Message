@@ -20,7 +20,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -117,7 +116,7 @@ fun LogInWithPhoneNumberScreen(navController: NavController, viewModel: MViewMod
                         modifier = Modifier.wrapContentSize()
                     ) {
                         Image(
-                            imageVector = Icons.Outlined.Phone,
+                            painter = painterResource(id = R.drawable.phone_outlined),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(60.dp)

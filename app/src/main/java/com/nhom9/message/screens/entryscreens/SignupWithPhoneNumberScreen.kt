@@ -19,7 +19,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MailOutline
-import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,7 +56,7 @@ import kotlinx.coroutines.launch
 fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewModel) {
     val context = LocalContext.current
     CheckSignedIn(viewModel, navController)
-    val signupFailed = remember {
+    val numberAlreadyRegistered = remember {
         mutableStateOf(false)
     }
     val nameState = remember {
@@ -111,7 +110,7 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                 modifier = Modifier.wrapContentSize()
             ) {
                 Image(
-                    imageVector = Icons.Outlined.Phone,
+                    painter = painterResource(id = R.drawable.person_outlined),
                     contentDescription = null,
                     modifier = Modifier
                         .size(60.dp)
@@ -125,7 +124,7 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                     Text(
                         text = "Name", style = MaterialTheme.typography.bodyMedium
                     )
-                }, shape = RoundedCornerShape(40.dp), modifier = Modifier.padding(end = 8.dp)
+                }, shape = RoundedCornerShape(40.dp), modifier = Modifier.padding(8.dp)
                 )
             }
             Row(
@@ -134,7 +133,7 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                 modifier = Modifier.wrapContentSize()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.key_encircled),
+                    painter = painterResource(id = R.drawable.phone_outlined),
                     contentDescription = null,
                     modifier = Modifier
                         .size(60.dp)
@@ -146,7 +145,9 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                     value = phoneNumberState.value,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     onValueChange = {
-                        phoneNumberState.value = it
+                        if (it.text.length <= 10) {
+                            phoneNumberState.value = it
+                        }
                     },
                     label = {
                         Text(
@@ -157,26 +158,21 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                     modifier = Modifier.padding(8.dp)
                 )
             }
-            if (signupFailed.value) {
-                Text(
-                    text = "This number has already been registered",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
             if (!verificationIsVisible.value) {
                 Button(onClick = {
                     if (phoneNumberState.value.text.isEmpty() || nameState.value.text.isEmpty()) {
                         Toast.makeText(context, "Please Fill In All Fields", Toast.LENGTH_SHORT)
                             .show()
                     } else {
-                        viewModel.sendVerificationCode(
-                            context, phoneNumberState.value.text, {verificationIsVisible.value = true}
-                        ) {scope.launch {
-                            verificationFailed.value = true
-                            delay(5000)
-                            verificationFailed.value = false
-                        }}
+                        viewModel.sendVerificationCode(context,
+                            phoneNumberState.value.text,
+                            { verificationIsVisible.value = true }) {
+                            scope.launch {
+                                verificationFailed.value = true
+                                delay(5000)
+                                verificationFailed.value = false
+                            }
+                        }
                     }
                 }) {
                     Text(
@@ -226,14 +222,28 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                                 otp.value,
                                 nameState.value.text,
                                 phoneNumberState.value.text,
-                                imageUrl.value
+                                imageUrl.value,
+                                {
+                                    scope.launch {
+                                        numberAlreadyRegistered.value = true
+                                        delay(5000)
+                                        numberAlreadyRegistered.value = false
+                                    }
+                                }
                             ) {
                                 Toast.makeText(context, "Incorrect OTP code", Toast.LENGTH_SHORT)
                                     .show()
                             }
                         } else {
                             viewModel.signUpWithPhoneNumber(
-                                otp.value, nameState.value.text, phoneNumberState.value.text
+                                otp.value, nameState.value.text, phoneNumberState.value.text,
+                                onNumberAlreadyRegistered = {
+                                    scope.launch {
+                                        numberAlreadyRegistered.value = true
+                                        delay(5000)
+                                        numberAlreadyRegistered.value = false
+                                    }
+                                }
                             ) {
                                 Toast.makeText(context, "Incorrect OTP code", Toast.LENGTH_SHORT)
                                     .show()
@@ -246,9 +256,16 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                     )
                 }
             }
-            if(verificationFailed.value){
+            if (verificationFailed.value) {
                 Text(
                     text = "Please Check Your Phone Number",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+            if (numberAlreadyRegistered.value) {
+                Text(
+                    text = "This number has already been registered",
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp)
                 )

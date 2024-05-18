@@ -96,6 +96,7 @@ class MViewModel @Inject constructor(
         name: String,
         phoneNumber: String,
         imageUrl: String? = null,
+        onNumberAlreadyRegistered: () -> Unit,
         onSignupFailed: () -> Unit
     ) {
         var phoneNumberDisplay = phoneNumber
@@ -122,11 +123,12 @@ class MViewModel @Inject constructor(
                                 }
                             } else {
                                 if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                                    onSignupFailed.invoke()
                                 }
                             }
                         }
                     } else {
-//
+                        onNumberAlreadyRegistered.invoke()
                     }
                 }
         }

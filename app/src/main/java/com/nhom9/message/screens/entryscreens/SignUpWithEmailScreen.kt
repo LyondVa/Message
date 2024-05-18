@@ -103,7 +103,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 modifier = Modifier.wrapContentSize()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.key_encircled),
+                    painter = painterResource(id = R.drawable.person_outlined),
                     contentDescription = null,
                     modifier = Modifier
                         .size(60.dp)
@@ -133,7 +133,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 modifier = Modifier.wrapContentSize()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.key_encircled),
+                    painter = painterResource(id = R.drawable.phone_outlined),
                     contentDescription = null,
                     modifier = Modifier
                         .size(60.dp)
@@ -164,7 +164,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 modifier = Modifier.wrapContentSize()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.key_encircled),
+                    painter = painterResource(id = R.drawable.mail_encircled),
                     contentDescription = null,
                     modifier = Modifier
                         .size(60.dp)
