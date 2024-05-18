@@ -11,7 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,8 @@ import com.nhom9.message.TitleBar
 import com.nhom9.message.navigateTo
 import com.nhom9.message.screens.BottomNavigationItem
 import com.nhom9.message.screens.BottomNavigationMenu
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
@@ -60,9 +63,36 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
         val onDismiss: () -> Unit = {
             showDialogue.value = false
         }
+        val enteredOwnPhoneNumber = remember {
+            mutableStateOf(false)
+        }
+        val enteredNothing = remember {
+            mutableStateOf(false)
+        }
+        val scope = rememberCoroutineScope()
         val onAddChat: (String) -> Unit = {
-            viewModel.onAddChat(it)
-            showDialogue.value = false
+            when (it) {
+                viewModel.userData.value?.phoneNumber -> {
+                    scope.launch {
+                        enteredOwnPhoneNumber.value = true
+                        delay(5000)
+                        enteredOwnPhoneNumber.value = false
+                    }
+                }
+
+                "" -> {
+                    scope.launch {
+                        enteredNothing.value = true
+                        delay(5000)
+                        enteredNothing.value = false
+                    }
+                }
+
+                else -> {
+                    viewModel.onSendChatRequest(it, {}, {}, {})
+                    showDialogue.value = false
+                }
+            }
         }
         val searchText = remember {
             mutableStateOf(TextFieldValue())
@@ -88,6 +118,8 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                     showDialogue = showDialogue.value,
                     onFABClick = onFABClick,
                     onDismiss = onDismiss,
+                    enteredOwnPhoneNumber = enteredOwnPhoneNumber.value,
+                    enteredNothing = enteredNothing.value,
                     onAddChat = onAddChat
                 )
             },
@@ -100,10 +132,12 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                     Box {
                         TitleBar(text = stringResource(R.string.messages))
                         IconButton(
-                            onClick = { },
+                            onClick = {
+                                navigateTo(navController, DestinationScreen.ChatRequestScreen.route)
+                            },
                             modifier = Modifier.align(Alignment.CenterEnd)
                         ) {
-                            Icon(imageVector = Icons.Outlined.Search, contentDescription = null)
+                            Icon(imageVector = Icons.Outlined.Notifications, contentDescription = null)
                         }
                     }
                     OutlinedTextField(
@@ -142,7 +176,10 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                                 } else {
                                     chat.user1
                                 }
-                                CommonProfileImageRow(imageUrl = chatUser.imageUrl, name = chatUser.name) {
+                                CommonProfileImageRow(
+                                    imageUrl = chatUser.imageUrl,
+                                    name = chatUser.name
+                                ) {
                                     chat.chatId?.let {
                                         navigateTo(
                                             navController,
@@ -171,6 +208,8 @@ fun FAB(
     showDialogue: Boolean,
     onFABClick: () -> Unit,
     onDismiss: () -> Unit,
+    enteredOwnPhoneNumber: Boolean,
+    enteredNothing: Boolean,
     onAddChat: (String) -> Unit
 ) {
     val addChatNumber = remember {
@@ -199,11 +238,30 @@ fun FAB(
                 )
             },
             text = {
-                OutlinedTextField(
-                    value = addChatNumber.value,
-                    onValueChange = { addChatNumber.value = it },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        value = addChatNumber.value,
+                        onValueChange = { addChatNumber.value = it },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                    if (enteredOwnPhoneNumber) {
+                        Text(
+                            text = "Please enter another number",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                    if (enteredNothing) {
+                        Text(
+                            text = "Please enter a phone number",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
             }
         )
     }

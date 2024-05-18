@@ -13,13 +13,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.nhom9.message.data.USERID
+import com.nhom9.message.screens.ProfileScreen
+import com.nhom9.message.screens.chatrequestscreen.ChatRequestScreen
+import com.nhom9.message.screens.chatrequestscreen.UserProfileScreen
 import com.nhom9.message.screens.chatscreens.ChatImageScreen
 import com.nhom9.message.screens.chatscreens.ChatListScreen
 import com.nhom9.message.screens.chatscreens.ChatProfileScreen
-import com.nhom9.message.screens.ProfileScreen
 import com.nhom9.message.screens.chatscreens.SingleChatScreen
-import com.nhom9.message.screens.statusscreens.SingleStatusScreen
-import com.nhom9.message.screens.statusscreens.StatusScreen
 import com.nhom9.message.screens.entryscreens.EntryScreen
 import com.nhom9.message.screens.entryscreens.LogInWithPhoneNumberScreen
 import com.nhom9.message.screens.entryscreens.LoginScreen
@@ -27,6 +28,8 @@ import com.nhom9.message.screens.entryscreens.SignUpScreen
 import com.nhom9.message.screens.entryscreens.SignUpWithPhoneNumberScreen
 import com.nhom9.message.screens.reportscreens.ReportOptionScreen
 import com.nhom9.message.screens.reportscreens.ReportScreen
+import com.nhom9.message.screens.statusscreens.SingleStatusScreen
+import com.nhom9.message.screens.statusscreens.StatusScreen
 import com.nhom9.message.screens.subsettingscreens.AccountSettingScreen
 import com.nhom9.message.screens.subsettingscreens.DisplaySettingScreen
 import com.nhom9.message.screens.subsettingscreens.NotificationAndSoundSettingScreen
@@ -55,7 +58,9 @@ sealed class DestinationScreen(var route: String) {
 
     data object AccountSetting : DestinationScreen(route = "accountSetting")
     data object DisplaySetting : DestinationScreen(route = "displaySetting")
-    data object NotificationAndSoundSetting : DestinationScreen(route = "notificationAndSoundSetting")
+    data object NotificationAndSoundSetting :
+        DestinationScreen(route = "notificationAndSoundSetting")
+
     data object PrivacyAndSecuritySetting : DestinationScreen(route = "privacyAndSecuritySetting")
     data object EditName : DestinationScreen(route = "editName")
     data object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
@@ -72,11 +77,19 @@ sealed class DestinationScreen(var route: String) {
     data object Report : DestinationScreen(route = "report/{userId}") {
         fun createRoute(userId: String) = "report/$userId"
     }
-    data object ReportOption : DestinationScreen(route = "reportOption/{reportOptionIndex}/{userId}") {
-        fun createRoute(reportOptionIndex: String, userId: String) = "reportOption/$reportOptionIndex/$userId"
+
+    data object ReportOption :
+        DestinationScreen(route = "reportOption/{reportOptionIndex}/{userId}") {
+        fun createRoute(reportOptionIndex: String, userId: String) =
+            "reportOption/$reportOptionIndex/$userId"
     }
+
     data object SignUpWithPhoneNumber : DestinationScreen(route = "signUpWithPhoneNumber")
     data object LogInWithPhoneNumber : DestinationScreen(route = "logInWithPhoneNumber")
+    data object ChatRequestScreen : DestinationScreen(route = "chatRequestScreen")
+    data object UserProfile : DestinationScreen(route = "userProfile/{isMyRequest}/{userId}") {
+        fun createRoute(userId: String, isMyRequest: String) = "userProfile/$isMyRequest/$userId"
+    }
 }
 
 @AndroidEntryPoint
@@ -178,7 +191,7 @@ class MainActivity : ComponentActivity() {
                 val reportOptionIndex = it.arguments?.getString("reportOptionIndex")
                 val userId = it.arguments?.getString("userId")
                 reportOptionIndex?.let {
-                    ReportOptionScreen(navController,viewModel, reportOptionIndex, userId!!)
+                    ReportOptionScreen(navController, viewModel, reportOptionIndex, userId!!)
                 }
             }
             composable(DestinationScreen.SignUpWithPhoneNumber.route) {
@@ -186,6 +199,16 @@ class MainActivity : ComponentActivity() {
             }
             composable(DestinationScreen.LogInWithPhoneNumber.route) {
                 LogInWithPhoneNumberScreen(navController, viewModel)
+            }
+            composable(DestinationScreen.ChatRequestScreen.route) {
+                ChatRequestScreen(navController, viewModel)
+            }
+            composable(DestinationScreen.UserProfile.route) {
+                val userId = it.arguments?.getString(USERID)
+                val isMyRequest = it.arguments?.getString("isMyRequest")
+                userId?.let {
+                    UserProfileScreen(navController, viewModel, userId, isMyRequest!!.toBoolean())
+                }
             }
         }
     }

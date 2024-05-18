@@ -249,15 +249,20 @@ fun TitleBarWithBackAndRightIcon(
 }
 
 @Composable
-fun CommonProfileImageRow(imageUrl: String?, name: String?, onItemClick: () -> Unit) {
+fun CommonProfileImageRow(
+    modifier: Modifier = Modifier,
+    imageUrl: String?,
+    name: String?,
+    onItemClick: () -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(75.dp)
             .clickable {
                 onItemClick.invoke()
-            }
+            },
     ) {
         CommonProfileImage(
             imageUrl = imageUrl,
@@ -422,6 +427,7 @@ fun CommonProfileImage(imageUrl: String?, modifier: Modifier = Modifier) {
         CommonImage(data = imageUrl, modifier = modifier)
     }
 }
+
 fun Context.getActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.getActivity()

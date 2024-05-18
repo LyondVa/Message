@@ -3,13 +3,13 @@ package com.nhom9.message
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -21,7 +21,9 @@ import com.nhom9.message.authentication.PhoneAuthentication
 import com.nhom9.message.data.BLOCKED_CHATS
 import com.nhom9.message.data.BlockedChats
 import com.nhom9.message.data.CHATS
+import com.nhom9.message.data.CHAT_REQUESTS
 import com.nhom9.message.data.ChatData
+import com.nhom9.message.data.ChatRequest
 import com.nhom9.message.data.ChatUser
 import com.nhom9.message.data.Event
 import com.nhom9.message.data.IMAGEURL
@@ -30,8 +32,10 @@ import com.nhom9.message.data.MESSAGE_AUDIO
 import com.nhom9.message.data.MESSAGE_IMAGE
 import com.nhom9.message.data.MESSAGE_TEXT
 import com.nhom9.message.data.Message
-import com.nhom9.message.data.PHONENUMBER
+import com.nhom9.message.data.PHONE_NUMBER
 import com.nhom9.message.data.REPORTS
+import com.nhom9.message.data.REQUESTEE
+import com.nhom9.message.data.REQUESTER
 import com.nhom9.message.data.STATUS
 import com.nhom9.message.data.Status
 import com.nhom9.message.data.USERID
@@ -48,7 +52,6 @@ import javax.inject.Inject
 class MViewModel @Inject constructor(
     val auth: FirebaseAuth, var db: FirebaseFirestore, var storage: FirebaseStorage
 ) : ViewModel() {
-    val visiblePermissionDialogQueue = mutableStateListOf<String>()
     var inProcess = mutableStateOf(false)
     val eventMutableState = mutableStateOf<Event<String>?>(null)
     var signIn = mutableStateOf(false)
@@ -76,6 +79,8 @@ class MViewModel @Inject constructor(
         }
     }
 
+    val myRequests = mutableStateOf<List<ChatRequest>>(listOf())
+    val friendsRequests = mutableStateOf<List<ChatRequest>>(listOf())
     fun sendVerificationCode(
         context: Context,
         phoneNumber: String,
@@ -325,6 +330,8 @@ class MViewModel @Inject constructor(
                 inProcess.value = false
                 populateChats()
                 populateStatuses()
+                populateMyRequests()
+                populateFriendsRequests()
                 getBlockedChats()
             }
         }
@@ -333,7 +340,7 @@ class MViewModel @Inject constructor(
     fun handleException(exception: Exception? = null, customMessage: String = "") {
         exception?.printStackTrace()
         val errorMessage = exception?.localizedMessage ?: ""
-        val message = if (customMessage.isNullOrEmpty()) errorMessage else customMessage
+        val message = if (customMessage.isEmpty()) errorMessage else customMessage
         eventMutableState.value = Event(message)
         inProcess.value = false
     }
@@ -617,7 +624,7 @@ class MViewModel @Inject constructor(
     fun updatePhoneNumber(phoneNumber: String) {
         val uid = auth.currentUser?.uid
         if (uid != null) {
-            db.collection(USER_NODE).document(uid).update(PHONENUMBER, phoneNumber)
+            db.collection(USER_NODE).document(uid).update(PHONE_NUMBER, phoneNumber)
         } else {
             handleException(customMessage = "User Id is null")
             return
@@ -631,7 +638,7 @@ class MViewModel @Inject constructor(
             if (value != null) {
                 for (document in value.documents) {
                     db.collection(CHATS).document(document.id)
-                        .update("user1.$PHONENUMBER", phoneNumber)
+                        .update("user1.$PHONE_NUMBER", phoneNumber)
                 }
             }
         }
@@ -644,14 +651,14 @@ class MViewModel @Inject constructor(
             if (value != null) {
                 for (document in value.documents) {
                     db.collection(CHATS).document(document.id)
-                        .update("user2.$PHONENUMBER", phoneNumber)
+                        .update("user2.$PHONE_NUMBER", phoneNumber)
                 }
             }
         }
         for (status in status.value) {
             if (status.user.userId == uid) {
                 db.collection(STATUS).document(status.statusId!!)
-                    .update("user.$PHONENUMBER", phoneNumber)
+                    .update("user.$PHONE_NUMBER", phoneNumber)
             }
         }
         getUserData(uid)
@@ -726,11 +733,149 @@ class MViewModel @Inject constructor(
         db.collection(REPORTS).document(id).set(userReport)
     }
 
-    fun sendChatRequest(requesteeId: String){
+    fun onSendChatRequest(
+        phoneNumber: String,
+        onChatExist: () -> Unit,
+        onRequestExisted: () -> Unit,
+        onPhoneNumberNotFound: () -> Unit
+    ) {
+        if (phoneNumber.isEmpty()) {
+            handleException(customMessage = "Number can only contain digits")
+        } else {
+            db.collection(CHATS).where(
+                Filter.or(
+                    Filter.and(
+                        Filter.equalTo("user1.phoneNumber", phoneNumber),
+                        Filter.equalTo("user2.phoneNumber", userData.value?.phoneNumber)
+                    ), Filter.and(
+                        Filter.equalTo("user1.phoneNumber", userData.value?.phoneNumber),
+                        Filter.equalTo("user2.phoneNumber", phoneNumber)
+                    )
+                )
+            ).get().addOnSuccessListener {
+                if (it.isEmpty) {
+                    db.collection(USER_NODE).whereEqualTo("phoneNumber", phoneNumber).get()
+                        .addOnSuccessListener {
+                            if (it.isEmpty) {
+                                onPhoneNumberNotFound.invoke()
+                                handleException(customMessage = "The number provided cannot be found")
+                            } else {
+                                val chatPartner = it.toObjects<UserData>()[0]
+                                val requesteeId = chatPartner.userId
+                                db.collection(CHAT_REQUESTS)
+                                    .whereEqualTo("$REQUESTEE.$USERID", requesteeId).get()
+                                    .addOnSuccessListener {
+                                        if (it.isEmpty) {
+                                            val requestId =
+                                                db.collection(CHAT_REQUESTS).document().id
+                                            val chatRequest = ChatRequest(
+                                                requestId = requestId,
+                                                requester = ChatUser(
+                                                    userId = userData.value?.userId,
+                                                    name = userData.value?.name,
+                                                    imageUrl = userData.value?.imageUrl,
+                                                    phoneNumber = userData.value?.phoneNumber
+                                                ),
+                                                requestee = ChatUser(
+                                                    userId = chatPartner.userId,
+                                                    name = chatPartner.name,
+                                                    imageUrl = chatPartner.imageUrl,
+                                                    phoneNumber = chatPartner.phoneNumber
+                                                ),
+                                                timeStamp = Timestamp.now()
+                                            )
+                                            db.collection(CHAT_REQUESTS).document(requestId)
+                                                .set(chatRequest)
+                                        } else {
+                                            onRequestExisted.invoke()
+                                        }
+                                    }
+                            }
+                        }.addOnFailureListener {
+                            handleException(customMessage = "Add chat db.collection error")
+                        }
+                } else {
+                    onChatExist.invoke()
+                    handleException(customMessage = "Chat already exists")
+                }
+            }
+        }
+
 
     }
-    fun acceptChatRequest(){
 
+    fun acceptChatRequest() {
+
+    }
+
+    fun populateMyRequests() {
+        db.collection(CHAT_REQUESTS).whereEqualTo("$REQUESTER.$USERID", userData.value?.userId)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    handleException(error)
+                }
+                if (value != null) {
+                    myRequests.value = value.documents.mapNotNull {
+                        it.toObject<ChatRequest>()
+                    }.sortedBy { it.timeStamp }
+                }
+            }
+    }
+
+    fun populateFriendsRequests() {
+        db.collection(CHAT_REQUESTS).whereEqualTo("$REQUESTEE.$USERID", userData.value?.userId)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    handleException(error)
+                }
+                if (value != null) {
+                    friendsRequests.value = value.documents.mapNotNull {
+                        it.toObject<ChatRequest>()
+                    }.sortedBy { it.timeStamp }
+                }
+            }
+    }
+
+    fun getUserDataFromRequest(userId: String, isMyRequest: Boolean): ChatUser? {
+        if (isMyRequest) {
+            myRequests.value.forEach {
+                if (it.requestee?.userId == userId) {
+                    return it.requestee
+                }
+            }
+        } else {
+            friendsRequests.value.forEach {
+                if (it.requester?.userId == userId) {
+                    return it.requester
+                }
+            }
+        }
+        return null
+    }
+
+    fun onDeleteRequest(requestId: String, onRequestNotExisting: () -> Unit) {
+        val docRef = db.collection(CHAT_REQUESTS).document(requestId)
+        val updates = hashMapOf<String, Any>(
+            "requestId" to FieldValue.delete(),
+            "requester" to FieldValue.delete(),
+            "requestee" to FieldValue.delete(),
+            "requestAccepted" to FieldValue.delete(),
+            "timeStamp" to FieldValue.delete(),
+        )
+        docRef.update(updates).addOnCompleteListener {
+            if (it.isSuccessful) {
+                docRef.delete()
+            } else {
+                onRequestNotExisting.invoke()
+            }
+        }
+    }
+
+    fun onAcceptRequest(chatRequest: ChatRequest) {
+        onAddChat(chatRequest.requester?.phoneNumber!!)
+        onDeleteRequest(chatRequest.requestId!!) {
+            handleException(customMessage = "onAcceptRequest: ${chatRequest.requester.userId} to ${chatRequest.requestee?.userId} failed")
+        }
     }
 }
 

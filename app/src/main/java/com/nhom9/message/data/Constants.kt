@@ -6,11 +6,14 @@ const val MESSAGE = "Message"
 const val STATUS = "Status"
 const val BLOCKED_CHATS = "BlockedChats"
 const val REPORTS = "Reports"
+const val CHAT_REQUESTS = "ChatRequests"
 
 const val USERNAME = "name"
 const val IMAGEURL = "imageUrl"
-const val PHONENUMBER = "phoneNumber"
+const val PHONE_NUMBER = "phoneNumber"
 const val USERID = "userId"
+const val REQUESTEE = "requestee"
+const val REQUESTER = "requester"
 
 
 const val MESSAGE_IMAGE = "image"

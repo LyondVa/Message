@@ -62,10 +62,11 @@ data class UserReport(
 )
 
 data class ChatRequest(
-    val requesterId: String,
-    val requesteeId: String,
-    val requestAccepted: Boolean,
-    val timeStamp: Timestamp = Timestamp.now()
+    val requestId: String? = "",
+    val requester: ChatUser? = null,
+    val requestee: ChatUser? = null,
+    val requestAccepted: Boolean? = false,
+    val timeStamp: Timestamp? = Timestamp.now()
 )
 
 enum class ReportOption(
