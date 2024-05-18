@@ -181,19 +181,12 @@ fun MessageBox(
 ) {
     LazyColumn(modifier = modifier) {
         items(chatMessages) {
-            val alignment = if (it.sendBy == currentUserId) Alignment.End else Alignment.Start
-            if (it.isDeleted) {
-                DeletedMessage(message = it, currentUserId = currentUserId, alignment = alignment)
-            } else {
-                Message(
-                    message = it,
-                    currentUserId = currentUserId!!,
-                    onMessageImageClick = onMessageImageClick,
-                    alignment = alignment,
-                    onMessageDelete = onMessageDelete
-                )
-
-            }
+            MessageHolder(
+                message = it,
+                currentUserId = currentUserId!!,
+                onMessageImageClick = onMessageImageClick,
+                onMessageDelete = onMessageDelete
+            )
         }
     }
 }
@@ -251,83 +244,98 @@ fun DeletedMessage(
 }
 
 @Composable
+fun MessageHolder(
+    message: Message,
+    currentUserId: String,
+    onMessageImageClick: (String) -> Unit,
+    onMessageDelete: (Message) -> Unit
+) {
+    message.let {
+        val alignment = if (it.sendBy == currentUserId) Alignment.End else Alignment.Start
+        Column(
+            horizontalAlignment = alignment, modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            if (message.sendBy == currentUserId) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    TimeStamp(message = it)
+                    if (it.isDeleted) {
+                        DeletedMessage(
+                            message = it,
+                            currentUserId = currentUserId,
+                            alignment = alignment
+                        )
+                    } else {
+                        Message(
+                            message = it,
+                            onMessageImageClick = onMessageImageClick,
+                            onMessageDelete = onMessageDelete
+                        )
+                    }
+                }
+            } else {
+                Row {
+                    if (it.isDeleted) {
+                        DeletedMessage(
+                            message = it,
+                            currentUserId = currentUserId,
+                            alignment = alignment
+                        )
+                    } else {
+                        Message(
+                            message = it,
+                            onMessageImageClick = onMessageImageClick,
+                            onMessageDelete = onMessageDelete
+                        )
+                    }
+                    TimeStamp(message = it)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun Message(
     message: Message,
-    currentUserId: String?,
-    alignment: Alignment.Horizontal,
     onMessageImageClick: (String) -> Unit,
     onMessageDelete: (Message) -> Unit
 ) {
     val color = md_theme_light_primaryContainer
     var mDisplayMenu by remember { mutableStateOf(false) }
-    Column(
-        horizontalAlignment = alignment, modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            modifier = Modifier
-                .padding(end = 8.dp)
-                .background(
-                    color, MaterialTheme.shapes.medium
-                )
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = {
-                            mDisplayMenu = !mDisplayMenu
-                        }
-                    )
-                }
-
-        ) {
-            if (message.sendBy == currentUserId) {
-                Text(
-                    text = getTimeFromTimestamp(message.timeStamp!!),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                )
-                when (message.type) {
-                    MESSAGE_TEXT -> Text(
-                        text = message.content ?: "",
-                        color = md_theme_light_onPrimaryContainer,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(12.dp)
-                    )
-
-                    MESSAGE_IMAGE -> AsyncImage(model = message.content,
-                        contentDescription = "null",
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .clickable { onMessageImageClick(message.content!!) })
-
-                    MESSAGE_AUDIO -> AudioMessage(message.content!!)
-                }
-            } else {
-                when (message.type) {
-                    MESSAGE_TEXT -> Text(
-                        text = message.content ?: "",
-                        color = md_theme_light_onPrimaryContainer,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(12.dp)
-                    )
-
-                    MESSAGE_IMAGE -> AsyncImage(model = message.content,
-                        contentDescription = "null",
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .clickable { onMessageImageClick(message.content!!) })
-
-                    MESSAGE_AUDIO -> AudioMessage(message.content!!)
-                }
-                Text(
-                    text = getTimeFromTimestamp(message.timeStamp!!),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        modifier = Modifier
+            .padding(end = 8.dp)
+            .background(
+                color, MaterialTheme.shapes.medium
+            )
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        mDisplayMenu = !mDisplayMenu
+                    }
                 )
             }
+
+    ) {
+        when (message.type) {
+            MESSAGE_TEXT -> Text(
+                text = message.content ?: "",
+                color = md_theme_light_onPrimaryContainer,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(12.dp)
+            )
+
+            MESSAGE_IMAGE -> AsyncImage(model = message.content,
+                contentDescription = "null",
+                modifier = Modifier
+                    .padding(12.dp)
+                    .clickable { onMessageImageClick(message.content!!) })
+
+            MESSAGE_AUDIO -> AudioMessage(message.content!!)
         }
     }
     DropdownMenu(
@@ -351,7 +359,12 @@ fun Message(
 }
 
 @Composable
-fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBackClick: () -> Unit) {
+fun ChatHeader(
+    name: String,
+    imageUrl: String,
+    onHeaderClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -401,7 +414,10 @@ fun ReplyBox(
                 Icon(painterResource(id = R.drawable.outline_mic_24), contentDescription = null)
             }
             IconButton(onClick = { onImageClick.invoke() }) {
-                Icon(painterResource(id = R.drawable.outline_image_24), contentDescription = null)
+                Icon(
+                    painterResource(id = R.drawable.outline_image_24),
+                    contentDescription = null
+                )
             }
             OutlinedTextField(
                 value = reply,
@@ -435,7 +451,9 @@ fun ProfileBox(name: String, imageUrl: String, modifier: Modifier) {
                 .clip(CircleShape)
         )
         Text(
-            text = name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+            text = name,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
         )
 
     }
@@ -516,4 +534,13 @@ fun AudioMessage(content: String) {
             }
         }
     }
+}
+
+@Composable
+fun TimeStamp(message: Message) {
+    Text(
+        text = getTimeFromTimestamp(message.timeStamp!!),
+        style = MaterialTheme.typography.labelSmall,
+        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, end = 8.dp)
+    )
 }

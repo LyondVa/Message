@@ -726,5 +726,11 @@ class MViewModel @Inject constructor(
         db.collection(REPORTS).document(id).set(userReport)
     }
 
+    fun sendChatRequest(requesteeId: String){
+
+    }
+    fun acceptChatRequest(){
+
+    }
 }
 

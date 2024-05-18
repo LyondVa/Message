@@ -55,15 +55,17 @@ data class Status(
     val timeStamp: Long? = null
 )
 
-data class DropDownItem(
-    val text: String,
-    val onItemClick:()->Unit
-)
-
 data class UserReport(
     val userId: String,
     val reportOption: String,
     val reportContent: String
+)
+
+data class ChatRequest(
+    val requesterId: String,
+    val requesteeId: String,
+    val requestAccepted: Boolean,
+    val timeStamp: Timestamp = Timestamp.now()
 )
 
 enum class ReportOption(

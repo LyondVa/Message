@@ -9,12 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
@@ -58,6 +58,9 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
     val photoIds = rememberSaveable {
         mutableListOf<String>()
     }
+    val launchCheck = rememberSaveable {
+        mutableStateOf(true)
+    }
     val onMessageImageClick: (String) -> Unit = {
         navigateTo(
             navController, DestinationScreen.ChatImage.createRoute(
@@ -67,66 +70,100 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
             )
         )
     }
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = launchCheck) {
         viewModel.getChatPhotos(photoIds)
+        launchCheck.value = false
     }
+
     Column {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
+        HeaderBar(navController = navController, userId = userId)
+        CommonDivider(0)
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 128.dp),
+            verticalArrangement = Arrangement.spacedBy(3.dp),
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
         ) {
-            HeaderBar(navController = navController, userId = userId)
-            CommonDivider(0)
-            ChatUserCard(chatUser?.name, chatUser?.imageUrl)
-            ProfileInfoCard("")
-            PhotoGrid(photoIds, onMessageImageClick)
-        }
-    }
-}
-
-@Composable
-fun ChatUserCard(name: String?, imageUrl: String?) {
-    Surface(
-        shadowElevation = 2.dp,
-        modifier = Modifier
-            .height(intrinsicSize = IntrinsicSize.Min)
-            .padding(bottom = 8.dp)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Card(
-                shape = CircleShape,
-                modifier = Modifier
-                    .size(160.dp)
-            ) {
-                CommonProfileImage(imageUrl = imageUrl)
+            item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                Column {
+                    Surface(
+                        shadowElevation = 2.dp,
+                        modifier = Modifier
+                            .height(intrinsicSize = IntrinsicSize.Min)
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        Column {
+                            ChatUserCard(chatUser?.name!!, chatUser.imageUrl)
+                            CommonDivider(0)
+                            ProfileInfoCard("not implemented", chatUser.phoneNumber!!)
+                            CommonDivider(0)
+                        }
+                    }
+                }
             }
-            Text(
-                text = name!!,
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(8.dp)
-            )
+            items(photoIds) {
+                Surface(
+                    tonalElevation = 3.dp,
+                    modifier = Modifier.aspectRatio(1f)
+                ) {
+                    CommonImage(
+                        data = it,
+                        modifier = Modifier.clickable { onMessageImageClick.invoke(it) })
+                }
+            }
         }
     }
 }
 
 @Composable
-fun ProfileInfoCard(name: String) {
+fun ChatUserCard(name: String, imageUrl: String?) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Card(
+            shape = CircleShape,
+            modifier = Modifier
+                .size(160.dp)
+        ) {
+            CommonProfileImage(imageUrl = imageUrl)
+        }
+        Text(
+            text = name,
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(8.dp)
+        )
+    }
+}
 
+@Composable
+fun ProfileInfoCard(bio: String, phoneNumber: String) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.Start,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text(
+            text = "Bio: $bio",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(8.dp)
+        )
+        Text(
+            text = "Phone Number: $phoneNumber",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(8.dp)
+        )
+    }
 
 }
 
 @Composable
 fun HeaderBar(navController: NavController, userId: String) {
-    val onReportClick={
+    val onReportClick = {
         navigateTo(navController, DestinationScreen.Report.createRoute(userId))
     }
     Box(
@@ -152,7 +189,7 @@ fun HeaderBar(navController: NavController, userId: String) {
 }
 
 @Composable
-fun DropDownMenuButton(onReportClick:()->Unit) {
+fun DropDownMenuButton(onReportClick: () -> Unit) {
     val context = LocalContext.current
     var mDisplayMenu by remember { mutableStateOf(false) }
     IconButton(onClick = { mDisplayMenu = !mDisplayMenu }) {
@@ -190,22 +227,13 @@ fun DropDownMenuButton(onReportClick:()->Unit) {
 }
 
 @Composable
-private fun PhotoGrid(photoIds: MutableList<String>, onMessageImageClick: (String) -> Unit) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 128.dp),
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-        horizontalArrangement = Arrangement.spacedBy(3.dp)
+fun Spacer(height: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height.dp)
+            .background(color = MaterialTheme.colorScheme.background)
     ) {
-        items(photoIds) {
-            Surface(
-                tonalElevation = 3.dp,
-                modifier = Modifier.aspectRatio(1f)
-            ) {
-                CommonImage(
-                    data = it,
-                    modifier = Modifier.clickable { onMessageImageClick.invoke(it) })
-            }
-        }
 
     }
 }
