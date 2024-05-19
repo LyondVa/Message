@@ -286,6 +286,7 @@ fun CommonRow(
     name: String,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
+    clickEnabled: Boolean = true,
     onItemClick: () -> Unit,
 ) {
     Row(
@@ -293,7 +294,7 @@ fun CommonRow(
         modifier = modifier
             .fillMaxWidth()
             .height(60.dp)
-            .clickable {
+            .clickable(enabled = clickEnabled) {
                 onItemClick.invoke()
             }
     ) {
@@ -316,9 +317,14 @@ fun CommonRow(
 }
 
 @Composable
-fun CommonSubSettingRow(title: String, text: String = "", onItemClick: () -> Unit = {}) {
-    Box() {
-        CommonRow(name = title) {
+fun CommonSubSettingRow(
+    title: String,
+    text: String = "",
+    onItemClick: () -> Unit = {},
+    clickEnabled: Boolean = true,
+) {
+    Box {
+        CommonRow(name = title, clickEnabled = clickEnabled) {
             onItemClick.invoke()
         }
         Row(modifier = Modifier.align(Alignment.CenterEnd)) {

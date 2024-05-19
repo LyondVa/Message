@@ -18,14 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -194,6 +192,13 @@ fun SettingCard(navController: NavController) {
                 navigateTo(navController, DestinationScreen.AccountSetting.route)
             }
             CommonDivider(0)
+            SwitchRow("DarkMode") {
+
+            }
+            CommonDivider(0)
+            SwitchRow("Notification") {
+
+            }/*
             CommonRow(name = stringResource(R.string.display), icon = Icons.Outlined.Settings) {
                 navigateTo(navController, DestinationScreen.DisplaySetting.route)
             }
@@ -209,7 +214,7 @@ fun SettingCard(navController: NavController) {
                 name = stringResource(R.string.privacy_and_security), icon = Icons.Outlined.Warning
             ) {
                 navigateTo(navController, DestinationScreen.PrivacyAndSecuritySetting.route)
-            }
+            }*/
         }
     }
 }
@@ -241,101 +246,34 @@ fun LogOutCard(navController: NavController, viewModel: MViewModel) {
     }
 }
 
-/*------------IMPORTANT JUNK------------*/
 
-/*
 @Composable
-fun ProfileContent(
-    modifier: Modifier,
-    allowEdit: Boolean,
-    viewModel: MViewModel,
-    name: String,
-    phoneNumber: String,
-    onNameChange: (String) -> Unit,
-    onNumberChange: (String) -> Unit,
-    onEdit: () -> Unit,
-    onCancel: () -> Unit,
-    onSave: () -> Unit,
-    onChangeImage: (Uri) -> Unit
-) {
-    val imageUrl = viewModel.userData.value?.imageUrl
-    Column(
-        modifier = modifier
-            .padding(8.dp)
+fun SwitchRow(title: String, onToggleTheme: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            /*if (allowEdit) {
-                Text(text = "Cancel",
-                    modifier = Modifier
-                        .clickable {
-                            onCancel.invoke()
-                        }
-                )
-                Text(text = "Save",
-                    modifier = Modifier
-                        .clickable {
-                            onSave.invoke()
-                        }
-                )
-            } else {
-                Text(text = "Edit",
-                    modifier = Modifier
-                        .clickable {
-                            onEdit.invoke()
-                        }
-
-                )
-            }*/
+        var checked by remember {
+            mutableStateOf(true)
         }
-        /*Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-        ) {
-            Text(
-                text = "Name: ",
-                modifier = Modifier.width(100.dp)
-            )
-            TextField(
-                value = name,
-                onValueChange = onNameChange,
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedTextColor = Color.Gray,
-                    unfocusedContainerColor = Color.Transparent
-                ),
-                readOnly = !allowEdit
-            )
+        val onCheckedChange: (Boolean) -> Unit = {
+            onToggleTheme.invoke()
+            checked = it
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-        ) {
-            Text(
-                text = "Number: ",
-                modifier = Modifier.width(100.dp)
-            )
-            TextField(
-                value = phoneNumber,
-                onValueChange = onNumberChange,
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = Color.Black,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedTextColor = Color.Gray,
-                    unfocusedContainerColor = Color.Transparent
-                ),
-                readOnly = !allowEdit
-            )
-        }
-        CommonDivider()
-    }*/
+                .padding(start = 20.dp)
+                .align(Alignment.CenterStart)
+        )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            modifier = Modifier
+                .padding(8.dp)
+                .align(Alignment.CenterEnd)
+        )
     }
-}*/
+}

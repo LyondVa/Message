@@ -40,16 +40,16 @@ fun DisplaySettings(navController: NavController, onToggleTheme: () -> Unit) {
         CommonDivider(0)
         CommonSubSettingRow("Font Size")
         CommonDivider(0)
-        CommonSubSettingRow("Language"){
+        CommonSubSettingRow("Language", onItemClick = {
             navigateTo(navController, DestinationScreen.ChangeLanguage.route)
-        }
+        })
         CommonDivider(0)
     }
 
 }
 
 @Composable
-fun DarkModeRow(onToggleTheme:()->Unit) {
+fun DarkModeRow(onToggleTheme: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

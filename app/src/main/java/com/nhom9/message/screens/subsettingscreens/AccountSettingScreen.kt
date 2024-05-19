@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProfileImage
+import com.nhom9.message.CommonRow
 import com.nhom9.message.CommonSubSettingRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
@@ -80,16 +81,16 @@ fun AccountInfoCard(
         CommonDivider(0)
         CommonSubSettingRow("Name", name, onNameClick)
         CommonDivider(0)
-        CommonSubSettingRow("Message Id", userId, {})
-        CommonDivider(0)
         CommonSubSettingRow("Phone Number", phoneNumber, onPhoneNumberClick)
+        CommonDivider(0)
+        UserIdRow(content = userId)
         CommonDivider(0)
     }
 
 }
 
 @Composable
-fun AccountSettingImageRow(imageUrl: String, onItemClick:()->Unit) {
+fun AccountSettingImageRow(imageUrl: String, onItemClick: () -> Unit) {
     Box(modifier = Modifier
         .clickable {
             onItemClick.invoke()
@@ -119,4 +120,19 @@ fun AccountSettingImageRow(imageUrl: String, onItemClick:()->Unit) {
         }
     }
 
+}
+
+
+@Composable
+fun UserIdRow(content: String) {
+    Box {
+        CommonRow(name = "User Id", clickEnabled = false, onItemClick = {})
+        Text(
+            text = content,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 8.dp)
+        )
+    }
 }
