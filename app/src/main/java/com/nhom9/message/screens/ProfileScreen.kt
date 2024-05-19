@@ -85,7 +85,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                 SettingCard(navController)
                 LogOutCard(navController, viewModel)
             }
-
+            CommonDivider(0)
             BottomNavigationMenu(
                 selectedItem = BottomNavigationItem.PROFILE,
                 navController = navController,

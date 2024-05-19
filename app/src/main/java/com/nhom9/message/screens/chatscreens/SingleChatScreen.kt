@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -61,11 +62,13 @@ import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.audiorecorder.AndroidAudioRecorder
 import com.nhom9.message.audiorecorder.playback.AndroidAudioPlayer
+import com.nhom9.message.data.ChatUser
 import com.nhom9.message.data.MESSAGE_AUDIO
 import com.nhom9.message.data.MESSAGE_IMAGE
 import com.nhom9.message.data.MESSAGE_TEXT
 import com.nhom9.message.data.Message
 import com.nhom9.message.data.TOP_BAR_HEIGHT
+import com.nhom9.message.data.UserData
 import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
@@ -152,7 +155,8 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         MessageBox(
             modifier = Modifier.weight(1f),
             chatMessages = chatMessages.value,
-            currentUserId = myUser?.userId ?: "",
+            currentUser = myUser!!,
+            chatUser = chatUser,
             onMessageImageClick = onMessageImageClick,
             onMessageDelete = onMessageDelete
         )
@@ -175,15 +179,19 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
 fun MessageBox(
     modifier: Modifier,
     chatMessages: List<Message>,
-    currentUserId: String?,
+    currentUser: UserData,
+    chatUser: ChatUser,
     onMessageImageClick: (String) -> Unit,
     onMessageDelete: (Message) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
         items(chatMessages) {
+            val currentUserImageUrl =
+                if (it.sendBy == currentUser.userId) currentUser.imageUrl else chatUser.imageUrl
             MessageHolder(
                 message = it,
-                currentUserId = currentUserId!!,
+                currentUserId = currentUser.userId!!,
+                currentUserImageUrl = currentUserImageUrl,
                 onMessageImageClick = onMessageImageClick,
                 onMessageDelete = onMessageDelete
             )
@@ -247,6 +255,7 @@ fun DeletedMessage(
 fun MessageHolder(
     message: Message,
     currentUserId: String,
+    currentUserImageUrl: String?,
     onMessageImageClick: (String) -> Unit,
     onMessageDelete: (Message) -> Unit
 ) {
@@ -258,7 +267,7 @@ fun MessageHolder(
                 .padding(8.dp)
         ) {
             if (message.sendBy == currentUserId) {
-                Row(verticalAlignment = Alignment.Bottom) {
+                Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(8.dp)) {
                     TimeStamp(message = it)
                     if (it.isDeleted) {
                         DeletedMessage(
@@ -270,12 +279,14 @@ fun MessageHolder(
                         Message(
                             message = it,
                             onMessageImageClick = onMessageImageClick,
-                            onMessageDelete = onMessageDelete
+                            onMessageDelete = onMessageDelete,
                         )
                     }
+                    MessageProfileImage(imageUrl = currentUserImageUrl)
                 }
             } else {
-                Row {
+                Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(8.dp)) {
+                    MessageProfileImage(imageUrl = currentUserImageUrl)
                     if (it.isDeleted) {
                         DeletedMessage(
                             message = it,
@@ -286,7 +297,7 @@ fun MessageHolder(
                         Message(
                             message = it,
                             onMessageImageClick = onMessageImageClick,
-                            onMessageDelete = onMessageDelete
+                            onMessageDelete = onMessageDelete,
                         )
                     }
                     TimeStamp(message = it)
@@ -306,8 +317,7 @@ fun Message(
     var mDisplayMenu by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.Bottom,
-        modifier = Modifier
-            .padding(end = 8.dp)
+        modifier = Modifier.padding(4.dp)
             .background(
                 color, MaterialTheme.shapes.medium
             )
@@ -541,6 +551,17 @@ fun TimeStamp(message: Message) {
     Text(
         text = getTimeFromTimestamp(message.timeStamp!!),
         style = MaterialTheme.typography.labelSmall,
-        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, end = 8.dp)
+        modifier = Modifier.padding(4.dp)
     )
+}
+
+@Composable
+fun MessageProfileImage(imageUrl: String?) {
+    Card(
+        shape = CircleShape,
+        modifier = Modifier
+            .size(20.dp)
+    ) {
+        CommonProfileImage(imageUrl = imageUrl)
+    }
 }

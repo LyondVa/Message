@@ -3,7 +3,6 @@ package com.nhom9.message.screens.entryscreens
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,10 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CheckSignedIn
 import com.nhom9.message.CommonProgressbar
-import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
-import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -208,20 +204,19 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                             .padding(8.dp)
                             .fillMaxWidth()
                     ) {
-
                         Text(
                             text = stringResource(id = R.string.login),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
-                    Text(text = stringResource(R.string.forgotten_password),
+                    /*Text(text = stringResource(R.string.forgotten_password),
                         color = Color.Blue,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .padding(8.dp)
                             .clickable {
                                 navigateTo(navController, DestinationScreen.SignUp.route)
-                            })
+                            })*/
                 }
             }
         }

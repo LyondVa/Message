@@ -1,8 +1,11 @@
 package com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens
 
 import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -11,9 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.MViewModel
 import com.nhom9.message.ProfileImageCard
@@ -48,9 +53,18 @@ fun EditProfileImageScreen(navController: NavController, viewModel: MViewModel) 
             imageUrl = it.toString()
         }
 
-        Column {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
             TitleBarWithBack(navController, "Edit Profile Image")
-            Column(modifier = Modifier.padding(8.dp)) {
+            CommonDivider(0)
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth()
+            ) {
                 ProfileImageCard(
                     isInEdit = allowEdit,
                     imageUrl = imageUrl,
@@ -58,15 +72,15 @@ fun EditProfileImageScreen(navController: NavController, viewModel: MViewModel) 
                 )
                 if (allowEdit) {
                     Row {
-                        Button(onClick = onCancelClick) {
+                        Button(onClick = onCancelClick, modifier = Modifier.padding(8.dp)) {
                             Text(text = "Cancel")
                         }
-                        Button(onClick = onSaveClick) {
+                        Button(onClick = onSaveClick, modifier = Modifier.padding(8.dp)) {
                             Text(text = "Save")
                         }
                     }
                 } else {
-                    Button(onClick = onEditClick) {
+                    Button(onClick = onEditClick, modifier = Modifier.padding(8.dp)) {
                         Text(text = "Edit")
                     }
                 }

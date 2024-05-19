@@ -68,6 +68,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                         .padding(it)
                 ) {
                     TitleBar(text = stringResource(R.string.status))
+                    CommonDivider(0)
                     if (statuses.isEmpty()) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -106,6 +107,7 @@ fun StatusScreen(navController: NavController, viewModel: MViewModel) {
                             }
                         }
                     }
+                    CommonDivider(0)
                     BottomNavigationMenu(
                         selectedItem = BottomNavigationItem.STATUSLIST,
                         navController = navController

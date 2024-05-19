@@ -49,6 +49,7 @@ fun AccountSettingScreen(navController: NavController, viewModel: MViewModel) {
     }
     Column {
         TitleBarWithBack(navController = navController, text = "Account")
+        CommonDivider(0)
         AccountInfoCard(navController, imageUrl, name, userId, phoneNumber)
     }
 

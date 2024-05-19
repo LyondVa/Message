@@ -3,14 +3,12 @@ package com.nhom9.message.screens.entryscreens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -101,22 +99,6 @@ fun EntryScreen(navController: NavController, viewModel: MViewModel) {
                     style = MaterialTheme.typography.labelMedium
                 )
             }
-            Text(
-                text = stringResource(R.string.or_log_in_with),
-                color = md_theme_light_onPrimaryContainer,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .padding(8.dp)
-            )
-            Image(
-                painter = painterResource(id = R.drawable.google__g__logo),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(32.dp)
-                    .clickable {
-                        navigateTo(navController, DestinationScreen.SignUp.route)
-                    }
-            )
         }
     }
     if (viewModel.inProcess.value) {

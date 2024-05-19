@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
@@ -28,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -137,9 +139,13 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                             },
                             modifier = Modifier.align(Alignment.CenterEnd)
                         ) {
-                            Icon(imageVector = Icons.Outlined.Notifications, contentDescription = null)
+                            Icon(
+                                imageVector = Icons.Outlined.Notifications,
+                                contentDescription = null
+                            )
                         }
                     }
+                    CommonDivider(0)
                     OutlinedTextField(
                         value = searchText.value,
                         textStyle = MaterialTheme.typography.labelLarge,
@@ -192,6 +198,7 @@ fun ChatListScreen(navController: NavController, viewModel: MViewModel) {
                             }
                         }
                     }
+                    CommonDivider(0)
                     BottomNavigationMenu(
                         selectedItem = BottomNavigationItem.CHATLIST,
                         navController = navController
@@ -216,10 +223,11 @@ fun FAB(
         mutableStateOf("")
     }
     if (showDialogue) {
-        AlertDialog(onDismissRequest = {
-            onDismiss.invoke()
-            addChatNumber.value = ""
-        },
+        AlertDialog(
+            onDismissRequest = {
+                onDismiss.invoke()
+                addChatNumber.value = ""
+            },
             confirmButton = {
                 Button(onClick = {
                     onAddChat(addChatNumber.value)
@@ -244,6 +252,7 @@ fun FAB(
                 ) {
                     OutlinedTextField(
                         value = addChatNumber.value,
+                        label = { Text(text = "Phone Number") },
                         onValueChange = { addChatNumber.value = it },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
@@ -262,7 +271,8 @@ fun FAB(
                         )
                     }
                 }
-            }
+            },
+            modifier = Modifier.clip(RoundedCornerShape(8.dp))
         )
     }
     FloatingActionButton(
