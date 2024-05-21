@@ -1,5 +1,6 @@
 package com.nhom9.message.screens.entryscreens
 
+import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -31,9 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,13 +46,18 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.nhom9.message.CheckSignedIn
 import com.nhom9.message.CommonProgressbar
+import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
 import com.nhom9.message.R
+import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: MViewModel) {
@@ -65,6 +74,7 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val clipboardManager = LocalClipboardManager.current
     CheckSignedIn(viewModel, navController)
 
     Scaffold { padding ->
@@ -192,11 +202,15 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                                     context, "Please fill in all fields!", Toast.LENGTH_SHORT
                                 ).show()
                             } else {
-                                viewModel.logIn(emailState.value.text, passwordState.value.text) {
-                                    scope.launch {
-                                        loginFailed.value = true
-                                        delay(5000)
-                                        loginFailed.value = false
+                                scope.launch {
+                                    val localToken = Firebase.messaging.token.await()
+                                    clipboardManager.setText(AnnotatedString(localToken))
+                                    viewModel.logIn(emailState.value.text, passwordState.value.text, localToken) {
+                                        scope.launch {
+                                            loginFailed.value = true
+                                            delay(5000)
+                                            loginFailed.value = false
+                                        }
                                     }
                                 }
                             }

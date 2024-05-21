@@ -51,12 +51,25 @@ import com.nhom9.message.data.TOP_BAR_HEIGHT
 import com.nhom9.message.navigateTo
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.UUID
+import kotlin.random.Random
 
 @Composable
 fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userId: String) {
     val chatUser = viewModel.getChatUser(userId)
     val photoIds = rememberSaveable {
         mutableListOf<String>()
+    }
+    val context = LocalContext.current
+    val chatId = "abcd"
+    val myUser = viewModel.userData.value
+    val onAudioCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser?.name.toString(), context)
+        navigateTo(navController, DestinationScreen.AudioCall.route)
+    }
+    val onVideoCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser?.name.toString(), context)
+        navigateTo(navController, DestinationScreen.AudioCall.route)
     }
     val launchCheck = rememberSaveable {
         mutableStateOf(true)
@@ -70,13 +83,22 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
             )
         )
     }
+
+    val onNotifyVideoCall = {
+        viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
+        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "2")
+    }
+
+    val onNotifyAudioCall = {
+        viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
+        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "3")
+    }
     LaunchedEffect(key1 = launchCheck) {
         viewModel.getChatPhotos(photoIds)
         launchCheck.value = false
     }
-
     Column {
-        HeaderBar(navController = navController, userId = userId)
+        HeaderBar(navController = navController, userId = userId, , onAudioCall, onVideoCall, onNotifyVideoCall, onNotifyAudioCall)
         CommonDivider(0)
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
@@ -162,8 +184,8 @@ fun ProfileInfoCard(bio: String, phoneNumber: String) {
 }
 
 @Composable
-fun HeaderBar(navController: NavController, userId: String) {
-    val onReportClick = {
+fun HeaderBar(navController: NavController, userId: String, onAudioCallClick: () -> Unit, onVideoCallClick: () -> Unit, onNotifyVideoCall: () -> Unit, onNotifyAudioCall: () -> Unit) {
+    val onReportClick={
         navigateTo(navController, DestinationScreen.Report.createRoute(userId))
     }
     Box(
@@ -182,7 +204,7 @@ fun HeaderBar(navController: NavController, userId: String) {
             modifier = Modifier
                 .align(Alignment.CenterEnd)
         ) {
-            CallBox()
+            CallBox(onAudioCallClick, onVideoCallClick, onNotifyVideoCall, onNotifyAudioCall)
             DropDownMenuButton(onReportClick)
         }
     }
@@ -227,13 +249,22 @@ fun DropDownMenuButton(onReportClick: () -> Unit) {
 }
 
 @Composable
-fun Spacer(height: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(height.dp)
-            .background(color = MaterialTheme.colorScheme.background)
+private fun PhotoGrid(photoIds: MutableList<String>, onMessageImageClick: (String) -> Unit) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 128.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
+        items(photoIds) {
+            Surface(
+                tonalElevation = 3.dp,
+                modifier = Modifier.aspectRatio(1f)
+            ) {
+                CommonImage(
+                    data = it,
+                    modifier = Modifier.clickable { onMessageImageClick.invoke(it) })
+            }
+        }
 
     }
 }

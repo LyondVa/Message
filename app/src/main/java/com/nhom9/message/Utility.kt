@@ -345,15 +345,17 @@ fun CommonSubSettingRow(
 }
 
 @Composable
-fun CallBox() {
+fun CallBox(onAudioCallClick: () -> Unit, onVideoCallClick: () -> Unit, onNotifyVideoCall: () -> Unit, onNotifyAudioCall: () -> Unit) {
     Row {
         IconButton(
-            onClick = {}
+            onClick = {onAudioCallClick.invoke()
+            onNotifyAudioCall.invoke()}
         ) {
             Icon(imageVector = Icons.Outlined.Phone, contentDescription = null)
         }
         IconButton(
-            onClick = {}
+            onClick = {onVideoCallClick.invoke()
+            onNotifyVideoCall.invoke()}
         ) {
             Icon(painterResource(id = R.drawable.outline_video_call_24), contentDescription = null)
         }
