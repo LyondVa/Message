@@ -51,12 +51,25 @@ import com.nhom9.message.data.TOP_BAR_HEIGHT
 import com.nhom9.message.navigateTo
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.UUID
+import kotlin.random.Random
 
 @Composable
 fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userId: String) {
     val chatUser = viewModel.getChatUser(userId)
     val photoIds = rememberSaveable {
         mutableListOf<String>()
+    }
+    val context = LocalContext.current
+    val chatId = "abcd"
+    val myUser = viewModel.userData.value
+    val onAudioCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser?.name.toString(), context)
+        navigateTo(navController, DestinationScreen.AudioCall.route)
+    }
+    val onVideoCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser?.name.toString(), context)
+        navigateTo(navController, DestinationScreen.AudioCall.route)
     }
     val onMessageImageClick: (String) -> Unit = {
         navigateTo(
@@ -67,6 +80,17 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
             )
         )
     }
+
+    val onNotifyVideoCall = {
+        viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
+        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "2")
+    }
+
+    val onNotifyAudioCall = {
+        viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
+        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "3")
+    }
+
     LaunchedEffect(key1 = Unit) {
         viewModel.getChatPhotos(photoIds)
     }
@@ -76,7 +100,7 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
                 .fillMaxSize()
                 .weight(1f)
         ) {
-            HeaderBar(navController = navController, userId = userId)
+            HeaderBar(navController = navController, userId = userId, onAudioCall, onVideoCall, onNotifyVideoCall, onNotifyAudioCall)
             CommonDivider(0)
             ChatUserCard(chatUser?.name, chatUser?.imageUrl)
             ProfileInfoCard("")
@@ -125,7 +149,7 @@ fun ProfileInfoCard(name: String) {
 }
 
 @Composable
-fun HeaderBar(navController: NavController, userId: String) {
+fun HeaderBar(navController: NavController, userId: String, onAudioCallClick: () -> Unit, onVideoCallClick: () -> Unit, onNotifyVideoCall: () -> Unit, onNotifyAudioCall: () -> Unit) {
     val onReportClick={
         navigateTo(navController, DestinationScreen.Report.createRoute(userId))
     }
@@ -145,7 +169,7 @@ fun HeaderBar(navController: NavController, userId: String) {
             modifier = Modifier
                 .align(Alignment.CenterEnd)
         ) {
-            CallBox()
+            CallBox(onAudioCallClick, onVideoCallClick, onNotifyVideoCall, onNotifyAudioCall)
             DropDownMenuButton(onReportClick)
         }
     }

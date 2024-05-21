@@ -7,6 +7,7 @@ data class UserData(
     var name: String? = "",
     var phoneNumber: String? = "",
     var imageUrl: String? = "",
+    var deviceToken: String? = ""
     //var handle: String?=""
 ) {
     fun toMap() = mapOf(
@@ -35,7 +36,8 @@ data class ChatUser(
     val userId: String? = "",
     val name: String? = "",
     val imageUrl: String? = "",
-    val phoneNumber: String? = ""
+    val phoneNumber: String? = "",
+    val deviceToken: String? = ""
 )
 
 data class Message(
@@ -65,6 +67,7 @@ data class UserReport(
     val reportOption: String,
     val reportContent: String
 )
+
 
 enum class ReportOption(
     val title: String,

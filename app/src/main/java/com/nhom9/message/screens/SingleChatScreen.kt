@@ -1,8 +1,10 @@
 package com.nhom9.message.screens
 
 import android.Manifest
+import android.content.ContentValues.TAG
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,21 +38,26 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.storageMetadata
 import com.nhom9.message.CallBox
@@ -70,12 +77,15 @@ import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import com.nhom9.message.ui.theme.md_theme_light_primaryContainer
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
 fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId: String) {
+    val context = LocalContext.current
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
@@ -118,6 +128,16 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         )
     }
 
+    val onVideoCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser.name.toString(), context)
+        navigateTo(navController, DestinationScreen.VideoCall.route)
+    }
+
+    val onAudioCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser.name.toString(), context)
+        navigateTo(navController, DestinationScreen.AudioCall.route)
+    }
+
     val onSendAudio: (String, StorageMetadata) -> Unit = { string, metadata ->
         viewModel.onSendAudio(chatId, metadata, Uri.parse(string))
     }
@@ -130,6 +150,21 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     val onMessageDelete: (Message) -> Unit = {
         viewModel.deleteMessage(chatId, it)
     }
+    val onMessageSend = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "1")
+    }
+
+    val onNotifyVideoCall = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "2")
+    }
+
+    val onNotifyAudioCall = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "3")
+    }
+
     LaunchedEffect(key1 = Unit) {
         viewModel.populateMessages(chatId)
     }
@@ -143,7 +178,11 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         ChatHeader(
             name = chatUser.name ?: "",
             imageUrl = chatUser.imageUrl ?: "",
-            onHeaderClick = onHeaderClick
+            onHeaderClick = onHeaderClick,
+            onAudioCallClick = onAudioCall,
+            onVideoCallClick = onVideoCall,
+            onNotifyVideoCall = onNotifyVideoCall,
+            onNotifyAudioCall = onNotifyAudioCall
         ) {
             viewModel.depopulateMessages()
             navController.popBackStack()
@@ -164,6 +203,7 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
                 onReplyChange = { reply = it },
                 onSendReply = onSendReply,
                 onImageClick = onImageClick,
+                onMessageSend = onMessageSend
             )
         } else {
             RecordBar(onRecordChange, onSendAudio)
@@ -351,7 +391,7 @@ fun Message(
 }
 
 @Composable
-fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBackClick: () -> Unit) {
+fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onAudioCallClick: () -> Unit, onVideoCallClick: () -> Unit, onNotifyVideoCall: () -> Unit, onNotifyAudioCall: () -> Unit, onBackClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -366,7 +406,7 @@ fun ChatHeader(name: String, imageUrl: String, onHeaderClick: () -> Unit, onBack
             modifier = Modifier
                 .weight(1f)
                 .clickable { onHeaderClick.invoke() })
-        CallBox()
+        CallBox(onAudioCallClick, onVideoCallClick, onNotifyVideoCall, onNotifyAudioCall)
     }
 }
 
@@ -378,8 +418,12 @@ fun ReplyBox(
     onRecordStart: (Boolean) -> Unit,
     onReplyChange: (String) -> Unit,
     onSendReply: () -> Unit,
-    onImageClick: () -> Unit
+    onImageClick: () -> Unit,
+    onMessageSend: () -> Unit
 ) {
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -392,11 +436,7 @@ fun ReplyBox(
                 .padding(8.dp)
         ) {
             IconButton(onClick = {
-                if (permissionState.hasPermission) {
-                    onRecordStart.invoke(true)
-                } else {
-                    permissionState.launchPermissionRequest()
-                }
+
             }) {
                 Icon(painterResource(id = R.drawable.outline_mic_24), contentDescription = null)
             }
@@ -414,6 +454,7 @@ fun ReplyBox(
             IconButton(onClick = {
                 if (reply != "") {
                     onSendReply.invoke()
+                    onMessageSend.invoke()
                 }
             }) {
                 Icon(imageVector = Icons.Outlined.Send, contentDescription = null)

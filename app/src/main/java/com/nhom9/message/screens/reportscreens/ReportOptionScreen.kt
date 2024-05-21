@@ -29,7 +29,7 @@ import com.nhom9.message.data.ReportOption
 
 
 @Composable
-fun ReportOptionScreen(navController: NavController,viewModel: MViewModel, reportOptionIndex: String, userId: String) {
+fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, reportOptionIndex: String, userId: String) {
     val reportContent = remember {
         mutableStateOf("")
     }

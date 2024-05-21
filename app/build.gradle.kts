@@ -57,6 +57,8 @@ android {
 
 dependencies {
 
+    implementation("io.getstream:stream-video-android-ui-compose:0.5.8")
+    implementation ("com.auth0:java-jwt:3.18.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -123,4 +125,15 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
 
     implementation("com.google.firebase:firebase-auth")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
+
+    implementation("com.google.firebase:firebase-messaging")
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
+    implementation("com.google.firebase:firebase-analytics")
+
+    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
 }
