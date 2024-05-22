@@ -97,7 +97,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme {
+            val viewModel: MViewModel = hiltViewModel()
+            val isDarkTheme = viewModel.isDarkTheme
+
+            AppTheme(useDarkTheme = isDarkTheme) {
                 Surface(
                     tonalElevation = 5.dp,
                     modifier = Modifier.fillMaxSize(),

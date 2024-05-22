@@ -69,6 +69,7 @@ class MViewModel @Inject constructor(
     val onToggleTheme = {
 
     }
+    val isDarkTheme = mutableStateOf(false)
     val blockedChats = mutableStateOf<List<BlockedChats>>(listOf())
 
     init {

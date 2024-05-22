@@ -26,6 +26,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,6 +69,8 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         val allowEdit = remember {
             mutableStateOf(false)
         }
+        val isDarkTheme = viewModel.isDarkTheme
+
         Column {
             Column(
                 modifier = Modifier
@@ -82,7 +85,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                     viewModel = viewModel
                 )
                 InfoCard(phoneNumber = phoneNumber)
-                SettingCard(navController)
+                SettingCard(navController, isDarkTheme)
                 LogOutCard(navController, viewModel)
             }
             CommonDivider(0)
@@ -171,7 +174,7 @@ fun InfoCard(
 
 
 @Composable
-fun SettingCard(navController: NavController) {
+fun SettingCard(navController: NavController, isDarkTheme: MutableState<Boolean>) {
     Surface(
         shadowElevation = 2.dp,
         modifier = Modifier
@@ -192,29 +195,13 @@ fun SettingCard(navController: NavController) {
                 navigateTo(navController, DestinationScreen.AccountSetting.route)
             }
             CommonDivider(0)
-            SwitchRow("DarkMode") {
-
+            SwitchRow(title = "Dark Mode", isChecked = isDarkTheme.value) {
+                isDarkTheme.value = it
             }
             CommonDivider(0)
-            SwitchRow("Notification") {
-
-            }/*
-            CommonRow(name = stringResource(R.string.display), icon = Icons.Outlined.Settings) {
-                navigateTo(navController, DestinationScreen.DisplaySetting.route)
+            SwitchRow(title = "Notification", isChecked = true) {
+                // Handle notification switch toggling
             }
-            CommonDivider(0)
-            CommonRow(
-                name = stringResource(R.string.notification_and_sound),
-                icon = Icons.Outlined.Notifications
-            ) {
-                navigateTo(navController, DestinationScreen.NotificationAndSoundSetting.route)
-            }
-            CommonDivider(0)
-            CommonRow(
-                name = stringResource(R.string.privacy_and_security), icon = Icons.Outlined.Warning
-            ) {
-                navigateTo(navController, DestinationScreen.PrivacyAndSecuritySetting.route)
-            }*/
         }
     }
 }
@@ -248,19 +235,16 @@ fun LogOutCard(navController: NavController, viewModel: MViewModel) {
 
 
 @Composable
-fun SwitchRow(title: String, onToggleTheme: () -> Unit) {
+fun SwitchRow(
+    title: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
     ) {
-        var checked by remember {
-            mutableStateOf(true)
-        }
-        val onCheckedChange: (Boolean) -> Unit = {
-            onToggleTheme.invoke()
-            checked = it
-        }
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
@@ -269,7 +253,7 @@ fun SwitchRow(title: String, onToggleTheme: () -> Unit) {
                 .align(Alignment.CenterStart)
         )
         Switch(
-            checked = checked,
+            checked = isChecked,
             onCheckedChange = onCheckedChange,
             modifier = Modifier
                 .padding(8.dp)
