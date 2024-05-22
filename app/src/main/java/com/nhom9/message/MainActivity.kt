@@ -18,14 +18,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.nhom9.message.data.USERID
 import com.nhom9.message.screens.AudioCallScreen
 import com.nhom9.message.screens.CallScreen
-import com.nhom9.message.screens.ChatImageScreen
-import com.nhom9.message.screens.ChatListScreen
-import com.nhom9.message.screens.ChatProfileScreen
-import com.nhom9.message.screens.EntryScreen
-import com.nhom9.message.screens.LoginScreen
-import com.nhom9.message.data.USERID
 import com.nhom9.message.screens.ProfileScreen
 import com.nhom9.message.screens.chatrequestscreen.ChatRequestScreen
 import com.nhom9.message.screens.chatrequestscreen.UserProfileScreen
@@ -49,7 +44,6 @@ import com.nhom9.message.screens.subsettingscreens.PrivacyAndSecuritySettingScre
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditNameScreen
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditPhoneNumberScreen
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditProfileImageScreen
-import com.nhom9.message.screens.subsettingscreens.displaysettingsubscreens.ChangeLanguageScreen
 import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -199,9 +193,6 @@ class MainActivity : ComponentActivity() {
                 imageUrl?.let {
                     ChatImageScreen(navController, imageUrl)
                 }
-            }
-            composable(DestinationScreen.ChangeLanguage.route) {
-                ChangeLanguageScreen(navController, viewModel)
             }
             composable(DestinationScreen.Report.route) {
                 val userId = it.arguments?.getString("userId")

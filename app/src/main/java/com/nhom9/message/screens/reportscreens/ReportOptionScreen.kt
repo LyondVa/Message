@@ -20,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.TitleBarWithBack
 import com.nhom9.message.data.ReportOption
 
@@ -37,7 +39,7 @@ fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, repo
     val context = LocalContext.current
     val reportOption = ReportOption.entries[reportOptionIndex.toInt()]
     Column {
-        TitleBarWithBack(navController = navController, text = "Report")
+        TitleBarWithBack(navController = navController, text = stringResource(R.string.report))
         CommonDivider()
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -58,7 +60,7 @@ fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, repo
                 .height(52.dp)
         ) {
             Text(
-                text = "Examples of what to report:",
+                text = stringResource(R.string.examples_of_what_to_report),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 20.dp)
             )
@@ -71,7 +73,7 @@ fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, repo
             onValueChange = { reportContent.value = it },
             placeholder = {
                 Text(
-                    text = "Please explain your reasoning for this report"
+                    text = stringResource(R.string.please_explain_your_reasoning_for_this_report)
                 )
             },
             modifier = Modifier
@@ -96,7 +98,7 @@ fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, repo
                     .align(Alignment.CenterEnd)
                     .padding(end = 8.dp)
             ) {
-                Text(text = "Submit")
+                Text(text = stringResource(R.string.submit))
             }
         }
     }

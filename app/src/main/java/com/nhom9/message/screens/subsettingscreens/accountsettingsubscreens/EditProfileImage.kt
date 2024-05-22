@@ -16,12 +16,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.MViewModel
 import com.nhom9.message.ProfileImageCard
+import com.nhom9.message.R
 import com.nhom9.message.TitleBarWithBack
 
 @Composable
@@ -56,7 +58,7 @@ fun EditProfileImageScreen(navController: NavController, viewModel: MViewModel) 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            TitleBarWithBack(navController, "Edit Profile Image")
+            TitleBarWithBack(navController, stringResource(R.string.edit_profile_image))
             CommonDivider(0)
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -73,15 +75,15 @@ fun EditProfileImageScreen(navController: NavController, viewModel: MViewModel) 
                 if (allowEdit) {
                     Row {
                         Button(onClick = onCancelClick, modifier = Modifier.padding(8.dp)) {
-                            Text(text = "Cancel")
+                            Text(text = stringResource(R.string.cancel))
                         }
                         Button(onClick = onSaveClick, modifier = Modifier.padding(8.dp)) {
-                            Text(text = "Save")
+                            Text(text = stringResource(R.string.save))
                         }
                     }
                 } else {
                     Button(onClick = onEditClick, modifier = Modifier.padding(8.dp)) {
-                        Text(text = "Edit")
+                        Text(text = stringResource(R.string.edit))
                     }
                 }
             }

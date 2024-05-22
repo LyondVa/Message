@@ -1,6 +1,5 @@
 package com.nhom9.message.screens.chatscreens
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CallBox
@@ -47,12 +47,11 @@ import com.nhom9.message.CommonImage
 import com.nhom9.message.CommonProfileImage
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.data.TOP_BAR_HEIGHT
 import com.nhom9.message.navigateTo
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.UUID
-import kotlin.random.Random
 
 @Composable
 fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userId: String) {
@@ -64,11 +63,15 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
     val chatId = "abcd"
     val myUser = viewModel.userData.value
     val onAudioCall = {
-        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser?.name.toString(), context)
+        viewModel.proceedService(
+            myUser?.name.toString(), chatId, chatUser?.name.toString(), context
+        )
         navigateTo(navController, DestinationScreen.AudioCall.route)
     }
     val onVideoCall = {
-        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser?.name.toString(), context)
+        viewModel.proceedService(
+            myUser?.name.toString(), chatId, chatUser?.name.toString(), context
+        )
         navigateTo(navController, DestinationScreen.AudioCall.route)
     }
     val launchCheck = rememberSaveable {
@@ -86,19 +89,30 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
 
     val onNotifyVideoCall = {
         viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
-        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "2")
+        viewModel.sendMessage(
+            isBroadcast = false, myUser?.name.toString(), context = context, type = "2"
+        )
     }
 
     val onNotifyAudioCall = {
         viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
-        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "3")
+        viewModel.sendMessage(
+            isBroadcast = false, myUser?.name.toString(), context = context, type = "3"
+        )
     }
     LaunchedEffect(key1 = launchCheck) {
         viewModel.getChatPhotos(photoIds)
         launchCheck.value = false
     }
     Column {
-        HeaderBar(navController = navController, userId = userId, , onAudioCall, onVideoCall, onNotifyVideoCall, onNotifyAudioCall)
+        HeaderBar(
+            navController = navController,
+            userId = userId,
+            onAudioCall,
+            onVideoCall,
+            onNotifyVideoCall,
+            onNotifyAudioCall
+        )
         CommonDivider(0)
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 128.dp),
@@ -124,11 +138,9 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
             }
             items(photoIds) {
                 Surface(
-                    tonalElevation = 3.dp,
-                    modifier = Modifier.aspectRatio(1f)
+                    tonalElevation = 3.dp, modifier = Modifier.aspectRatio(1f)
                 ) {
-                    CommonImage(
-                        data = it,
+                    CommonImage(data = it,
                         modifier = Modifier.clickable { onMessageImageClick.invoke(it) })
                 }
             }
@@ -146,9 +158,7 @@ fun ChatUserCard(name: String, imageUrl: String?) {
             .padding(8.dp)
     ) {
         Card(
-            shape = CircleShape,
-            modifier = Modifier
-                .size(160.dp)
+            shape = CircleShape, modifier = Modifier.size(160.dp)
         ) {
             CommonProfileImage(imageUrl = imageUrl)
         }
@@ -169,13 +179,13 @@ fun ProfileInfoCard(bio: String, phoneNumber: String) {
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Text(
+        /*Text(
             text = "Bio: $bio",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(8.dp)
-        )
+        )*/
         Text(
-            text = "Phone Number: $phoneNumber",
+            text = stringResource(id = R.string.phone_number) + ": $phoneNumber",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(8.dp)
         )
@@ -184,8 +194,15 @@ fun ProfileInfoCard(bio: String, phoneNumber: String) {
 }
 
 @Composable
-fun HeaderBar(navController: NavController, userId: String, onAudioCallClick: () -> Unit, onVideoCallClick: () -> Unit, onNotifyVideoCall: () -> Unit, onNotifyAudioCall: () -> Unit) {
-    val onReportClick={
+fun HeaderBar(
+    navController: NavController,
+    userId: String,
+    onAudioCallClick: () -> Unit,
+    onVideoCallClick: () -> Unit,
+    onNotifyVideoCall: () -> Unit,
+    onNotifyAudioCall: () -> Unit
+) {
+    val onReportClick = {
         navigateTo(navController, DestinationScreen.Report.createRoute(userId))
     }
     Box(
@@ -201,8 +218,7 @@ fun HeaderBar(navController: NavController, userId: String, onAudioCallClick: ()
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
+            modifier = Modifier.align(Alignment.CenterEnd)
         ) {
             CallBox(onAudioCallClick, onVideoCallClick, onNotifyVideoCall, onNotifyAudioCall)
             DropDownMenuButton(onReportClick)
@@ -217,11 +233,8 @@ fun DropDownMenuButton(onReportClick: () -> Unit) {
     IconButton(onClick = { mDisplayMenu = !mDisplayMenu }) {
         Icon(Icons.Outlined.MoreVert, "")
     }
-    DropdownMenu(
-        expanded = mDisplayMenu,
-        onDismissRequest = { mDisplayMenu = false }
-    ) {
-        DropdownMenuItem(
+    DropdownMenu(expanded = mDisplayMenu, onDismissRequest = { mDisplayMenu = false }) {
+        /*DropdownMenuItem(
             {
                 Text(
                     text = "Block",
@@ -232,19 +245,16 @@ fun DropDownMenuButton(onReportClick: () -> Unit) {
                 Toast.makeText(context, "Block", Toast.LENGTH_SHORT).show()
                 mDisplayMenu = false
             }
-        )
-        DropdownMenuItem(
-            {
-                Text(
-                    text = "Report",
-                    style = MaterialTheme.typography.labelMedium
-                )
-            },
-            {
-                onReportClick.invoke()
-                mDisplayMenu = false
-            }
-        )
+        )*/
+        DropdownMenuItem({
+            Text(
+                text = stringResource(R.string.report),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }, {
+            onReportClick.invoke()
+            mDisplayMenu = false
+        })
     }
 }
 
@@ -257,11 +267,9 @@ private fun PhotoGrid(photoIds: MutableList<String>, onMessageImageClick: (Strin
     ) {
         items(photoIds) {
             Surface(
-                tonalElevation = 3.dp,
-                modifier = Modifier.aspectRatio(1f)
+                tonalElevation = 3.dp, modifier = Modifier.aspectRatio(1f)
             ) {
-                CommonImage(
-                    data = it,
+                CommonImage(data = it,
                     modifier = Modifier.clickable { onMessageImageClick.invoke(it) })
             }
         }

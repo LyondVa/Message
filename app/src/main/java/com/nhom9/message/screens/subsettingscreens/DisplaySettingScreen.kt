@@ -15,19 +15,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonSubSettingRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.TitleBarWithBack
 import com.nhom9.message.navigateTo
 
 @Composable
 fun DisplaySettingScreen(navController: NavController, viewModel: MViewModel) {
     Column {
-        TitleBarWithBack(navController = navController, text = "Display")
+        TitleBarWithBack(navController = navController, text = stringResource(R.string.display))
         DisplaySettings(navController, viewModel.onToggleTheme)
     }
 
@@ -63,7 +65,7 @@ fun DarkModeRow(onToggleTheme: () -> Unit) {
             checked = it
         }
         Text(
-            text = "Dark Mode",
+            text = stringResource(R.string.dark_mode),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .padding(start = 20.dp)

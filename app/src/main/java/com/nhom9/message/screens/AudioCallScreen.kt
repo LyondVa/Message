@@ -1,8 +1,6 @@
 package com.nhom9.message.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -14,7 +12,6 @@ import com.nhom9.message.MViewModel
 import io.getstream.video.android.compose.permission.LaunchCallPermissions
 import io.getstream.video.android.compose.theme.VideoTheme
 import io.getstream.video.android.compose.ui.components.call.activecall.CallContent
-import io.getstream.video.android.compose.ui.components.call.controls.ControlActions
 import io.getstream.video.android.compose.ui.components.call.ringing.RingingCallContent
 import io.getstream.video.android.core.call.state.CallAction
 import io.getstream.video.android.core.call.state.FlipCamera
@@ -23,18 +20,14 @@ import io.getstream.video.android.core.call.state.ToggleCamera
 import io.getstream.video.android.core.call.state.ToggleMicrophone
 import io.getstream.video.android.core.call.state.ToggleSpeakerphone
 import kotlinx.coroutines.launch
-import android.app.Activity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @SuppressLint("SuspiciousIndentation", "CoroutineCreationDuringComposition")
 @Composable
 fun AudioCallScreen(navController: NavController, MViewModel: MViewModel) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    LocalContext.current
     val call = MViewModel.call
     val members = MViewModel.members
-    Log.d("TAG", "Done")
 
     LaunchCallPermissions(
         call = call,

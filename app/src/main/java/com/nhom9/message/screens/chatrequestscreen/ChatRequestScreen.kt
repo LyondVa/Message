@@ -19,12 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProfileImageRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.TitleBarWithBack
 import com.nhom9.message.data.ChatRequest
 import com.nhom9.message.navigateTo
@@ -44,7 +46,7 @@ fun ChatRequestScreen(navController: NavController, viewModel: MViewModel) {
         LazyColumn {
             item {
                 Text(
-                    text = "My Request",
+                    text = stringResource(R.string.my_request),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -57,7 +59,7 @@ fun ChatRequestScreen(navController: NavController, viewModel: MViewModel) {
                             .padding(8.dp)
                     ) {
                         Text(
-                            text = "No Requests",
+                            text = stringResource(R.string.no_requests),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.align(
                                 Alignment.Center
@@ -79,7 +81,7 @@ fun ChatRequestScreen(navController: NavController, viewModel: MViewModel) {
                 Column {
                     CommonDivider(0)
                     Text(
-                        text = "Pending Request",
+                        text = stringResource(R.string.pending_request),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(8.dp)
                     )
@@ -93,7 +95,7 @@ fun ChatRequestScreen(navController: NavController, viewModel: MViewModel) {
                             .padding(8.dp)
                     ) {
                         Text(
-                            text = "No Requests",
+                            text = stringResource(id = R.string.no_requests),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.align(
                                 Alignment.Center

@@ -34,6 +34,11 @@ android {
                 isDebuggable = true
             }
         }
+        debug {
+            getByName("debug"){
+                enableAndroidTestCoverage = false
+            }
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -135,5 +140,5 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.15.1")
     implementation("com.google.firebase:firebase-analytics")
 
-    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+    implementation("com.google.accompanist:accompanist-permissions:0.32.0")
 }

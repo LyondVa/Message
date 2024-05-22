@@ -134,7 +134,7 @@ fun LogInWithPhoneNumberScreen(navController: NavController, viewModel: MViewMod
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             label = {
                                 Text(
-                                    text = "Phone Number",
+                                    text = stringResource(R.string.phone_number),
                                     style = MaterialTheme.typography.labelMedium
                                 )
                             },
@@ -165,7 +165,7 @@ fun LogInWithPhoneNumberScreen(navController: NavController, viewModel: MViewMod
                                 .fillMaxWidth()
                         ) {
                             Text(
-                                text = "Get Verification Code",
+                                text = stringResource(R.string.get_verification_code),
                                 style = MaterialTheme.typography.labelMedium
                             )
                         }
@@ -194,7 +194,7 @@ fun LogInWithPhoneNumberScreen(navController: NavController, viewModel: MViewMod
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 label = {
                                     Text(
-                                        text = "Verification Code",
+                                        text = stringResource(R.string.verification_code),
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                 },
@@ -234,20 +234,20 @@ fun LogInWithPhoneNumberScreen(navController: NavController, viewModel: MViewMod
                     }
                     if(verificationFailed.value){
                         Text(
-                            text = "Please Check Your Phone Number",
+                            text = stringResource(R.string.please_check_your_phone_number),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                     if (loginFailed.value) {
                         Text(
-                            text = "Please Check Your OTP Code",
+                            text = stringResource(R.string.please_check_your_otp_code),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                     Text(
-                        text = "Or Sign In With",
+                        text = stringResource(R.string.or_sign_in_with),
                         color = Color.Blue,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier

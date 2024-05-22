@@ -22,11 +22,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
 import com.nhom9.message.CommonProfileImage
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.data.TOP_BAR_HEIGHT
 
 @Composable
@@ -84,13 +86,13 @@ fun ProfileInfoCard(bio: String, phoneNumber: String) {
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Text(
+        /*Text(
             text = "Bio: $bio",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(8.dp)
-        )
+        )*/
         Text(
-            text = "Phone Number: $phoneNumber",
+            text =  stringResource(id = R.string.phone_number)+ ": $phoneNumber",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(8.dp)
         )

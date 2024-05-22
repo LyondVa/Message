@@ -4,13 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.auth0.jwt.JWT
@@ -26,7 +21,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
-import com.google.firebase.messaging.ktx.messaging
 import com.google.firebase.messaging.messaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
@@ -1014,15 +1008,15 @@ class MViewModel @Inject constructor(
         )
     }
 
-    fun sendMessage(isBroadcast: Boolean, title: String, type: String)
+    fun sendMessage(isBroadcast: Boolean, title: String, type: String, context: Context)
     {
         val messageText : String
         if (type == "1"){
             messageText = state.messageText
         } else if (type == "2"){
-            messageText = "is calling video for you"
+            messageText = context.getString(R.string.there_is_video_call_for_you)
         } else {
-            messageText = "is calling audio for you"
+            messageText = context.getString(R.string.there_is_audio_call_for_you)
         }
         viewModelScope.launch {
             val messageDto = SendMessageDto(

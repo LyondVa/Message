@@ -1,10 +1,9 @@
 package com.nhom9.message.screens.chatscreens
 
 import android.Manifest
-import android.content.ContentValues.TAG
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,9 +22,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.Send
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -39,26 +38,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
 import com.google.firebase.storage.StorageMetadata
 import com.google.firebase.storage.storageMetadata
 import com.nhom9.message.CallBox
@@ -80,8 +75,6 @@ import com.nhom9.message.getTimeFromTimestamp
 import com.nhom9.message.navigateTo
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import com.nhom9.message.ui.theme.md_theme_light_primaryContainer
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -155,17 +148,32 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
     val onMessageSend = {
         viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
-        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "1")
+        viewModel.sendMessage(
+            isBroadcast = false,
+            myUser?.name.toString(),
+            context = context,
+            type = "1"
+        )
     }
 
     val onNotifyVideoCall = {
         viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
-        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "2")
+        viewModel.sendMessage(
+            isBroadcast = false,
+            myUser?.name.toString(),
+            context = context,
+            type = "2"
+        )
     }
 
     val onNotifyAudioCall = {
         viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
-        viewModel.sendMessage(isBroadcast = false, myUser?.name.toString(), "3")
+        viewModel.sendMessage(
+            isBroadcast = false,
+            myUser?.name.toString(),
+            context = context,
+            type = "3"
+        )
     }
 
     LaunchedEffect(key1 = Unit) {
@@ -267,7 +275,7 @@ fun DeletedMessage(
                     modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                 )
                 Text(
-                    text = "Message Deleted",
+                    text = stringResource(R.string.message_deleted),
                     color = md_theme_light_onPrimaryContainer,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
@@ -275,7 +283,7 @@ fun DeletedMessage(
                 )
             } else {
                 Text(
-                    text = "Message Deleted",
+                    text = stringResource(R.string.message_deleted),
                     color = md_theme_light_onPrimaryContainer,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
@@ -357,7 +365,8 @@ fun Message(
     var mDisplayMenu by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.Bottom,
-        modifier = Modifier.padding(4.dp)
+        modifier = Modifier
+            .padding(4.dp)
             .background(
                 color, MaterialTheme.shapes.medium
             )
@@ -395,7 +404,7 @@ fun Message(
         DropdownMenuItem(
             {
                 Text(
-                    text = "Delete",
+                    text = stringResource(R.string.delete),
                     style = MaterialTheme.typography.labelMedium
                 )
             },
@@ -413,7 +422,11 @@ fun ChatHeader(
     name: String,
     imageUrl: String,
     onHeaderClick: () -> Unit,
-   onAudioCallClick: () -> Unit, onVideoCallClick: () -> Unit, onNotifyVideoCall: () -> Unit, onNotifyAudioCall: () -> Unit, onBackClick: () -> Unit
+    onAudioCallClick: () -> Unit,
+    onVideoCallClick: () -> Unit,
+    onNotifyVideoCall: () -> Unit,
+    onNotifyAudioCall: () -> Unit,
+    onBackClick: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -422,7 +435,7 @@ fun ChatHeader(
             .fillMaxWidth()
     ) {
         IconButton(onClick = { onBackClick.invoke() }) {
-            Icon(Icons.Rounded.ArrowBack, contentDescription = null)
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
         }
         ProfileBox(name,
             imageUrl,
@@ -444,9 +457,7 @@ fun ReplyBox(
     onImageClick: () -> Unit,
     onMessageSend: () -> Unit
 ) {
-    val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -459,7 +470,11 @@ fun ReplyBox(
                 .padding(8.dp)
         ) {
             IconButton(onClick = {
-                if (permissionState.hasPermission) {
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
                     onRecordStart.invoke(true)
                 } else {
                     permissionState.launchPermissionRequest()
@@ -487,7 +502,7 @@ fun ReplyBox(
                     onMessageSend.invoke()
                 }
             }) {
-                Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
+                Icon(imageVector = Icons.AutoMirrored.Outlined.Send, contentDescription = null)
             }
         }
     }
@@ -555,7 +570,7 @@ fun RecordBar(onRecordStop: (Boolean) -> Unit, onSendAudio: (String, StorageMeta
             onSendAudio.invoke(audioFile.toURI().toString(), metadata)
             onRecordStop.invoke(false)
         }) {
-            Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
+            Icon(imageVector = Icons.AutoMirrored.Outlined.Send, contentDescription = null)
         }
     }
 }

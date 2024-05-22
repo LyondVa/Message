@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -122,7 +123,8 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                     nameState.value = it
                 }, label = {
                     Text(
-                        text = "Name", style = MaterialTheme.typography.bodyMedium
+                        text = stringResource(R.string.name),
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }, shape = RoundedCornerShape(40.dp), modifier = Modifier.padding(8.dp)
                 )
@@ -151,7 +153,8 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                     },
                     label = {
                         Text(
-                            text = "Phone number", style = MaterialTheme.typography.bodyMedium
+                            text = stringResource(R.string.phone_number),
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     },
                     shape = RoundedCornerShape(40.dp),
@@ -201,7 +204,8 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         label = {
                             Text(
-                                text = "OTP Code", style = MaterialTheme.typography.bodyMedium
+                                text = stringResource(R.string.otp_code),
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         },
                         onValueChange = { if (it.length <= 6) otp.value = it },
@@ -252,26 +256,27 @@ fun SignUpWithPhoneNumberScreen(navController: NavController, viewModel: MViewMo
                     }, modifier = Modifier.padding(8.dp)
                 ) {
                     Text(
-                        text = "Sign Up", style = MaterialTheme.typography.bodyMedium
+                        text = stringResource(R.string.sign_up),
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
             if (verificationFailed.value) {
                 Text(
-                    text = "Please Check Your Phone Number",
+                    text = stringResource(R.string.please_check_your_phone_number),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
             if (numberAlreadyRegistered.value) {
                 Text(
-                    text = "This number has already been registered",
+                    text = stringResource(id = R.string.this_number_has_already_been_registered),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
             Text(
-                text = "Or Register With",
+                text = stringResource(R.string.or_register_with),
                 color = Color.Blue,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(8.dp)
