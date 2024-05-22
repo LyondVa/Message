@@ -197,7 +197,7 @@ fun SettingCard(navController: NavController) {
             }
             CommonDivider(0)
             SwitchRow("Notification") {
-
+                
             }/*
             CommonRow(name = stringResource(R.string.display), icon = Icons.Outlined.Settings) {
                 navigateTo(navController, DestinationScreen.DisplaySetting.route)
@@ -248,7 +248,7 @@ fun LogOutCard(navController: NavController, viewModel: MViewModel) {
 
 
 @Composable
-fun SwitchRow(title: String, onToggleTheme: () -> Unit) {
+fun SwitchRow(title: String, onToggleTheme: (Boolean) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,7 +258,7 @@ fun SwitchRow(title: String, onToggleTheme: () -> Unit) {
             mutableStateOf(true)
         }
         val onCheckedChange: (Boolean) -> Unit = {
-            onToggleTheme.invoke()
+            onToggleTheme.invoke(it)
             checked = it
         }
         Text(

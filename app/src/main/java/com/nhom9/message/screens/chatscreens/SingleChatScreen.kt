@@ -493,7 +493,6 @@ fun ReplyBox(
                 onValueChange = onReplyChange,
                 maxLines = 3,
                 modifier = Modifier
-                    .height(40.dp)
                     .weight(0.1f)
             )
             IconButton(onClick = {

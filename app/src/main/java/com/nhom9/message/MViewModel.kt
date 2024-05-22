@@ -792,11 +792,6 @@ class MViewModel @Inject constructor(
         updateMessage(chatId, message)
     }
 
-    fun editMessage(chatId: String, message: Message, content: String) {
-        message.isEdited = true
-        updateMessage(chatId, message, content)
-    }
-
     fun getChatPhotos(photoList: MutableList<String>) {
         for (message in chatMessages.value) {
             if (message.type == MESSAGE_IMAGE) {
@@ -880,13 +875,8 @@ class MViewModel @Inject constructor(
                 }
             }
         }
-
-
     }
 
-    fun acceptChatRequest() {
-
-    }
 
     fun populateMyRequests() {
         db.collection(CHAT_REQUESTS).whereEqualTo("$REQUESTER.$USERID", userData.value?.userId)
