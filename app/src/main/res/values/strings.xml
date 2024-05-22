@@ -64,4 +64,6 @@
     <string name="dark_mode">Dark Mode</string>
     <string name="there_is_video_call_for_you">There is a video call for you</string>
     <string name="there_is_audio_call_for_you">there is an audio call for you</string>
+    <string name="sent_image">Sent image</string>
+    <string name="sent_record">Sent record</string>
 </resources>

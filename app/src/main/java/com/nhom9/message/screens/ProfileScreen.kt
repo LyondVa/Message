@@ -65,6 +65,9 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
         val imageUrl by rememberSaveable {
             mutableStateOf(userData?.imageUrl ?: "")
         }
+        val deviceToken by rememberSaveable {
+            mutableStateOf(userData?.deviceToken ?: "")
+        }
         val allowEdit = remember {
             mutableStateOf(false)
         }
@@ -82,7 +85,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                     viewModel = viewModel
                 )
                 InfoCard(phoneNumber = phoneNumber)
-                SettingCard(navController)
+                SettingCard(navController, viewModel)
                 LogOutCard(navController, viewModel)
             }
             CommonDivider(0)
@@ -171,7 +174,7 @@ fun InfoCard(
 
 
 @Composable
-fun SettingCard(navController: NavController) {
+fun SettingCard(navController: NavController, viewModel: MViewModel) {
     Surface(
         shadowElevation = 2.dp,
         modifier = Modifier

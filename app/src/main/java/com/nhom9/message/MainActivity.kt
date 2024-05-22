@@ -72,8 +72,8 @@ sealed class DestinationScreen(var route: String) {
     data object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
     data object EditProfileImage : DestinationScreen(route = "editProfileImage")
 
-    data object VideoCall : DestinationScreen(route = "callScreen")
-    data object AudioCall : DestinationScreen(route = "callScreen")
+    data object VideoCall : DestinationScreen(route = "callVideoScreen")
+    data object AudioCall : DestinationScreen(route = "callAudioScreen")
     data object ChatProfile : DestinationScreen(route = "chatProfile/{userId}") {
         fun createRoute(userId: String) = "chatProfile/$userId"
     }

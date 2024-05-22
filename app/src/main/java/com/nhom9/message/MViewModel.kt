@@ -219,7 +219,7 @@ class MViewModel @Inject constructor(
     var state by mutableStateOf(ChatState())
         private set
     private val api: FcmApi = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8081/")
+        .baseUrl("http://192.168.1.2:8081/")
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
         .create()
@@ -999,18 +999,22 @@ class MViewModel @Inject constructor(
         )
     }
 
-    fun sendMessage(isBroadcast: Boolean, title: String, type: String, context: Context) {
+    fun sendMessage(title: String, type: String, context: Context) {
         val messageText: String
         if (type == "1") {
             messageText = state.messageText
         } else if (type == "2") {
             messageText = context.getString(R.string.there_is_video_call_for_you)
-        } else {
+        } else if (type == "3"){
             messageText = context.getString(R.string.there_is_audio_call_for_you)
+        } else if (type == "4"){
+            messageText = context.getString(R.string.sent_record)
+        } else {
+            messageText = context.getString(R.string.sent_image)
         }
         viewModelScope.launch {
             val messageDto = SendMessageDto(
-                to = if (isBroadcast) null else state.remoteToken,
+                to = state.remoteToken,
                 notification = NotificationBody(
                     title = title,
                     body = messageText
@@ -1020,12 +1024,7 @@ class MViewModel @Inject constructor(
             Log.d("text", messageDto.notification.body)
             Log.d("token", messageDto.to.toString())
             try {
-                if (isBroadcast) {
-
-                } else {
-                    api.sendMessage(messageDto)
-                }
-
+                 api.sendMessage(messageDto)
                 state = state.copy(
                     messageText = ""
                 )
@@ -1045,5 +1044,4 @@ class MViewModel @Inject constructor(
         }
         return null
     }
-    //hi
 }
