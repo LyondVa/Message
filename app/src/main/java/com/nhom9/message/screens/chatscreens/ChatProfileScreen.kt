@@ -60,20 +60,22 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
         mutableListOf<String>()
     }
     val context = LocalContext.current
-    val chatId = viewModel.getChatId(userId)
+    val chatId = rememberSaveable {
+        mutableStateOf(viewModel.getChatId(userId))
+    }
     val myUser = viewModel.userData.value
     val onAudioCall = {
-        if (chatId != null) {
+        chatId.value?.let {
             viewModel.proceedService(
-                myUser?.name.toString(), chatId, chatUser?.name.toString(), context
+                myUser?.name.toString(), it, chatUser?.name.toString(), context
             )
         }
         navigateTo(navController, DestinationScreen.AudioCall.route)
     }
     val onVideoCall = {
-        if (chatId != null) {
+        chatId.value?.let {
             viewModel.proceedService(
-                myUser?.name.toString(), chatId, chatUser?.name.toString(), context
+                myUser?.name.toString(), it, chatUser?.name.toString(), context
             )
         }
         navigateTo(navController, DestinationScreen.AudioCall.route)
