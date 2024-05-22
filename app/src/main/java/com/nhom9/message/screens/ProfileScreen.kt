@@ -70,7 +70,15 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
             mutableStateOf(false)
         }
         val isDarkTheme = viewModel.isDarkTheme
-
+        val enableNotification = viewModel.enableNotification
+        val onNotificationChange = {
+            if (enableNotification.value) {
+                viewModel.onRemoteTokenChange("")
+            }
+            else{
+                viewModel.onRemoteTokenChange(userData?.deviceToken.toString())
+            }
+        }
         Column {
             Column(
                 modifier = Modifier
@@ -85,7 +93,7 @@ fun ProfileScreen(navController: NavController, viewModel: MViewModel) {
                     viewModel = viewModel
                 )
                 InfoCard(phoneNumber = phoneNumber)
-                SettingCard(navController, isDarkTheme)
+                SettingCard(navController, isDarkTheme, enableNotification, onNotificationChange)
                 LogOutCard(navController, viewModel)
             }
             CommonDivider(0)
@@ -174,7 +182,12 @@ fun InfoCard(
 
 
 @Composable
-fun SettingCard(navController: NavController, isDarkTheme: MutableState<Boolean>) {
+fun SettingCard(
+    navController: NavController,
+    isDarkTheme: MutableState<Boolean>,
+    enableNotification: MutableState<Boolean>,
+    onNotificationChange: () -> Unit
+) {
     Surface(
         shadowElevation = 2.dp,
         modifier = Modifier
@@ -198,10 +211,11 @@ fun SettingCard(navController: NavController, isDarkTheme: MutableState<Boolean>
             SwitchRow(title = "Dark Mode", isChecked = isDarkTheme.value) {
                 isDarkTheme.value = it
             }
-            CommonDivider(0)
-            SwitchRow(title = "Notification", isChecked = true) {
-                // Handle notification switch toggling
-            }
+            CommonDivider(0)/*
+            SwitchRow(title = "Notification", isChecked = enableNotification.value) {
+                onNotificationChange.invoke()
+                enableNotification.value = it
+            }*/
         }
     }
 }

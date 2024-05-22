@@ -94,6 +94,7 @@ class MViewModel @Inject constructor(
     val onToggleTheme = {
 
     }
+    var enableNotification = mutableStateOf(true)
     val isDarkTheme = mutableStateOf(false)
     val blockedChats = mutableStateOf<List<BlockedChats>>(listOf())
 
@@ -120,6 +121,15 @@ class MViewModel @Inject constructor(
         phoneAuth.sendVerificationCode(
             context, phoneNumberEdited, onCodeSend, onVerificationFailed
         )
+    }
+
+    fun getNotificationState() {
+        userData.value?.userId?.let {
+            db.collection(USER_NODE).document(it).get().addOnSuccessListener {
+                val token = it.data?.get("token")
+                enableNotification.value = token != ""
+            }
+        }
     }
 
     fun signUpWithPhoneNumber(
@@ -1047,4 +1057,5 @@ class MViewModel @Inject constructor(
         return null
     }
     //hi
+
 }
