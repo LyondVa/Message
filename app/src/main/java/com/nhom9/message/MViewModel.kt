@@ -218,14 +218,13 @@ class MViewModel @Inject constructor(
         .build()
     var state by mutableStateOf(ChatState())
         private set
-    private val api:FcmApi = Retrofit.Builder()
+    private val api: FcmApi = Retrofit.Builder()
         .baseUrl("http://10.0.2.2:8081/")
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
         .create()
 
-    fun onMessageChange(message: String)
-    {
+    fun onMessageChange(message: String) {
         state = state.copy(
             messageText = message
         )
@@ -291,35 +290,36 @@ class MViewModel @Inject constructor(
 
     fun createDeviceToken(
         token: String = ""
-    ){
+    ) {
         val uid = auth.currentUser?.uid
         val userData = UserData(
             userId = uid,
             deviceToken = token
         )
         uid?.let {
-                inProcess.value = true
-                db.collection(USER_NODE).document(uid).get()
-                    .addOnSuccessListener {
-                        if (it.exists()) {
-                            db.collection(USER_NODE).document(uid)
-                                .update(
-                                    "deviceToken",
-                                    userData.deviceToken
-                                )
-                            getUserData(uid)
-                            inProcess.value = false //custom
-                        } else {
-                            db.collection(USER_NODE).document(uid).set(userData)
-                            inProcess.value = false
-                            getUserData(uid)
-                        }
+            inProcess.value = true
+            db.collection(USER_NODE).document(uid).get()
+                .addOnSuccessListener {
+                    if (it.exists()) {
+                        db.collection(USER_NODE).document(uid)
+                            .update(
+                                "deviceToken",
+                                userData.deviceToken
+                            )
+                        getUserData(uid)
+                        inProcess.value = false //custom
+                    } else {
+                        db.collection(USER_NODE).document(uid).set(userData)
+                        inProcess.value = false
+                        getUserData(uid)
                     }
-                    .addOnFailureListener {
-                        handleException(it, "cannot retrieve user")
-                    }
+                }
+                .addOnFailureListener {
+                    handleException(it, "cannot retrieve user")
+                }
         }
     }
+
     fun createOrUpdateProfile(
         name: String? = null,
         phoneNumber: String? = null,
@@ -947,8 +947,8 @@ class MViewModel @Inject constructor(
             handleException(customMessage = "onAcceptRequest: ${chatRequest.requester.userId} to ${chatRequest.requestee?.userId} failed")
         }
     }
-    fun proceedService(userID: String, chatID: String, chatuserID: String, context: Context)
-    {
+
+    fun proceedService(userID: String, chatID: String, chatuserID: String, context: Context) {
         val userId = userID
         val userToken = tokenGenerate(userId)
         val callId = chatID
@@ -972,6 +972,7 @@ class MViewModel @Inject constructor(
         Log.d("TAG", "Done")
 
     }
+
     private fun tokenGenerate(
         userId: String
     ): String? {
@@ -986,7 +987,7 @@ class MViewModel @Inject constructor(
     }
 
 
-    init{
+    init {
         viewModelScope.launch {
             Firebase.messaging.subscribeToTopic("chat").await()
         }
@@ -998,29 +999,28 @@ class MViewModel @Inject constructor(
         )
     }
 
-    fun sendMessage(isBroadcast: Boolean, title: String, type: String, context: Context)
-    {
-        val messageText : String
-        if (type == "1"){
+    fun sendMessage(isBroadcast: Boolean, title: String, type: String, context: Context) {
+        val messageText: String
+        if (type == "1") {
             messageText = state.messageText
-        } else if (type == "2"){
+        } else if (type == "2") {
             messageText = context.getString(R.string.there_is_video_call_for_you)
         } else {
             messageText = context.getString(R.string.there_is_audio_call_for_you)
         }
         viewModelScope.launch {
             val messageDto = SendMessageDto(
-            to = if(isBroadcast) null else state.remoteToken,
-            notification = NotificationBody(
-                title = title,
-                body = messageText
+                to = if (isBroadcast) null else state.remoteToken,
+                notification = NotificationBody(
+                    title = title,
+                    body = messageText
+                )
             )
-        )
             Log.d("name", messageDto.notification.title)
             Log.d("text", messageDto.notification.body)
             Log.d("token", messageDto.to.toString())
             try {
-                if(isBroadcast){
+                if (isBroadcast) {
 
                 } else {
                     api.sendMessage(messageDto)
@@ -1036,5 +1036,13 @@ class MViewModel @Inject constructor(
             }
         }
     }
-}
 
+    fun getChatId(userId: String): String? {
+        for (chat in chats.value) {
+            if (chat.user1.userId == userId || chat.user2.userId == userId) {
+                return chat.chatId
+            }
+        }
+        return null
+    }
+}
