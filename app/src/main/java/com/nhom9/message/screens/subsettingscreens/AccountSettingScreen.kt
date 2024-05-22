@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonDivider
@@ -28,6 +29,7 @@ import com.nhom9.message.CommonRow
 import com.nhom9.message.CommonSubSettingRow
 import com.nhom9.message.DestinationScreen
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.TitleBarWithBack
 import com.nhom9.message.navigateTo
 
@@ -48,7 +50,7 @@ fun AccountSettingScreen(navController: NavController, viewModel: MViewModel) {
         mutableStateOf(userData?.userId ?: "")
     }
     Column {
-        TitleBarWithBack(navController = navController, text = "Account")
+        TitleBarWithBack(navController = navController, text = stringResource(R.string.account))
         CommonDivider(0)
         AccountInfoCard(navController, imageUrl, name, userId, phoneNumber)
     }
@@ -104,7 +106,7 @@ fun AccountSettingImageRow(imageUrl: String, onItemClick: () -> Unit) {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Profile Image",
+                text = stringResource(R.string.profile_image),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 20.dp)
             )

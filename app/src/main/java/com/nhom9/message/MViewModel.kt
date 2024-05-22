@@ -3,8 +3,14 @@ package com.nhom9.message
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -15,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
+import com.google.firebase.messaging.messaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
 import com.nhom9.message.authentication.PhoneAuthentication
@@ -43,7 +50,23 @@ import com.nhom9.message.data.USERNAME
 import com.nhom9.message.data.USER_NODE
 import com.nhom9.message.data.UserData
 import com.nhom9.message.data.UserReport
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.getstream.log.Priority
+import io.getstream.video.android.core.Call
+import io.getstream.video.android.core.GEO
+import io.getstream.video.android.core.StreamVideo
+import io.getstream.video.android.core.StreamVideoBuilder
+import io.getstream.video.android.core.logging.LoggingLevel
+import io.getstream.video.android.model.User
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import retrofit2.HttpException
+import retrofit2.Retrofit
+import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.create
+import java.io.IOException
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
@@ -66,6 +89,8 @@ class MViewModel @Inject constructor(
     var currentChatMessageListener: ListenerRegistration? = null
     val status = mutableStateOf<List<Status>>(listOf())
     val inProgressStatus = mutableStateOf(false)
+    lateinit var call: Call
+    lateinit var members: List<String>
     val onToggleTheme = {
 
     }
@@ -189,6 +214,23 @@ class MViewModel @Inject constructor(
     }
 
 
+    val moshi = Moshi.Builder()
+        .addLast(KotlinJsonAdapterFactory())
+        .build()
+    var state by mutableStateOf(ChatState())
+        private set
+    private val api: FcmApi = Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:8081/")
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .build()
+        .create()
+
+    fun onMessageChange(message: String) {
+        state = state.copy(
+            messageText = message
+        )
+    }
+
     fun signUp(
         name: String,
         phoneNumber: String,
@@ -226,7 +268,7 @@ class MViewModel @Inject constructor(
         }
     }
 
-    fun logIn(email: String, password: String, onLoginFailed: () -> Unit) {
+    fun logIn(email: String, password: String, token: String, onLoginFailed: () -> Unit) {
         if (email.isEmpty() || password.isEmpty()) {
             handleException(customMessage = "Please Fill In All Fields")
             return
@@ -235,13 +277,47 @@ class MViewModel @Inject constructor(
                 if (it.isSuccessful) {
                     signIn.value = true
                     inProcess.value = false
+                    Log.d("local", token)
                     auth.currentUser?.uid?.let {
                         getUserData(it)
+                        createDeviceToken(token)
                     }
                 } else {
                     onLoginFailed.invoke()
                 }
             }
+        }
+    }
+
+    fun createDeviceToken(
+        token: String = ""
+    ) {
+        val uid = auth.currentUser?.uid
+        val userData = UserData(
+            userId = uid,
+            deviceToken = token
+        )
+        uid?.let {
+            inProcess.value = true
+            db.collection(USER_NODE).document(uid).get()
+                .addOnSuccessListener {
+                    if (it.exists()) {
+                        db.collection(USER_NODE).document(uid)
+                            .update(
+                                "deviceToken",
+                                userData.deviceToken
+                            )
+                        getUserData(uid)
+                        inProcess.value = false //custom
+                    } else {
+                        db.collection(USER_NODE).document(uid).set(userData)
+                        inProcess.value = false
+                        getUserData(uid)
+                    }
+                }
+                .addOnFailureListener {
+                    handleException(it, "cannot retrieve user")
+                }
         }
     }
 
@@ -384,12 +460,15 @@ class MViewModel @Inject constructor(
                                         userData.value?.userId,
                                         userData.value?.name,
                                         userData.value?.imageUrl,
-                                        userData.value?.phoneNumber
+                                        userData.value?.phoneNumber,
+                                        userData.value?.deviceToken
+
                                     ), ChatUser(
                                         chatPartner.userId,
                                         chatPartner.name,
                                         chatPartner.imageUrl,
-                                        chatPartner.phoneNumber
+                                        chatPartner.phoneNumber,
+                                        chatPartner.deviceToken
                                     )
                                 )
                                 db.collection(CHATS).document(id).set(chat)
@@ -429,6 +508,7 @@ class MViewModel @Inject constructor(
         val time = Timestamp.now()
         val message = Message(messageId, MESSAGE_TEXT, userData.value?.userId, content, time)
         db.collection(CHATS).document(chatId).collection(MESSAGE).document(messageId).set(message)
+        onMessageChange(content)
     }
 
     fun onSendImage(chatId: String, imageUri: Uri) {
@@ -713,11 +793,6 @@ class MViewModel @Inject constructor(
         updateMessage(chatId, message)
     }
 
-    fun editMessage(chatId: String, message: Message, content: String) {
-        message.isEdited = true
-        updateMessage(chatId, message, content)
-    }
-
     fun getChatPhotos(photoList: MutableList<String>) {
         for (message in chatMessages.value) {
             if (message.type == MESSAGE_IMAGE) {
@@ -801,13 +876,8 @@ class MViewModel @Inject constructor(
                 }
             }
         }
-
-
     }
 
-    fun acceptChatRequest() {
-
-    }
 
     fun populateMyRequests() {
         db.collection(CHAT_REQUESTS).whereEqualTo("$REQUESTER.$USERID", userData.value?.userId)
@@ -878,5 +948,103 @@ class MViewModel @Inject constructor(
             handleException(customMessage = "onAcceptRequest: ${chatRequest.requester.userId} to ${chatRequest.requestee?.userId} failed")
         }
     }
-}
 
+    fun proceedService(userID: String, chatID: String, chatuserID: String, context: Context) {
+        val userId = userID
+        val userToken = tokenGenerate(userId)
+        val callId = chatID
+        val user = User(
+            id = userId,
+            name = userId
+        )
+
+        StreamVideo.removeClient()
+        val client = StreamVideoBuilder(
+            context = context,
+            apiKey = "zecrkhvczah3",
+            geo = GEO.GlobalEdgeNetwork,
+            user = user,
+            token = userToken!!,
+            loggingLevel = LoggingLevel(priority = Priority.DEBUG)
+        ).build()
+
+        members = listOf(userID, chatuserID)
+        call = client.call("default", callId)
+        Log.d("TAG", "Done")
+
+    }
+
+    private fun tokenGenerate(
+        userId: String
+    ): String? {
+        val algorithm =
+            Algorithm.HMAC256("52pr5gfwf725q42ygr3uvndybxyxu7kghz4z375jkgnta9puvc3ywkkwk75vphyh")
+
+        return JWT.create()
+            .withIssuer("example.com")
+            .withClaim("user_id", userId)
+//            .withExpiresAt(Date(System.currentTimeMillis() + 3600000)) // Token expires in 1 hour
+            .sign(algorithm)
+    }
+
+
+    init {
+        viewModelScope.launch {
+            Firebase.messaging.subscribeToTopic("chat").await()
+        }
+    }
+
+    fun onRemoteTokenChange(newToken: String) {
+        state = state.copy(
+            remoteToken = newToken
+        )
+    }
+
+    fun sendMessage(isBroadcast: Boolean, title: String, type: String, context: Context) {
+        val messageText: String
+        if (type == "1") {
+            messageText = state.messageText
+        } else if (type == "2") {
+            messageText = context.getString(R.string.there_is_video_call_for_you)
+        } else {
+            messageText = context.getString(R.string.there_is_audio_call_for_you)
+        }
+        viewModelScope.launch {
+            val messageDto = SendMessageDto(
+                to = if (isBroadcast) null else state.remoteToken,
+                notification = NotificationBody(
+                    title = title,
+                    body = messageText
+                )
+            )
+            Log.d("name", messageDto.notification.title)
+            Log.d("text", messageDto.notification.body)
+            Log.d("token", messageDto.to.toString())
+            try {
+                if (isBroadcast) {
+
+                } else {
+                    api.sendMessage(messageDto)
+                }
+
+                state = state.copy(
+                    messageText = ""
+                )
+            } catch (e: HttpException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getChatId(userId: String): String? {
+        for (chat in chats.value) {
+            if (chat.user1.userId == userId || chat.user2.userId == userId) {
+                return chat.chatId
+            }
+        }
+        return null
+    }
+    //hi
+}

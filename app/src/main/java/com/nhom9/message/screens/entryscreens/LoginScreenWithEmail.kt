@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import com.nhom9.message.CheckSignedIn
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.MViewModel
@@ -49,6 +52,7 @@ import com.nhom9.message.R
 import com.nhom9.message.ui.theme.md_theme_light_onPrimaryContainer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: MViewModel) {
@@ -65,6 +69,7 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val clipboardManager = LocalClipboardManager.current
     CheckSignedIn(viewModel, navController)
 
     Scaffold { padding ->
@@ -179,7 +184,7 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                     }
                     if (loginFailed.value) {
                         Text(
-                            text = "Please check your login information again",
+                            text = stringResource(R.string.please_check_your_login_information_again),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(top = 8.dp)
                         )
@@ -189,14 +194,19 @@ fun LoginScreen(navController: NavController, viewModel: MViewModel) {
                             if (emailState.value.text.isEmpty() || passwordState.value.text.isEmpty()
                             ) {
                                 Toast.makeText(
-                                    context, "Please fill in all fields!", Toast.LENGTH_SHORT
+                                    context,
+                                    context.getString(R.string.please_fill_in_all_fields), Toast.LENGTH_SHORT
                                 ).show()
                             } else {
-                                viewModel.logIn(emailState.value.text, passwordState.value.text) {
-                                    scope.launch {
-                                        loginFailed.value = true
-                                        delay(5000)
-                                        loginFailed.value = false
+                                scope.launch {
+                                    val localToken = Firebase.messaging.token.await()
+                                    //clipboardManager.setText(AnnotatedString(localToken))
+                                    viewModel.logIn(emailState.value.text, passwordState.value.text, localToken) {
+                                        scope.launch {
+                                            loginFailed.value = true
+                                            delay(5000)
+                                            loginFailed.value = false
+                                        }
                                     }
                                 }
                             }

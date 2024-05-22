@@ -12,10 +12,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.nhom9.message.CommonProgressbar
 import com.nhom9.message.MViewModel
+import com.nhom9.message.R
 import com.nhom9.message.TitleBarWithBackAndRightButton
 
 @Composable
@@ -33,11 +35,12 @@ fun EditNameScreen(navController: NavController, viewModel: MViewModel){
             viewModel.updateName(name = name)
         }
         Column {
-            TitleBarWithBackAndRightButton(navController, "Edit Name", "Save", onButtonClick)
+            TitleBarWithBackAndRightButton(navController,
+                stringResource(R.string.edit_name), stringResource(R.string.save), onButtonClick)
             Column(modifier  =Modifier.padding(8.dp)) {
 
                 OutlinedTextField(value = name, onValueChange = {name = it}, modifier = Modifier.fillMaxWidth())
-                Text(text = "Choose a good name for yourself!", color = Color.LightGray, modifier = Modifier.padding(top = 8.dp))
+                Text(text = stringResource(R.string.choose_a_good_name_for_yourself), color = Color.LightGray, modifier = Modifier.padding(top = 8.dp))
             }
         }
 

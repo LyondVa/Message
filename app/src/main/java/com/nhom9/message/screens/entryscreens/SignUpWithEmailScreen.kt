@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavController
 import com.nhom9.message.CheckSignedIn
 import com.nhom9.message.CommonProgressbar
@@ -86,7 +88,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Sign Up",
+                text = stringResource(id = R.string.sign_up),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
                 color = md_theme_light_onPrimaryContainer,
@@ -118,7 +120,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                     },
                     label = {
                         Text(
-                            text = "Name",
+                            text = stringResource(R.string.name),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -149,7 +151,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                     },
                     label = {
                         Text(
-                            text = "Phone number",
+                            text = stringResource(R.string.phone_number),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -179,7 +181,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                     },
                     label = {
                         Text(
-                            text = "Email",
+                            text = stringResource(R.string.email),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -209,7 +211,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
                     },
                     label = {
                         Text(
-                            text = "Password",
+                            text = stringResource(R.string.password),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -231,7 +233,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             }
             if (signupFailed.value) {
                 Text(
-                    text = "This number has already been registered",
+                    text = stringResource(R.string.this_number_has_already_been_registered),
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -239,7 +241,11 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             Button(
                 onClick = {
                     if (emailState.value.text.isEmpty() || passwordState.value.text.isEmpty() || nameState.value.text.isEmpty() || phoneNumberState.value.text.isEmpty()) {
-                        Toast.makeText(context, "PLease fill in all fields", Toast.LENGTH_SHORT)
+                        Toast.makeText(
+                            context,
+                            getString(context, R.string.please_fill_in_all_fields),
+                            Toast.LENGTH_SHORT
+                        )
                             .show()
                     } else if (imageUrl.value != "") {
                         viewModel.uploadImage(Uri.parse(imageUrl.value)) {
@@ -266,7 +272,7 @@ fun SignUpScreen(navController: NavController, viewModel: MViewModel) {
             ) {
 
                 Text(
-                    text = "Sign Up",
+                    text = stringResource(id = R.string.sign_up),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

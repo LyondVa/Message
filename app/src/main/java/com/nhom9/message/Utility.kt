@@ -12,18 +12,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material3.Button
@@ -35,11 +33,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +44,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -108,7 +103,7 @@ fun CommonImage(
 
 @Composable
 fun CheckSignedIn(viewModel: MViewModel, navController: NavController) {
-    var alreadySignedIn = remember { mutableStateOf(false) }
+    val alreadySignedIn = remember { mutableStateOf(false) }
     val signIn = viewModel.signIn.value
     if (signIn && !alreadySignedIn.value) {
         alreadySignedIn.value = true
@@ -147,7 +142,7 @@ fun TitleBarWithBack(navController: NavController, text: String) {
             modifier = Modifier.align(Alignment.CenterStart),
             onClick = { navController.popBackStack() }
         ) {
-            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
+            Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
         }
         Text(
             text = text,
@@ -177,7 +172,7 @@ fun TitleBarWithBackAndRightButton(
             modifier = Modifier.align(Alignment.CenterStart),
             onClick = { navController.popBackStack() }
         ) {
-            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
+            Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
         }
         Text(
             text = text,
@@ -222,7 +217,7 @@ fun TitleBarWithBackAndRightIcon(
             modifier = Modifier
                 .align(Alignment.CenterStart)
         ) {
-            Icon(imageVector = Icons.Outlined.ArrowBack, contentDescription = null)
+            Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = null)
         }
         Text(
             text = text,
@@ -339,46 +334,33 @@ fun CommonSubSettingRow(
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
-            Icon(imageVector = Icons.Outlined.KeyboardArrowRight, contentDescription = null)
+            Icon(imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null)
         }
     }
 }
 
 @Composable
-fun CallBox() {
+fun CallBox(onAudioCallClick: () -> Unit, onVideoCallClick: () -> Unit, onNotifyVideoCall: () -> Unit, onNotifyAudioCall: () -> Unit) {
     Row {
         IconButton(
-            onClick = {}
+            onClick = {onAudioCallClick.invoke()
+            onNotifyAudioCall.invoke()}
         ) {
             Icon(imageVector = Icons.Outlined.Phone, contentDescription = null)
         }
         IconButton(
-            onClick = {}
+            onClick = {onVideoCallClick.invoke()
+            onNotifyVideoCall.invoke()}
         ) {
             Icon(painterResource(id = R.drawable.outline_video_call_24), contentDescription = null)
         }
     }
 }
 
-@Composable
-fun Spacer(space: Int = 16) {
-    Box(Modifier.padding(space.dp))
-}
 
 fun getTimeFromTimestamp(timestamp: Timestamp): String {
     val time = timestamp.toDate().toString()
     return time.substring(11, 16)
-}
-
-fun getDateFromTimestamp(timestamp: Timestamp): String {
-    val time = timestamp.toDate().toString()
-    return time.substring(4, 9)
-}
-
-@Composable
-fun keyboardAsState(): State<Boolean> {
-    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    return rememberUpdatedState(isImeVisible)
 }
 
 @Composable

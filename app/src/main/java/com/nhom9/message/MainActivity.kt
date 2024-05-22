@@ -1,5 +1,8 @@
 package com.nhom9.message
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,11 +12,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nhom9.message.data.USERID
+import com.nhom9.message.screens.AudioCallScreen
+import com.nhom9.message.screens.CallScreen
 import com.nhom9.message.screens.ProfileScreen
 import com.nhom9.message.screens.chatrequestscreen.ChatRequestScreen
 import com.nhom9.message.screens.chatrequestscreen.UserProfileScreen
@@ -37,7 +44,6 @@ import com.nhom9.message.screens.subsettingscreens.PrivacyAndSecuritySettingScre
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditNameScreen
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditPhoneNumberScreen
 import com.nhom9.message.screens.subsettingscreens.accountsettingsubscreens.EditProfileImageScreen
-import com.nhom9.message.screens.subsettingscreens.displaysettingsubscreens.ChangeLanguageScreen
 import com.nhom9.message.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -65,6 +71,9 @@ sealed class DestinationScreen(var route: String) {
     data object EditName : DestinationScreen(route = "editName")
     data object EditPhoneNumber : DestinationScreen(route = "editPhoneNumber")
     data object EditProfileImage : DestinationScreen(route = "editProfileImage")
+
+    data object VideoCall : DestinationScreen(route = "callScreen")
+    data object AudioCall : DestinationScreen(route = "callScreen")
     data object ChatProfile : DestinationScreen(route = "chatProfile/{userId}") {
         fun createRoute(userId: String) = "chatProfile/$userId"
     }
@@ -96,6 +105,7 @@ sealed class DestinationScreen(var route: String) {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestNotificationPermission()
         setContent {
             val viewModel: MViewModel = hiltViewModel()
             val isDarkTheme = viewModel.isDarkTheme
@@ -135,6 +145,12 @@ class MainActivity : ComponentActivity() {
                 chatId?.let {
                     SingleChatScreen(navController, viewModel, chatId)
                 }
+            }
+            composable(DestinationScreen.VideoCall.route){
+                CallScreen(navController, viewModel)
+            }
+            composable(DestinationScreen.AudioCall.route){
+                AudioCallScreen(navController, viewModel)
             }
             composable(DestinationScreen.StatusList.route) {
                 StatusScreen(navController, viewModel)
@@ -181,9 +197,6 @@ class MainActivity : ComponentActivity() {
                     ChatImageScreen(navController, imageUrl)
                 }
             }
-            composable(DestinationScreen.ChangeLanguage.route) {
-                ChangeLanguageScreen(navController, viewModel)
-            }
             composable(DestinationScreen.Report.route) {
                 val userId = it.arguments?.getString("userId")
                 userId?.let {
@@ -215,4 +228,22 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun requestNotificationPermission() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if(!hasPermission) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0
+                )
+            }
+        }
+    }
+
 }

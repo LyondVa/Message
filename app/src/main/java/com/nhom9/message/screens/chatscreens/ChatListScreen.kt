@@ -252,20 +252,20 @@ fun FAB(
                 ) {
                     OutlinedTextField(
                         value = addChatNumber.value,
-                        label = { Text(text = "Phone Number") },
+                        label = { Text(text = stringResource(id = R.string.phone_number)) },
                         onValueChange = { addChatNumber.value = it },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                     if (enteredOwnPhoneNumber) {
                         Text(
-                            text = "Please enter another number",
+                            text = stringResource(R.string.please_enter_another_number),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                     if (enteredNothing) {
                         Text(
-                            text = "Please enter a phone number",
+                            text = stringResource(R.string.please_enter_a_phone_number),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(top = 8.dp)
                         )

@@ -1,6 +1,7 @@
 package com.nhom9.message.screens.chatscreens
 
 import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.BackHandler
@@ -21,9 +22,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.Send
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -48,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -79,6 +81,7 @@ import java.nio.charset.StandardCharsets
 
 @Composable
 fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId: String) {
+    val context = LocalContext.current
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
@@ -121,6 +124,16 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         )
     }
 
+    val onVideoCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser.name.toString(), context)
+        navigateTo(navController, DestinationScreen.VideoCall.route)
+    }
+
+    val onAudioCall = {
+        viewModel.proceedService(myUser?.name.toString(), chatId, chatUser.name.toString(), context)
+        navigateTo(navController, DestinationScreen.AudioCall.route)
+    }
+
     val onSendAudio: (String, StorageMetadata) -> Unit = { string, metadata ->
         viewModel.onSendAudio(chatId, metadata, Uri.parse(string))
     }
@@ -133,6 +146,36 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     val onMessageDelete: (Message) -> Unit = {
         viewModel.deleteMessage(chatId, it)
     }
+    val onMessageSend = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(
+            isBroadcast = false,
+            myUser?.name.toString(),
+            context = context,
+            type = "1"
+        )
+    }
+
+    val onNotifyVideoCall = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(
+            isBroadcast = false,
+            myUser?.name.toString(),
+            context = context,
+            type = "2"
+        )
+    }
+
+    val onNotifyAudioCall = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(
+            isBroadcast = false,
+            myUser?.name.toString(),
+            context = context,
+            type = "3"
+        )
+    }
+
     LaunchedEffect(key1 = Unit) {
         viewModel.populateMessages(chatId)
     }
@@ -146,7 +189,11 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
         ChatHeader(
             name = chatUser.name ?: "",
             imageUrl = chatUser.imageUrl ?: "",
-            onHeaderClick = onHeaderClick
+            onHeaderClick = onHeaderClick,
+            onAudioCallClick = onAudioCall,
+            onVideoCallClick = onVideoCall,
+            onNotifyVideoCall = onNotifyVideoCall,
+            onNotifyAudioCall = onNotifyAudioCall
         ) {
             viewModel.depopulateMessages()
             navController.popBackStack()
@@ -168,6 +215,7 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
                 onReplyChange = { reply = it },
                 onSendReply = onSendReply,
                 onImageClick = onImageClick,
+                onMessageSend = onMessageSend
             )
         } else {
             RecordBar(onRecordChange, onSendAudio)
@@ -227,7 +275,7 @@ fun DeletedMessage(
                     modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                 )
                 Text(
-                    text = "Message Deleted",
+                    text = stringResource(R.string.message_deleted),
                     color = md_theme_light_onPrimaryContainer,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
@@ -235,7 +283,7 @@ fun DeletedMessage(
                 )
             } else {
                 Text(
-                    text = "Message Deleted",
+                    text = stringResource(R.string.message_deleted),
                     color = md_theme_light_onPrimaryContainer,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
@@ -317,7 +365,8 @@ fun Message(
     var mDisplayMenu by remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.Bottom,
-        modifier = Modifier.padding(4.dp)
+        modifier = Modifier
+            .padding(4.dp)
             .background(
                 color, MaterialTheme.shapes.medium
             )
@@ -355,7 +404,7 @@ fun Message(
         DropdownMenuItem(
             {
                 Text(
-                    text = "Delete",
+                    text = stringResource(R.string.delete),
                     style = MaterialTheme.typography.labelMedium
                 )
             },
@@ -373,6 +422,10 @@ fun ChatHeader(
     name: String,
     imageUrl: String,
     onHeaderClick: () -> Unit,
+    onAudioCallClick: () -> Unit,
+    onVideoCallClick: () -> Unit,
+    onNotifyVideoCall: () -> Unit,
+    onNotifyAudioCall: () -> Unit,
     onBackClick: () -> Unit
 ) {
     Row(
@@ -382,14 +435,14 @@ fun ChatHeader(
             .fillMaxWidth()
     ) {
         IconButton(onClick = { onBackClick.invoke() }) {
-            Icon(Icons.Rounded.ArrowBack, contentDescription = null)
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
         }
         ProfileBox(name,
             imageUrl,
             modifier = Modifier
                 .weight(1f)
                 .clickable { onHeaderClick.invoke() })
-        CallBox()
+        CallBox(onAudioCallClick, onVideoCallClick, onNotifyVideoCall, onNotifyAudioCall)
     }
 }
 
@@ -401,8 +454,10 @@ fun ReplyBox(
     onRecordStart: (Boolean) -> Unit,
     onReplyChange: (String) -> Unit,
     onSendReply: () -> Unit,
-    onImageClick: () -> Unit
+    onImageClick: () -> Unit,
+    onMessageSend: () -> Unit
 ) {
+    val context = LocalContext.current
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -415,7 +470,11 @@ fun ReplyBox(
                 .padding(8.dp)
         ) {
             IconButton(onClick = {
-                if (permissionState.hasPermission) {
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
                     onRecordStart.invoke(true)
                 } else {
                     permissionState.launchPermissionRequest()
@@ -434,15 +493,15 @@ fun ReplyBox(
                 onValueChange = onReplyChange,
                 maxLines = 3,
                 modifier = Modifier
-                    .height(40.dp)
                     .weight(0.1f)
             )
             IconButton(onClick = {
                 if (reply != "") {
                     onSendReply.invoke()
+                    onMessageSend.invoke()
                 }
             }) {
-                Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
+                Icon(imageVector = Icons.AutoMirrored.Outlined.Send, contentDescription = null)
             }
         }
     }
@@ -510,7 +569,7 @@ fun RecordBar(onRecordStop: (Boolean) -> Unit, onSendAudio: (String, StorageMeta
             onSendAudio.invoke(audioFile.toURI().toString(), metadata)
             onRecordStop.invoke(false)
         }) {
-            Icon(imageVector = Icons.Outlined.Send, contentDescription = null)
+            Icon(imageVector = Icons.AutoMirrored.Outlined.Send, contentDescription = null)
         }
     }
 }
