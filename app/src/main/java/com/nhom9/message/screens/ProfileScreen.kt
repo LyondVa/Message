@@ -208,7 +208,7 @@ fun SettingCard(
                 navigateTo(navController, DestinationScreen.AccountSetting.route)
             }
             CommonDivider(0)
-            SwitchRow(title = "Dark Mode", isChecked = isDarkTheme.value) {
+            SwitchRow(title = stringResource(id = R.string.dark_mode), isChecked = isDarkTheme.value) {
                 isDarkTheme.value = it
             }
             CommonDivider(0)/*

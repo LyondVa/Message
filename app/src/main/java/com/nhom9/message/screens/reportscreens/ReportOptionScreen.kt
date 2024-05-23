@@ -28,6 +28,7 @@ import com.nhom9.message.MViewModel
 import com.nhom9.message.R
 import com.nhom9.message.TitleBarWithBack
 import com.nhom9.message.data.ReportOption
+import java.util.Locale
 
 
 @Composable
@@ -48,7 +49,7 @@ fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, repo
                 .height(60.dp)
         ) {
             Text(
-                text = reportOption.title,
+                text = reportOption.getTranslatedTitle(Locale.getDefault()),
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(start = 20.dp)
             )
@@ -65,9 +66,9 @@ fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, repo
                 modifier = Modifier.padding(start = 20.dp)
             )
         }
-        CommonBaseRow(text = reportOption.text1)
-        CommonBaseRow(text = reportOption.text2)
-        CommonBaseRow(text = reportOption.text3)
+        CommonBaseRow(text = reportOption.getTranslatedText1(Locale.getDefault()))
+        CommonBaseRow(text = reportOption.getTranslatedText2(Locale.getDefault()))
+        CommonBaseRow(text = reportOption.getTranslatedText3(Locale.getDefault()))
         OutlinedTextField(
             value = reportContent.value,
             onValueChange = { reportContent.value = it },
@@ -87,11 +88,13 @@ fun ReportOptionScreen(navController: NavController, viewModel: MViewModel, repo
                     if (reportContent.value != "") {
                         viewModel.reportUser(userId, reportOption.title, reportContent.value)
                         Toast.makeText(
-                            context, "Thank you for submitting a report", Toast.LENGTH_SHORT
+                            context,
+                            context.getString(R.string.thank_you_for_submitting_a_report), Toast.LENGTH_SHORT
                         ).show()
                         navController.popBackStack(nav!!, true)
                     } else {
-                        Toast.makeText(context, "Please state your reasoning", Toast.LENGTH_SHORT)
+                        Toast.makeText(context,
+                            context.getString(R.string.please_state_your_reasoning), Toast.LENGTH_SHORT)
                             .show()
                     }
                 }, modifier = Modifier

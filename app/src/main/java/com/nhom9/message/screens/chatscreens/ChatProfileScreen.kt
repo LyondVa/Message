@@ -80,7 +80,7 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
         }
         navigateTo(navController, DestinationScreen.AudioCall.route)
     }
-    val launchCheck = rememberSaveable {
+    val launchCheck = remember {
         mutableStateOf(true)
     }
     val onMessageImageClick: (String) -> Unit = {
