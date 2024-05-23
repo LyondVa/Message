@@ -62,4 +62,6 @@
     <string name="dark_mode">Chế độ tối</string>
     <string name="there_is_video_call_for_you">Có một cuộc gọi video cho bạn</string>
     <string name="there_is_audio_call_for_you">Có một cuộc gọi thoại cho bạn</string>
+    <string name="sent_image">Đã gửi một ảnh</string>
+    <string name="sent_record">Đã gửi đoạn ghi âm</string>
 </resources>

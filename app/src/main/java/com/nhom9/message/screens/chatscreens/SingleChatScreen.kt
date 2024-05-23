@@ -148,8 +148,9 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     }
     val onMessageSend = {
         viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        Log.d("chatusername", chatUser.name.toString())
+        Log.d("chatusertoken", chatUser.deviceToken.toString())
         viewModel.sendMessage(
-            isBroadcast = false,
             myUser?.name.toString(),
             context = context,
             type = "1"
@@ -159,7 +160,6 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     val onNotifyVideoCall = {
         viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
         viewModel.sendMessage(
-            isBroadcast = false,
             myUser?.name.toString(),
             context = context,
             type = "2"
@@ -169,10 +169,27 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
     val onNotifyAudioCall = {
         viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
         viewModel.sendMessage(
-            isBroadcast = false,
             myUser?.name.toString(),
             context = context,
             type = "3"
+        )
+    }
+
+    val onNotifySendRecord = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(
+            myUser?.name.toString(),
+            context = context,
+            type = "4"
+        )
+    }
+
+    val onNotifySendImage = {
+        viewModel.onRemoteTokenChange(chatUser.deviceToken.toString())
+        viewModel.sendMessage(
+            myUser?.name.toString(),
+            context = context,
+            type = "5"
         )
     }
 
@@ -215,7 +232,9 @@ fun SingleChatScreen(navController: NavController, viewModel: MViewModel, chatId
                 onReplyChange = { reply = it },
                 onSendReply = onSendReply,
                 onImageClick = onImageClick,
-                onMessageSend = onMessageSend
+                onMessageSend = onMessageSend,
+                onNotifySendRecord = onNotifySendRecord,
+                onNotifySendImage = onNotifySendImage
             )
         } else {
             RecordBar(onRecordChange, onSendAudio)
@@ -455,7 +474,9 @@ fun ReplyBox(
     onReplyChange: (String) -> Unit,
     onSendReply: () -> Unit,
     onImageClick: () -> Unit,
-    onMessageSend: () -> Unit
+    onMessageSend: () -> Unit,
+    onNotifySendRecord: () -> Unit,
+    onNotifySendImage: () -> Unit
 ) {
     val context = LocalContext.current
     val permissionState = rememberPermissionState(permission = Manifest.permission.RECORD_AUDIO)
@@ -476,13 +497,15 @@ fun ReplyBox(
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
                     onRecordStart.invoke(true)
+                    onNotifySendRecord.invoke()
                 } else {
                     permissionState.launchPermissionRequest()
                 }
             }) {
                 Icon(painterResource(id = R.drawable.outline_mic_24), contentDescription = null)
             }
-            IconButton(onClick = { onImageClick.invoke() }) {
+            IconButton(onClick = { onImageClick.invoke()
+            onNotifySendImage.invoke()}) {
                 Icon(
                     painterResource(id = R.drawable.outline_image_24),
                     contentDescription = null

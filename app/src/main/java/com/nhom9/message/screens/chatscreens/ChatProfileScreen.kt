@@ -96,14 +96,14 @@ fun ChatProfileScreen(navController: NavController, viewModel: MViewModel, userI
     val onNotifyVideoCall = {
         viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
         viewModel.sendMessage(
-            isBroadcast = false, myUser?.name.toString(), context = context, type = "2"
+            myUser?.name.toString(), context = context, type = "2"
         )
     }
 
     val onNotifyAudioCall = {
         viewModel.onRemoteTokenChange(chatUser?.deviceToken.toString())
         viewModel.sendMessage(
-            isBroadcast = false, myUser?.name.toString(), context = context, type = "3"
+            myUser?.name.toString(), context = context, type = "3"
         )
     }
     LaunchedEffect(key1 = launchCheck) {

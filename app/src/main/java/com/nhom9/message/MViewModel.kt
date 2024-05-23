@@ -123,15 +123,6 @@ class MViewModel @Inject constructor(
         )
     }
 
-    fun getNotificationState() {
-        userData.value?.userId?.let {
-            db.collection(USER_NODE).document(it).get().addOnSuccessListener {
-                val token = it.data?.get("token")
-                enableNotification.value = token != ""
-            }
-        }
-    }
-
     fun signUpWithPhoneNumber(
         otp: String,
         name: String,
@@ -1010,18 +1001,22 @@ class MViewModel @Inject constructor(
         )
     }
 
-    fun sendMessage(isBroadcast: Boolean, title: String, type: String, context: Context) {
+    fun sendMessage(title: String, type: String, context: Context) {
         val messageText: String
         if (type == "1") {
             messageText = state.messageText
         } else if (type == "2") {
             messageText = context.getString(R.string.there_is_video_call_for_you)
-        } else {
+        } else if (type == "3"){
             messageText = context.getString(R.string.there_is_audio_call_for_you)
+        } else if (type == "4"){
+            messageText = context.getString(R.string.sent_record)
+        } else {
+            messageText = context.getString(R.string.sent_image)
         }
         viewModelScope.launch {
             val messageDto = SendMessageDto(
-                to = if (isBroadcast) null else state.remoteToken,
+                to = state.remoteToken,
                 notification = NotificationBody(
                     title = title,
                     body = messageText
@@ -1031,12 +1026,7 @@ class MViewModel @Inject constructor(
             Log.d("text", messageDto.notification.body)
             Log.d("token", messageDto.to.toString())
             try {
-                if (isBroadcast) {
-
-                } else {
-                    api.sendMessage(messageDto)
-                }
-
+                 api.sendMessage(messageDto)
                 state = state.copy(
                     messageText = ""
                 )
@@ -1057,5 +1047,4 @@ class MViewModel @Inject constructor(
         return null
     }
     //hi
-
 }

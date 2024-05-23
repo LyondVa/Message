@@ -24,6 +24,15 @@ import io.getstream.video.android.core.call.state.ToggleMicrophone
 import io.getstream.video.android.core.call.state.ToggleSpeakerphone
 import kotlinx.coroutines.launch
 import android.app.Activity
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import io.getstream.video.android.compose.ui.components.call.controls.actions.FlipCameraAction
+import io.getstream.video.android.compose.ui.components.call.controls.actions.LeaveCallAction
+import io.getstream.video.android.compose.ui.components.call.controls.actions.ToggleCameraAction
+import io.getstream.video.android.compose.ui.components.call.controls.actions.ToggleMicrophoneAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -34,6 +43,15 @@ fun CallScreen(navController: NavController, MViewModel: MViewModel) {
     val context = LocalContext.current
     val call = MViewModel.call
     val members = MViewModel.members
+    val onEndCall = {
+        scope.launch {
+            call.end()
+        }
+        navController.popBackStack()
+    }
+    val onBackPressed = {
+        navController.popBackStack()
+    }
     Log.d("TAG", "Done")
 
     LaunchCallPermissions(
@@ -47,7 +65,6 @@ fun CallScreen(navController: NavController, MViewModel: MViewModel) {
             }
         }
     )
-
     VideoTheme{
         val onCallAction: (CallAction) -> Unit = { callAction ->
             when (callAction) {
@@ -55,26 +72,14 @@ fun CallScreen(navController: NavController, MViewModel: MViewModel) {
                 is ToggleMicrophone -> call.microphone.setEnabled(callAction.isEnabled)
                 is ToggleSpeakerphone -> call.speaker.setEnabled(callAction.isEnabled)
                 is FlipCamera -> call.camera.flip()
-                is LeaveCall -> navController.popBackStack()
-                else -> Unit
+                is LeaveCall -> onEndCall.invoke()
+                else -> onBackPressed.invoke()
             }
         }
-        RingingCallContent(
-            modifier = Modifier.background(color = VideoTheme.colors.brandRed),
+        CallContent(
+            modifier = Modifier.fillMaxSize(),
             call = call,
-//                onBackPressed = { finish() },
-            isVideoType = true,
-            onAcceptedContent = {
-                CallContent(
-                    modifier = Modifier.fillMaxSize(),
-                    call = call,
-                    onBackPressed = {navController.popBackStack()},
-                    onCallAction = onCallAction
-                )
-            },
-            onRejectedContent = {
-                // do something when a call is rejected
-            },
+            onBackPressed = {onBackPressed.invoke()},
             onCallAction = onCallAction
         )
     }
