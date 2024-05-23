@@ -24,6 +24,7 @@ import com.google.firebase.firestore.toObjects
 import com.google.firebase.messaging.messaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageMetadata
+import com.nhom9.message.R.string.sent_record
 import com.nhom9.message.authentication.PhoneAuthentication
 import com.nhom9.message.data.BLOCKED_CHATS
 import com.nhom9.message.data.BlockedChats
@@ -1010,7 +1011,7 @@ class MViewModel @Inject constructor(
         } else if (type == "3"){
             messageText = context.getString(R.string.there_is_audio_call_for_you)
         } else if (type == "4"){
-            messageText = context.getString(R.string.sent_record)
+            messageText = context.getString(sent_record)
         } else {
             messageText = context.getString(R.string.sent_image)
         }

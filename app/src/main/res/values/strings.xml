@@ -66,4 +66,6 @@
     <string name="there_is_audio_call_for_you">there is an audio call for you</string>
     <string name="thank_you_for_submitting_a_report">Thank you for submitting a report</string>
     <string name="please_state_your_reasoning">Please state your reasoning</string>
+    <string name="sent_image">A message has been sent</string>
+    <string name="sent_record">A recording has been sent</string>
 </resources>
